@@ -4,8 +4,12 @@ name: Lint examples
 # at the repo root (package.json, composer.json, Cargo.toml, Package.swift,
 # cs-zerosmtp.csproj, pom.xml, build.gradle.kts) that point at the relevant
 # single-file example. The Swift job is best-effort (continue-on-error):
-# its Package.swift target layout and the setup-swift action could not be
-# verified against a local Swift toolchain when this workflow was written.
+# our own Package.swift/swift-zerosmtp.swift resolve and start building
+# fine, but a transitive dependency of Kitura/Swift-SMTP (BlueSSLService)
+# fails to compile against the OpenSSL version on current Ubuntu runners
+# (SSL_get_peer_certificate was removed/renamed upstream). That's an
+# unmaintained-library problem, not something fixable in this repo without
+# replacing the Swift-SMTP dependency itself.
 
 on:
   push:
