@@ -1,0 +1,106 @@
+name: Lint examples
+
+# Syntax-checks every example script on push/PR. Scope note: C#, Java,
+# Kotlin, Rust, and Swift examples depend on third-party mail libraries
+# (MailKit, Jakarta Mail, lettre, Swift-SMTP) and ship as single files
+# without a build manifest (no .csproj/pom.xml/Cargo.toml/Package.swift),
+# so a meaningful compile isn't possible here without vendoring those
+# dependencies. Their syntax should be checked manually on review.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  bash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax-check bash scripts
+        run: |
+          set -e
+          for f in bash-curl-zerosmtp.sh bash-swaks-zerosmtp.sh; do
+            echo "Checking $f"
+            bash -n "$f"
+          done
+
+  powershell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax-check PowerShell scripts
+        shell: pwsh
+        run: |
+          $files = @('pwsh-zerosmtp.ps1', 'SendEmailTest_mail-tester.com.ps1')
+          $failed = $false
+          foreach ($f in $files) {
+            Write-Host "Checking $f"
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f), [ref]$null, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              foreach ($e in $errors) {
+                Write-Host "::error file=$f,line=$($e.Extent.StartLineNumber)::$($e.Message)"
+              }
+            }
+          }
+          if ($failed) { exit 1 }
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Syntax-check Python script
+        run: python -m py_compile python-zerosmtp.py
+
+  ruby:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      - name: Syntax-check Ruby script
+        run: ruby -c ruby-zerosmtp.rb
+
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - name: Syntax-check PHP scripts
+        run: |
+          php -l php-zerosmtp.php
+          php -l php-symfony-mailer-zerosmtp.php
+
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Build Go example (stdlib only, no external deps)
+        run: go build -o /tmp/go-zerosmtp go-zerosmtp.go
+
+  node-and-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check Node.js example
+        run: node --check node-zerosmtp.mjs
+      - name: Install TypeScript
+        run: npm install -g typescript
+      - name: Syntax-check TypeScript example
+        # --noResolve: check syntax/types within the file only, without
+        # requiring node_modules for the imported nodemailer package.
+        run: tsc --noEmit --noResolve --target es2022 --module esnext ts-zerosmtp.ts

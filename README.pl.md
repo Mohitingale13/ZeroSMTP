@@ -20,6 +20,34 @@ Idealne dla:
 
 Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md)
 
+## Przykłady kodu
+
+Gotowe do użycia przykłady dla `mx.msgwing.com:465` (SSL/TLS) lub `:587`
+(STARTTLS), po jednym pliku na język:
+
+| Język | Plik |
+| --- | --- |
+| Python | [python-zerosmtp.py](python-zerosmtp.py) |
+| PHP (PHPMailer) | [php-zerosmtp.php](php-zerosmtp.php) |
+| PHP (Symfony Mailer) | [php-symfony-mailer-zerosmtp.php](php-symfony-mailer-zerosmtp.php) |
+| Node.js | [node-zerosmtp.mjs](node-zerosmtp.mjs) |
+| TypeScript | [ts-zerosmtp.ts](ts-zerosmtp.ts) |
+| Bash (curl) | [bash-curl-zerosmtp.sh](bash-curl-zerosmtp.sh) |
+| Bash (swaks) | [bash-swaks-zerosmtp.sh](bash-swaks-zerosmtp.sh) |
+| Java | [java-zerosmtp.java](java-zerosmtp.java) |
+| C# (.NET / MailKit) | [cs-zerosmtp.cs](cs-zerosmtp.cs) |
+| Go | [go-zerosmtp.go](go-zerosmtp.go) |
+| Ruby | [ruby-zerosmtp.rb](ruby-zerosmtp.rb) |
+| Rust | [rust-zerosmtp.rs](rust-zerosmtp.rs) |
+| Kotlin | [kotlin-zerosmtp.kt](kotlin-zerosmtp.kt) |
+| Swift | [swift-zerosmtp.swift](swift-zerosmtp.swift) |
+| PowerShell | [pwsh-zerosmtp.ps1](pwsh-zerosmtp.ps1) |
+
+Każdy przykład pobiera dane logowania ze zmiennych środowiskowych
+`ZEROSMTP_*` (`ZEROSMTP_USERNAME`, `ZEROSMTP_PASSWORD`, `ZEROSMTP_FROM`,
+`ZEROSMTP_TO`, `ZEROSMTP_SUBJECT`) — nigdy nie wpisuj prawdziwych danych na
+sztywno w skrypcie.
+
 Dane do konfiguracji:
 - Login: losowo wygenerowany adres @msgwing.com
 - Serwer SMTP: mx.msgwing.com
