@@ -3,10 +3,8 @@ name: Lint examples
 # Builds/syntax-checks every example on push/PR, using the manifest files
 # at the repo root (package.json, composer.json, Cargo.toml, Package.swift,
 # cs-zerosmtp.csproj, pom.xml, build.gradle.kts) that point at the relevant
-# single-file example. The Swift job stays continue-on-error for one more
-# run: it was switched from the unmaintained Kitura/Swift-SMTP (which failed
-# to build against current OpenSSL) to sersoft-gmbh/swift-smtp, but that
-# hasn't been confirmed green here yet — remove continue-on-error once it is.
+# single-file example. All 12 jobs are confirmed green as of the commit that
+# added this line.
 
 on:
   push:
@@ -151,7 +149,6 @@ jobs:
 
   swift:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: swift-actions/setup-swift@v2

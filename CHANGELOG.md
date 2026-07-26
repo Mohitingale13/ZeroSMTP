@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.3.0] - 2026-07-26
+
+All 12 CI jobs (one per language/script surface) are green as of this
+release — confirmed by actually running the workflow, not just by reading
+the code.
+
+### Changed
+- Replaced the unmaintained Kitura/Swift-SMTP dependency in
+  `swift-zerosmtp.swift` with `sersoft-gmbh/swift-smtp` (SwiftNIO-based,
+  actively maintained, async/await-native). Kitura's dependency chain
+  failed to compile against the OpenSSL version on current Linux — not
+  fixable from this repo.
+- `.github/workflows/lint.yml`: the `swift` job no longer needs
+  `continue-on-error`.
+
+### Fixed
+Found only by actually running each build in CI, not by review:
+- `java-zerosmtp.java`: two unreported checked exceptions
+  (`Thread.join()`'s `InterruptedException`, and the two-argument
+  `InternetAddress` constructor's `UnsupportedEncodingException`) — a
+  real compile error present since the file was first written.
+- `kotlin-zerosmtp.kt`: `createMultipartMessage` returned the base
+  `Message` type instead of `MimeMessage`, but the caller read
+  `.messageID`, which only `MimeMessage` exposes.
+- `.github/workflows/lint.yml`: the Kotlin job's pinned Gradle version
+  (8.10) was too old for the Kotlin Gradle plugin (2.4.x needs Gradle
+  9.6+); bumped to 9.6.1.
+- `swift-zerosmtp.swift`: two Swift 6 strict-concurrency errors —
+  `EventLoopGroup.syncShutdownGracefully()` called from an async
+  context, and touching the non-Sendable C `stderr` global via
+  `fputs`. Replaced with the async shutdown API and
+  `FileHandle.standardError`.
+- `Package.swift`: swift-smtp 2.17.0+ requires Swift tools-version 6.3,
+  which `swift-actions/setup-swift@v2` cannot install yet (max 6.2);
+  pinned to the exact last release built against 6.2 (`2.16.0`).
+
 ## [1.2.0] - 2026-07-26
 
 ### Added
