@@ -29,14 +29,22 @@ struct ZeroSMTPMailer {
         )
 
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        defer { try? group.syncShutdownGracefully() }
+        let result = await sendEmail(config: config, group: group)
+        // NOTE: shut down with the async API, not the synchronous
+        // syncShutdownGracefully() — calling that from an async context is
+        // a compile error under Swift 6's strict concurrency checking
+        // (it would block a cooperative-pool thread).
+        try? await group.shutdownGracefully()
 
-        switch await sendEmail(config: config, group: group) {
+        switch result {
         case .success:
             print("Email sent successfully")
             exit(0)
         case .failure(let error):
-            fputs("Error: \(error)\n", stderr)
+            // NOTE: FileHandle.standardError instead of fputs(..., stderr) —
+            // the C `stderr` global isn't Sendable, so Swift 6's strict
+            // concurrency checking rejects touching it from this context.
+            FileHandle.standardError.write(Data("Error: \(error)\n".utf8))
             exit(1)
         }
     }
