@@ -79,12 +79,14 @@ public static class ZeroSMTPMailer
 
     public static async Task Main(string[] args)
     {
+        // NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+        // reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
         var config = new EmailConfig(
-            Username: Environment.GetEnvironmentVariable("USERNAME") ?? "your-username",
-            Password: Environment.GetEnvironmentVariable("PASSWORD") ?? "your-password",
-            From: Environment.GetEnvironmentVariable("FROM") ?? "sender@example.com",
-            To: Environment.GetEnvironmentVariable("TO") ?? "recipient@example.com",
-            Subject: Environment.GetEnvironmentVariable("SUBJECT") ?? "Test Email from ZeroSMTP"
+            Username: Environment.GetEnvironmentVariable("ZEROSMTP_USERNAME") ?? "your-username",
+            Password: Environment.GetEnvironmentVariable("ZEROSMTP_PASSWORD") ?? "your-password",
+            From: Environment.GetEnvironmentVariable("ZEROSMTP_FROM") ?? "sender@example.com",
+            To: Environment.GetEnvironmentVariable("ZEROSMTP_TO") ?? "recipient@example.com",
+            Subject: Environment.GetEnvironmentVariable("ZEROSMTP_SUBJECT") ?? "Test Email from ZeroSMTP"
         );
         bool success = await SendEmailAsync(config);
         Environment.Exit(success ? 0 : 1);

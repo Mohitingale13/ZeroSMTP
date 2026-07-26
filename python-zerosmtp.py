@@ -68,12 +68,14 @@ def send_email_via_zerosmtp(
 
 
 if __name__ == '__main__':
+    # NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+    # reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
     config = {
-        'username': os.getenv('USERNAME', 'your-username'),
-        'password': os.getenv('PASSWORD', 'your-password'),
-        'from_addr': os.getenv('FROM', 'sender@example.com'),
-        'to_addr': os.getenv('TO', 'recipient@example.com'),
-        'subject': os.getenv('SUBJECT', 'Test Email from ZeroSMTP'),
+        'username': os.getenv('ZEROSMTP_USERNAME', 'your-username'),
+        'password': os.getenv('ZEROSMTP_PASSWORD', 'your-password'),
+        'from_addr': os.getenv('ZEROSMTP_FROM', 'sender@example.com'),
+        'to_addr': os.getenv('ZEROSMTP_TO', 'recipient@example.com'),
+        'subject': os.getenv('ZEROSMTP_SUBJECT', 'Test Email from ZeroSMTP'),
     }
     success = send_email_via_zerosmtp(**config)
     exit(0 if success else 1)

@@ -13,18 +13,20 @@ error_exit() {
 trap 'error_exit "Script interrupted"' INT TERM
 
 # Configuration
-USERNAME="${USERNAME:-your-username}"
-PASSWORD="${PASSWORD:-your-password}"
-FROM="${FROM:-sender@example.com}"
-TO="${TO:-recipient@example.com}"
-SUBJECT="${SUBJECT:-Test Email from ZeroSMTP}"
-BODY="${BODY:-Hello from ZeroSMTP! This is an email sent via mx.msgwing.com:465}"
+# NOTE: names are prefixed with ZEROSMTP_ to avoid colliding with
+# reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
+USERNAME="${ZEROSMTP_USERNAME:-your-username}"
+PASSWORD="${ZEROSMTP_PASSWORD:-your-password}"
+FROM="${ZEROSMTP_FROM:-sender@example.com}"
+TO="${ZEROSMTP_TO:-recipient@example.com}"
+SUBJECT="${ZEROSMTP_SUBJECT:-Test Email from ZeroSMTP}"
+BODY="${ZEROSMTP_BODY:-Hello from ZeroSMTP! This is an email sent via mx.msgwing.com:465}"
 
 # Validate
-[[ -z "$USERNAME" ]] && error_exit "USERNAME not set"
-[[ -z "$PASSWORD" ]] && error_exit "PASSWORD not set"
-[[ -z "$FROM" ]] && error_exit "FROM not set"
-[[ -z "$TO" ]] && error_exit "TO not set"
+[[ -z "$USERNAME" ]] && error_exit "ZEROSMTP_USERNAME not set"
+[[ -z "$PASSWORD" ]] && error_exit "ZEROSMTP_PASSWORD not set"
+[[ -z "$FROM" ]] && error_exit "ZEROSMTP_FROM not set"
+[[ -z "$TO" ]] && error_exit "ZEROSMTP_TO not set"
 
 # Check swaks availability
 command -v swaks >/dev/null 2>&1 || error_exit "swaks not found. Install with: apt-get install swaks"

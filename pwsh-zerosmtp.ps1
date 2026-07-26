@@ -2,16 +2,21 @@
 # pwsh-zerosmtp.ps1
 # ====================================================================
 # PowerShell SMTP Test Script - ZeroSMTP (msgwing.com)
-# 
+#
 # Features:
-#   - Port 587 (STARTTLS) - Recommended for PowerShell Send-MailMessage
+#   - Port 587 (STARTTLS), full TLS certificate validation via MailKit
 #   - Full parameter support via PSCredential
 #   - Environment variable fallback
 #   - Production-ready error handling
-#   - TLS 1.2+ security enforcement
+#
+# SECURITY NOTE: this script uses the Send-MailKitMessage module instead of
+# the built-in Send-MailMessage cmdlet. Send-MailMessage is marked Obsolete
+# by Microsoft ("This cmdlet does not guarantee secure connections to SMTP
+# servers.") and must not be used for new code.
 #
 # Requirements:
 #   - PowerShell 5.1+ (Windows PowerShell) or PowerShell 7.0+ (cross-platform)
+#   - Send-MailKitMessage module: Install-Module -Name Send-MailKitMessage -Scope CurrentUser
 #   - Active ZeroSMTP account at https://msgwing.com
 #
 # Usage:
@@ -19,31 +24,34 @@
 #                       -From "user@msgwing.com" -To "recipient@example.com"
 #
 #   Or with environment variables:
-#   $env:USERNAME="user@msgwing.com"
-#   $env:PASSWORD="yourpassword"
-#   $env:FROM="user@msgwing.com"
-#   $env:TO="recipient@example.com"
+#   $env:ZEROSMTP_USERNAME="user@msgwing.com"
+#   $env:ZEROSMTP_PASSWORD="yourpassword"
+#   $env:ZEROSMTP_FROM="user@msgwing.com"
+#   $env:ZEROSMTP_TO="recipient@example.com"
 #   ./pwsh-zerosmtp.ps1
+#
+#   NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+#   reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
 # ====================================================================
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Username = $env:USERNAME,
+    [string]$Username = $env:ZEROSMTP_USERNAME,
 
     [Parameter(Mandatory=$false)]
-    [string]$Password = $env:PASSWORD,
+    [string]$Password = $env:ZEROSMTP_PASSWORD,
 
     [Parameter(Mandatory=$false)]
-    [string]$From = $env:FROM,
+    [string]$From = $env:ZEROSMTP_FROM,
 
     [Parameter(Mandatory=$false)]
-    [string]$To = $env:TO,
+    [string]$To = $env:ZEROSMTP_TO,
 
     [Parameter(Mandatory=$false)]
-    [string]$Subject = $env:SUBJECT,
+    [string]$Subject = $env:ZEROSMTP_SUBJECT,
 
     [Parameter(Mandatory=$false)]
-    [string]$Body = $env:BODY
+    [string]$Body = $env:ZEROSMTP_BODY
 )
 
 # ====================================================================
@@ -63,7 +71,6 @@ This email was sent via msgwing.com's free SMTP relay service.
 Service: ZeroSMTP (https://msgwing.com)
 SMTP Server: mx.msgwing.com
 Port: 587 (STARTTLS)
-Security: TLS 1.2+
 
 Thank you for using ZeroSMTP!
 "@ }
@@ -73,8 +80,7 @@ Thank you for using ZeroSMTP!
 # ====================================================================
 
 $SmtpServer = "mx.msgwing.com"
-$SmtpPort = 587  # STARTTLS - Only port fully supported by PowerShell Send-MailMessage
-$UseSsl = $true  # Use STARTTLS
+$SmtpPort = 587  # STARTTLS
 
 # ====================================================================
 # SCRIPT EXECUTION
@@ -84,23 +90,20 @@ Write-Host "`n=========================================" -ForegroundColor Cyan
 Write-Host "ZeroSMTP PowerShell Email Test" -ForegroundColor Cyan
 Write-Host "=========================================" -ForegroundColor Cyan
 
-# Enforce TLS 1.2+ for modern security
-try {
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::Tls13
-    Write-Host "`n✓ Security Protocol: TLS 1.2+ enforced" -ForegroundColor Green
+if (-not (Get-Module -ListAvailable -Name Send-MailKitMessage)) {
+    Write-Host "`n[ERROR] Send-MailKitMessage module is not installed" -ForegroundColor Red
+    Write-Host "  Install it with: Install-Module -Name Send-MailKitMessage -Scope CurrentUser`n" -ForegroundColor Yellow
+    exit 1
 }
-catch {
-    Write-Host "`n⚠ Warning: Could not enforce TLS 1.2+" -ForegroundColor Yellow
-}
+Import-Module Send-MailKitMessage
 
-# Create PSCredential object
 try {
     $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
     $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword)
-    Write-Host "✓ Credentials configured" -ForegroundColor Green
+    Write-Host "[OK] Credentials configured" -ForegroundColor Green
 }
 catch {
-    Write-Host "`n✗ Error: Failed to configure credentials" -ForegroundColor Red
+    Write-Host "`n[ERROR] Failed to configure credentials" -ForegroundColor Red
     Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
@@ -109,28 +112,29 @@ catch {
 Write-Host "`nConfiguration:" -ForegroundColor Yellow
 Write-Host "  SMTP Server: $SmtpServer"
 Write-Host "  Port: $SmtpPort"
-Write-Host "  Security: STARTTLS (Explicit TLS)"
+Write-Host "  Security: STARTTLS (Explicit TLS, full certificate validation)"
 Write-Host "  From: $From"
 Write-Host "  To: $To"
 Write-Host "  Subject: $Subject`n"
 
-# Send email using Send-MailMessage
 try {
     Write-Host "Sending email..." -ForegroundColor Cyan
-    
-    Send-MailMessage `
-        -SmtpServer $SmtpServer `
-        -Port $SmtpPort `
-        -UseSsl `
-        -Credential $Credential `
-        -From $From `
-        -To $To `
-        -Subject $Subject `
-        -Body $Body `
-        -Encoding UTF8 `
-        -ErrorAction Stop
 
-    Write-Host "`n✓ Email sent successfully!" -ForegroundColor Green
+    $MailFrom = [MimeKit.MailboxAddress]$From
+    $RecipientList = [MimeKit.InternetAddressList]::new()
+    $RecipientList.Add([MimeKit.InternetAddress]$To)
+
+    Send-MailKitMessage `
+        -UseSecureConnectionIfAvailable `
+        -Credential $Credential `
+        -SMTPServer $SmtpServer `
+        -Port $SmtpPort `
+        -From $MailFrom `
+        -RecipientList $RecipientList `
+        -Subject $Subject `
+        -TextBody $Body
+
+    Write-Host "`n[OK] Email sent successfully!" -ForegroundColor Green
     Write-Host "`nEmail Details:" -ForegroundColor Green
     Write-Host "  From: $From"
     Write-Host "  To: $To"
@@ -138,28 +142,13 @@ try {
     Write-Host "  Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n"
     exit 0
 }
-catch [System.Net.Mail.SmtpException] {
-    Write-Host "`n✗ SMTP Error" -ForegroundColor Red
+catch {
+    Write-Host "`n[ERROR] Error sending email" -ForegroundColor Red
     Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "`nTroubleshooting:" -ForegroundColor Yellow
     Write-Host "  - Verify username and password"
     Write-Host "  - Ensure @msgwing.com account is active"
     Write-Host "  - Check network connectivity"
     Write-Host "  - Verify recipient email address is valid`n"
-    exit 1
-}
-catch [System.UnauthorizedAccessException] {
-    Write-Host "`n✗ Authentication Failed" -ForegroundColor Red
-    Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "`nCommon causes:" -ForegroundColor Yellow
-    Write-Host "  - Incorrect password"
-    Write-Host "  - Account disabled"
-    Write-Host "  - Firewall/proxy blocking connection`n"
-    exit 1
-}
-catch {
-    Write-Host "`n✗ Unexpected Error" -ForegroundColor Red
-    Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Type: $($_.Exception.GetType().Name)`n"
     exit 1
 }

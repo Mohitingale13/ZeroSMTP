@@ -24,12 +24,14 @@ interface ZeroSMTPConfig {
   subject: string;
 }
 
+// NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+// reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
 const config = {
-  username: createUsername(process.env.USERNAME || 'your-username'),
-  password: createPassword(process.env.PASSWORD || 'your-password'),
-  from: createEmailAddress(process.env.FROM || 'sender@example.com'),
-  to: createEmailAddress(process.env.TO || 'recipient@example.com'),
-  subject: process.env.SUBJECT || 'Test Email from ZeroSMTP',
+  username: createUsername(process.env.ZEROSMTP_USERNAME || 'your-username'),
+  password: createPassword(process.env.ZEROSMTP_PASSWORD || 'your-password'),
+  from: createEmailAddress(process.env.ZEROSMTP_FROM || 'sender@example.com'),
+  to: createEmailAddress(process.env.ZEROSMTP_TO || 'recipient@example.com'),
+  subject: process.env.ZEROSMTP_SUBJECT || 'Test Email from ZeroSMTP',
 } satisfies ZeroSMTPConfig;
 
 async function sendEmailViaZeroSMTP(cfg: ZeroSMTPConfig): Promise<boolean> {

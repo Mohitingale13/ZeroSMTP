@@ -18,6 +18,8 @@ Perfect for:
 - Network printers (Scan-to-Email function)
 - IoT devices and any hardware that supports SMTP
 
+Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md)
+
 Easy Configuration:
 - Login: randomly generated address @msgwing.com
 - SMTP Server: mx.msgwing.com

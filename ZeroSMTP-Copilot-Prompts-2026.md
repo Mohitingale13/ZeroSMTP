@@ -24,7 +24,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Python 3.13+ (smtplib)
 
 ```python
-# @copilot: Generate production-ready Python 3.13+ smtplib.SMTP_SSL example for mx.msgwing.com:465 implicit TLS, default ssl.create_default_context(), EmailMessage HTML+plain, match/case error handling, contextlib. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. NO starttls() on 465. Single-file executable.
+# @copilot: Generate production-ready Python 3.13+ smtplib.SMTP_SSL example for mx.msgwing.com:465 implicit TLS, default ssl.create_default_context(), EmailMessage HTML+plain, match/case error handling, contextlib. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). NO starttls() on 465. Single-file executable.
 ```
 
 
@@ -33,7 +33,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Node.js 22+ (nodemailer 6.9.15)
 
 ```javascript
-// @copilot: Generate production-ready Node.js 22+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full cert verification (NO rejectUnauthorized:false), HTML+text, async/await, structuredClone error handling. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file ESM executable.
+// @copilot: Generate production-ready Node.js 22+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full cert verification (NO rejectUnauthorized:false), HTML+text, async/await, structuredClone error handling. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
 ```
 
 
@@ -42,7 +42,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## TypeScript 5.6+ (nodemailer 6.9.15)
 
 ```typescript
-// @copilot: Generate production-ready TypeScript 5.6+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full type safety, branded types, satisfies operator, HTML+text async/await. Let's Encrypt verification ON. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file ESM executable.
+// @copilot: Generate production-ready TypeScript 5.6+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full type safety, branded types, satisfies operator, HTML+text async/await. Let's Encrypt verification ON. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
 ```
 
 
@@ -52,7 +52,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ```bash
 #!/bin/bash
-# @copilot: Generate production-ready bash curl 8.10+ smtps://mx.msgwing.com:465 script, implicit TLS, system CA verification (NO --insecure), heredoc body, env vars USERNAME PASSWORD FROM TO SUBJECT. POSIX compliant, error_exit trap. Single-file executable.
+# @copilot: Generate production-ready bash curl 8.10+ smtps://mx.msgwing.com:465 script, implicit TLS, curl's default CA trust store (NO --insecure, NO hardcoded --cacert path), heredoc body, env vars ZEROSMTP_USERNAME ZEROSMTP_PASSWORD ZEROSMTP_FROM ZEROSMTP_TO ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). POSIX compliant, error_exit trap. Single-file executable.
 ```
 
 
@@ -62,7 +62,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ```bash
 #!/bin/bash
-# @copilot: Generate production-ready swaks 20240101+ script for mx.msgwing.com:465 --tlsc implicit TLS, full cert verification, --auth LOGIN, env vars USERNAME PASSWORD FROM TO SUBJECT BODY. Error handling, POSIX shebang. Single-file executable.
+# @copilot: Generate production-ready swaks 20240101+ script for mx.msgwing.com:465 --tlsc implicit TLS, full cert verification, --auth LOGIN, env vars ZEROSMTP_USERNAME ZEROSMTP_PASSWORD ZEROSMTP_FROM ZEROSMTP_TO ZEROSMTP_SUBJECT ZEROSMTP_BODY (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Error handling, POSIX shebang. Single-file executable.
 ```
 
 
@@ -71,7 +71,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Java 23+ (Jakarta Mail 3.0)
 
 ```java
-// @copilot: Generate production-ready Java 23+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL (mail.smtp.ssl.enable=true), virtual threads, records, pattern matching, HTML+plain MimeMultipart, default JVM Let's Encrypt trust. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file executable.
+// @copilot: Generate production-ready Java 23+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL (mail.smtp.ssl.enable=true), virtual threads, records, pattern matching, HTML+plain MimeMultipart, default JVM Let's Encrypt trust. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 
@@ -80,7 +80,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## C\# 13 (.NET 10) MailKit 4.8
 
 ```csharp
-// @copilot: Generate production-ready C# 13 .NET 10 MailKit 4.8 MimeKit 4.8 example for mx.msgwing.com:465 SslOnConnect, default cert validation, primary constructors, required members, HTML+plain, async/await. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. NO SmtpClient. Single-file executable.
+// @copilot: Generate production-ready C# 13 .NET 10 MailKit 4.8 MimeKit 4.8 example for mx.msgwing.com:465 SslOnConnect, default cert validation, primary constructors, required members, HTML+plain, async/await. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). NO SmtpClient. Single-file executable.
 ```
 
 
@@ -89,7 +89,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Go 1.23+ (net/smtp)
 
 ```go
-// @copilot: Generate production-ready Go 1.23+ net/smtp + crypto/tls.Dial("tcp", "mx.msgwing.com:465") example, range over func, slices.Values(), io.Discard, HTML MIME, system CA pool (InsecureSkipVerify=false). Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file executable.
+// @copilot: Generate production-ready Go 1.23+ net/smtp + crypto/tls.Dial("tcp", "mx.msgwing.com:465") example, single recipient via direct client.Rcpt() call (avoid slices.Values()/range-over-func for a one-element list — unnecessary complexity), random per-message MIME boundary via crypto/rand, system CA pool (InsecureSkipVerify=false). Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 
@@ -98,7 +98,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Ruby 3.4+ (Net::SMTP)
 
 ```ruby
-# @copilot: Generate production-ready Ruby 3.4+ Net::SMTP example for mx.msgwing.com:465 enable_tls(context: OpenSSL::SSL::VERIFY_PEER), pattern matching, frozen strings, HTML+plain MIME, begin/rescue/ensure. Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file executable.
+# @copilot: Generate production-ready Ruby 3.4+ Net::SMTP example for mx.msgwing.com:465 enable_tls(context: OpenSSL::SSL::VERIFY_PEER), frozen strings (# frozen_string_literal: true as the FIRST line, before any other code), HTML+plain MIME, rescue specific exception classes (Net::SMTPAuthenticationError, OpenSSL::SSL::SSLError) rather than string-matching on error messages. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 
@@ -107,7 +107,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Rust 1.81+ (lettre 0.12)
 
 ```rust
-// @copilot: Generate production-ready Rust 1.81+ lettre 0.12 SmtpTransport::relay("mx.msgwing.com:465")?, system TLS (native-tls/rustls), anyhow::Result, HTML+plain MultiPart, const placeholders. NO dangerous_accept_invalid_certs(). Single-file executable.
+// @copilot: Generate production-ready Rust 1.81+ lettre 0.12 SmtpTransport::relay("mx.msgwing.com")?.port(465), system TLS (native-tls/rustls), explicit .timeout(Some(Duration::from_secs(30))) to avoid indefinite hangs, anyhow::Result, HTML+plain MultiPart. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). NO dangerous_accept_invalid_certs(). Single-file executable.
 ```
 
 
@@ -125,7 +125,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Kotlin 2.0+ (Jakarta Mail 3.0)
 
 ```kotlin
-// @copilot: Generate production-ready Kotlin 2.0+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL, context receivers, sealed interfaces, default JVM trust, HTML+plain MimeMultipart, result<>(). Placeholders: USERNAME, PASSWORD, FROM, TO, SUBJECT. Single-file executable.
+// @copilot: Generate production-ready Kotlin 2.0+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL, sealed interfaces, default JVM trust, HTML+plain MimeMultipart, Result<>. Avoid experimental/preview language features (e.g. context receivers) that require non-default compiler flags — plain functions with explicit Session parameters keep the example simple and compilable out of the box. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 

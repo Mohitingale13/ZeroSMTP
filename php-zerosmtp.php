@@ -10,7 +10,7 @@ declare(strict_types=1);
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once '/path/to/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 readonly class ZeroSMTPConfig {
     public function __construct(
@@ -52,12 +52,14 @@ function sendEmailViaZeroSMTP(ZeroSMTPConfig $config): bool {
     }
 }
 
+// NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+// reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
 $config = new ZeroSMTPConfig(
-    username: getenv('USERNAME') ?: 'your-username',
-    password: getenv('PASSWORD') ?: 'your-password',
-    from: getenv('FROM') ?: 'sender@example.com',
-    to: getenv('TO') ?: 'recipient@example.com',
-    subject: getenv('SUBJECT') ?: 'Test Email from ZeroSMTP',
+    username: getenv('ZEROSMTP_USERNAME') ?: 'your-username',
+    password: getenv('ZEROSMTP_PASSWORD') ?: 'your-password',
+    from: getenv('ZEROSMTP_FROM') ?: 'sender@example.com',
+    to: getenv('ZEROSMTP_TO') ?: 'recipient@example.com',
+    subject: getenv('ZEROSMTP_SUBJECT') ?: 'Test Email from ZeroSMTP',
 );
 
 exit(sendEmailViaZeroSMTP($config) ? 0 : 1);

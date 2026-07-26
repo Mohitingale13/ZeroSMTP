@@ -12,6 +12,7 @@ use lettre::{
 use lettre::message::MultiPart;
 use anyhow::{Context, Result};
 use std::env;
+use std::time::Duration;
 
 const ZEROSMTP_HOST: &str = "mx.msgwing.com";
 const ZEROSMTP_PORT: u16 = 465;
@@ -25,12 +26,14 @@ struct EmailConfig {
 }
 
 fn get_config() -> Result<EmailConfig> {
+    // NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+    // reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
     Ok(EmailConfig {
-        username: env::var("USERNAME").unwrap_or_else(|_| "your-username".to_string()),
-        password: env::var("PASSWORD").unwrap_or_else(|_| "your-password".to_string()),
-        from: env::var("FROM").unwrap_or_else(|_| "sender@example.com".to_string()),
-        to: env::var("TO").unwrap_or_else(|_| "recipient@example.com".to_string()),
-        subject: env::var("SUBJECT").unwrap_or_else(|_| "Test Email from ZeroSMTP".to_string()),
+        username: env::var("ZEROSMTP_USERNAME").unwrap_or_else(|_| "your-username".to_string()),
+        password: env::var("ZEROSMTP_PASSWORD").unwrap_or_else(|_| "your-password".to_string()),
+        from: env::var("ZEROSMTP_FROM").unwrap_or_else(|_| "sender@example.com".to_string()),
+        to: env::var("ZEROSMTP_TO").unwrap_or_else(|_| "recipient@example.com".to_string()),
+        subject: env::var("ZEROSMTP_SUBJECT").unwrap_or_else(|_| "Test Email from ZeroSMTP".to_string()),
     })
 }
 
@@ -46,6 +49,7 @@ fn send_email_via_zerosmtp(config: EmailConfig) -> Result<()> {
         .context("Failed to create SMTP transport")?
         .port(ZEROSMTP_PORT)
         .credentials(credentials)
+        .timeout(Some(Duration::from_secs(30)))
         .build();
 
     // Create message with multipart body

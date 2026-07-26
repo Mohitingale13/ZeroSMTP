@@ -11,12 +11,14 @@ import SMTP
 @main
 struct ZeroSMTPMailer {
     static func main() async {
+        // NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+        // reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
         let config = EmailConfig(
-            username: ProcessInfo.processInfo.environment["USERNAME"] ?? "your-username",
-            password: ProcessInfo.processInfo.environment["PASSWORD"] ?? "your-password",
-            from: ProcessInfo.processInfo.environment["FROM"] ?? "sender@example.com",
-            to: ProcessInfo.processInfo.environment["TO"] ?? "recipient@example.com",
-            subject: ProcessInfo.processInfo.environment["SUBJECT"] ?? "Test Email from ZeroSMTP"
+            username: ProcessInfo.processInfo.environment["ZEROSMTP_USERNAME"] ?? "your-username",
+            password: ProcessInfo.processInfo.environment["ZEROSMTP_PASSWORD"] ?? "your-password",
+            from: ProcessInfo.processInfo.environment["ZEROSMTP_FROM"] ?? "sender@example.com",
+            to: ProcessInfo.processInfo.environment["ZEROSMTP_TO"] ?? "recipient@example.com",
+            subject: ProcessInfo.processInfo.environment["ZEROSMTP_SUBJECT"] ?? "Test Email from ZeroSMTP"
         )
 
         let mailer = MailerActor(config: config)

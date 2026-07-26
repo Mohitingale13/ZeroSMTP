@@ -1,7 +1,7 @@
 /**
  * kotlin-zerosmtp.kt
  * Kotlin 2.0+ Jakarta Mail 3.0 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
- * Production-ready | Let's Encrypt | Sealed interfaces, context receivers, Result<>
+ * Production-ready | Let's Encrypt | Sealed interfaces, Result<>
  */
 
 import jakarta.mail.*
@@ -24,8 +24,7 @@ data class EmailConfig(
     val subject: String,
 )
 
-context(Session)
-fun createMultipartMessage(config: EmailConfig): Message = MimeMessage(this@Session).apply {
+fun createMultipartMessage(session: Session, config: EmailConfig): Message = MimeMessage(session).apply {
     setFrom(InternetAddress(config.from, "ZeroSMTP User"))
     setRecipients(Message.RecipientType.TO, InternetAddress.parse(config.to))
     subject = config.subject
@@ -65,11 +64,9 @@ suspend fun sendEmailViaZeroSMTP(config: EmailConfig): MailResult = runCatching 
     }
 
     val session = Session.getInstance(props, authenticator)
-    with(session) {
-        val message = createMultipartMessage(config)
-        Transport.send(message)
-        MailResult.Success(message.messageID ?: "sent")
-    }
+    val message = createMultipartMessage(session, config)
+    Transport.send(message)
+    MailResult.Success(message.messageID ?: "sent")
 }.fold(
     onSuccess = { it },
     onFailure = { e ->
@@ -82,12 +79,14 @@ suspend fun sendEmailViaZeroSMTP(config: EmailConfig): MailResult = runCatching 
 )
 
 suspend fun main() {
+    // NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+    // reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
     val config = EmailConfig(
-        username = System.getenv("USERNAME") ?: "your-username",
-        password = System.getenv("PASSWORD") ?: "your-password",
-        from     = System.getenv("FROM") ?: "sender@example.com",
-        to       = System.getenv("TO") ?: "recipient@example.com",
-        subject  = System.getenv("SUBJECT") ?: "Test Email from ZeroSMTP",
+        username = System.getenv("ZEROSMTP_USERNAME") ?: "your-username",
+        password = System.getenv("ZEROSMTP_PASSWORD") ?: "your-password",
+        from     = System.getenv("ZEROSMTP_FROM") ?: "sender@example.com",
+        to       = System.getenv("ZEROSMTP_TO") ?: "recipient@example.com",
+        subject  = System.getenv("ZEROSMTP_SUBJECT") ?: "Test Email from ZeroSMTP",
     )
 
     when (val result = sendEmailViaZeroSMTP(config)) {

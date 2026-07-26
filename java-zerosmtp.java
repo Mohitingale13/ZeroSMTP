@@ -22,12 +22,14 @@ public final class ZeroSMTPMailer {
     ) {}
 
     public static void main(String[] args) {
+        // NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+        // reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
         EmailConfig config = new EmailConfig(
-            System.getenv("USERNAME") != null ? System.getenv("USERNAME") : "your-username",
-            System.getenv("PASSWORD") != null ? System.getenv("PASSWORD") : "your-password",
-            System.getenv("FROM") != null ? System.getenv("FROM") : "sender@example.com",
-            System.getenv("TO") != null ? System.getenv("TO") : "recipient@example.com",
-            System.getenv("SUBJECT") != null ? System.getenv("SUBJECT") : "Test Email from ZeroSMTP"
+            System.getenv("ZEROSMTP_USERNAME") != null ? System.getenv("ZEROSMTP_USERNAME") : "your-username",
+            System.getenv("ZEROSMTP_PASSWORD") != null ? System.getenv("ZEROSMTP_PASSWORD") : "your-password",
+            System.getenv("ZEROSMTP_FROM") != null ? System.getenv("ZEROSMTP_FROM") : "sender@example.com",
+            System.getenv("ZEROSMTP_TO") != null ? System.getenv("ZEROSMTP_TO") : "recipient@example.com",
+            System.getenv("ZEROSMTP_SUBJECT") != null ? System.getenv("ZEROSMTP_SUBJECT") : "Test Email from ZeroSMTP"
         );
         Thread.ofVirtual().start(() -> {
             try {

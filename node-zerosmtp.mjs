@@ -6,12 +6,14 @@
 
 import nodemailer from 'nodemailer';
 
+// NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+// reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
 const config = {
-  username: process.env.USERNAME || 'your-username',
-  password: process.env.PASSWORD || 'your-password',
-  from: process.env.FROM || 'sender@example.com',
-  to: process.env.TO || 'recipient@example.com',
-  subject: process.env.SUBJECT || 'Test Email from ZeroSMTP',
+  username: process.env.ZEROSMTP_USERNAME || 'your-username',
+  password: process.env.ZEROSMTP_PASSWORD || 'your-password',
+  from: process.env.ZEROSMTP_FROM || 'sender@example.com',
+  to: process.env.ZEROSMTP_TO || 'recipient@example.com',
+  subject: process.env.ZEROSMTP_SUBJECT || 'Test Email from ZeroSMTP',
 };
 
 async function sendEmailViaZeroSMTP() {

@@ -18,6 +18,8 @@ Idealne dla:
 - Drukarek sieciowych (skan-do-mail)
 - Urządzeń IoT i innych sprzętów z obsługą SMTP
 
+Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md)
+
 Dane do konfiguracji:
 - Login: losowo wygenerowany adres @msgwing.com
 - Serwer SMTP: mx.msgwing.com

@@ -7,12 +7,13 @@
 package main
 
 import (
+	"crypto/rand"
 	"crypto/tls"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/smtp"
 	"os"
-	"slices"
 	"strings"
 )
 
@@ -57,12 +58,9 @@ func sendEmailViaZeroSMTP(config EmailConfig) error {
 		return fmt.Errorf("failed to set sender: %w", err)
 	}
 
-	// Set recipient(s) - handle multiple with range over func
-	recipients := slices.Values([]string{config.To})
-	for recipient := range recipients {
-		if err := client.Rcpt(recipient); err != nil {
-			return fmt.Errorf("failed to add recipient %s: %w", recipient, err)
-		}
+	// Set recipient
+	if err := client.Rcpt(config.To); err != nil {
+		return fmt.Errorf("failed to add recipient %s: %w", config.To, err)
 	}
 
 	// Create message
@@ -82,8 +80,16 @@ func sendEmailViaZeroSMTP(config EmailConfig) error {
 	return client.Quit()
 }
 
+func newBoundary() string {
+	buf := make([]byte, 16)
+	if _, err := rand.Read(buf); err != nil {
+		return "zerosmtp-fallback-boundary"
+	}
+	return "zerosmtp-" + hex.EncodeToString(buf)
+}
+
 func buildEmailBody(config EmailConfig) string {
-	boundary := "boundary123"
+	boundary := newBoundary()
 	body := strings.Builder{}
 	body.WriteString(fmt.Sprintf("From: %s\r\n", config.From))
 	body.WriteString(fmt.Sprintf("To: %s\r\n", config.To))
@@ -107,12 +113,14 @@ func buildEmailBody(config EmailConfig) string {
 }
 
 func main() {
+	// NOTE: variable names are prefixed with ZEROSMTP_ to avoid colliding with
+	// reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
 	config := EmailConfig{
-		Username: getEnv("USERNAME", "your-username"),
-		Password: getEnv("PASSWORD", "your-password"),
-		From:     getEnv("FROM", "sender@example.com"),
-		To:       getEnv("TO", "recipient@example.com"),
-		Subject:  getEnv("SUBJECT", "Test Email from ZeroSMTP"),
+		Username: getEnv("ZEROSMTP_USERNAME", "your-username"),
+		Password: getEnv("ZEROSMTP_PASSWORD", "your-password"),
+		From:     getEnv("ZEROSMTP_FROM", "sender@example.com"),
+		To:       getEnv("ZEROSMTP_TO", "recipient@example.com"),
+		Subject:  getEnv("ZEROSMTP_SUBJECT", "Test Email from ZeroSMTP"),
 	}
 
 	if err := sendEmailViaZeroSMTP(config); err != nil {

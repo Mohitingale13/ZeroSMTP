@@ -1,21 +1,20 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # ruby-zerosmtp.rb
 # Ruby 3.4+ Net::SMTP - ZeroSMTP mx.msgwing.com:465 SSL/TLS
 # Production-ready | Let's Encrypt | Pattern matching, frozen strings
 
-frozen_string_literal: true
-
 require 'net/smtp'
 require 'openssl'
-require 'mail'
 
 class ZeroSMTPMailer
   CONFIG = {
-    username: ENV.fetch('USERNAME', 'your-username').freeze,
-    password: ENV.fetch('PASSWORD', 'your-password').freeze,
-    from:     ENV.fetch('FROM', 'sender@example.com').freeze,
-    to:       ENV.fetch('TO', 'recipient@example.com').freeze,
-    subject:  ENV.fetch('SUBJECT', 'Test Email from ZeroSMTP').freeze,
+    username: ENV.fetch('ZEROSMTP_USERNAME', 'your-username').freeze,
+    password: ENV.fetch('ZEROSMTP_PASSWORD', 'your-password').freeze,
+    from:     ENV.fetch('ZEROSMTP_FROM', 'sender@example.com').freeze,
+    to:       ENV.fetch('ZEROSMTP_TO', 'recipient@example.com').freeze,
+    subject:  ENV.fetch('ZEROSMTP_SUBJECT', 'Test Email from ZeroSMTP').freeze,
   }.freeze
 
   def self.send_email
@@ -40,18 +39,15 @@ class ZeroSMTPMailer
     end
 
     true
+  rescue Net::SMTPAuthenticationError => e
+    warn "Authentication failed: #{e.message}"
+    false
+  rescue OpenSSL::SSL::SSLError => e
+    warn "Certificate verification failed: #{e.message}"
+    false
   rescue => e
-    case e
-    in StandardError => err if err.message.include?('authentication')
-      warn "Authentication failed: #{err.message}"
-      false
-    in StandardError => err if err.message.include?('certificate')
-      warn "Certificate verification failed: #{err.message}"
-      false
-    in StandardError => err
-      warn "SMTP error: #{err.message}"
-      false
-    end
+    warn "SMTP error: #{e.message}"
+    false
   end
 
   private

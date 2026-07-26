@@ -13,17 +13,19 @@ error_exit() {
 trap 'error_exit "Script interrupted"' INT TERM
 
 # Configuration from environment variables
-USERNAME="${USERNAME:-your-username}"
-PASSWORD="${PASSWORD:-your-password}"
-FROM="${FROM:-sender@example.com}"
-TO="${TO:-recipient@example.com}"
-SUBJECT="${SUBJECT:-Test Email from ZeroSMTP}"
+# NOTE: names are prefixed with ZEROSMTP_ to avoid colliding with
+# reserved/OS-level variables (e.g. USERNAME is auto-set on Windows).
+USERNAME="${ZEROSMTP_USERNAME:-your-username}"
+PASSWORD="${ZEROSMTP_PASSWORD:-your-password}"
+FROM="${ZEROSMTP_FROM:-sender@example.com}"
+TO="${ZEROSMTP_TO:-recipient@example.com}"
+SUBJECT="${ZEROSMTP_SUBJECT:-Test Email from ZeroSMTP}"
 
 # Validate inputs
-[[ -z "$USERNAME" ]] && error_exit "USERNAME not set"
-[[ -z "$PASSWORD" ]] && error_exit "PASSWORD not set"
-[[ -z "$FROM" ]] && error_exit "FROM not set"
-[[ -z "$TO" ]] && error_exit "TO not set"
+[[ -z "$USERNAME" ]] && error_exit "ZEROSMTP_USERNAME not set"
+[[ -z "$PASSWORD" ]] && error_exit "ZEROSMTP_PASSWORD not set"
+[[ -z "$FROM" ]] && error_exit "ZEROSMTP_FROM not set"
+[[ -z "$TO" ]] && error_exit "ZEROSMTP_TO not set"
 
 # Build email body
 EMAIL_BODY="From: $FROM\r\nTo: $TO\r\nSubject: $SUBJECT\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nHello from ZeroSMTP! This is plain text sent via mx.msgwing.com:465"
@@ -37,7 +39,6 @@ if curl \
   --upload-file <(printf '%b' "$EMAIL_BODY") \
   --ssl-reqd \
   --tlsv1.2 \
-  --cacert /etc/ssl/certs/ca-certificates.crt \
   --connect-timeout 10 \
   --max-time 30 \
   --silent \
