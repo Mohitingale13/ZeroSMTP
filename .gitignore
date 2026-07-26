@@ -13,3 +13,5 @@ obj/
 *.class
 .build/
 Packages/
+.gradle/
+build/

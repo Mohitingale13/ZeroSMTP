@@ -1,6 +1,6 @@
 // node-zerosmtp.mjs
 /**
- * Node.js 22+ nodemailer 6.9.15 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Node.js 22+ nodemailer 9.x - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | ESM async/await
  */
 

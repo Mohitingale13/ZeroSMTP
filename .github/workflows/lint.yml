@@ -1,11 +1,11 @@
 name: Lint examples
 
-# Syntax-checks every example script on push/PR. Scope note: C#, Java,
-# Kotlin, Rust, and Swift examples depend on third-party mail libraries
-# (MailKit, Jakarta Mail, lettre, Swift-SMTP) and ship as single files
-# without a build manifest (no .csproj/pom.xml/Cargo.toml/Package.swift),
-# so a meaningful compile isn't possible here without vendoring those
-# dependencies. Their syntax should be checked manually on review.
+# Builds/syntax-checks every example on push/PR, using the manifest files
+# at the repo root (package.json, composer.json, Cargo.toml, Package.swift,
+# cs-zerosmtp.csproj, pom.xml, build.gradle.kts) that point at the relevant
+# single-file example. The Swift job is best-effort (continue-on-error):
+# its Package.swift target layout and the setup-swift action could not be
+# verified against a local Swift toolchain when this workflow was written.
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       - name: Syntax-check bash scripts
         run: |
           set -e
-          for f in bash-curl-zerosmtp.sh bash-swaks-zerosmtp.sh; do
+          for f in bash-curl-zerosmtp.sh bash-swaks-zerosmtp.sh check-connection.sh; do
             echo "Checking $f"
             bash -n "$f"
           done
@@ -32,7 +32,7 @@ jobs:
       - name: Syntax-check PowerShell scripts
         shell: pwsh
         run: |
-          $files = @('pwsh-zerosmtp.ps1', 'SendEmailTest_mail-tester.com.ps1')
+          $files = @('pwsh-zerosmtp.ps1', 'SendEmailTest_mail-tester.com.ps1', 'check-connection.ps1')
           $failed = $false
           foreach ($f in $files) {
             Write-Host "Checking $f"
@@ -96,11 +96,63 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install dependencies
+        run: npm install
       - name: Syntax-check Node.js example
         run: node --check node-zerosmtp.mjs
-      - name: Install TypeScript
-        run: npm install -g typescript
-      - name: Syntax-check TypeScript example
-        # --noResolve: check syntax/types within the file only, without
-        # requiring node_modules for the imported nodemailer package.
-        run: tsc --noEmit --noResolve --target es2022 --module esnext ts-zerosmtp.ts
+      - name: Type-check TypeScript example
+        run: npm run typecheck
+
+  csharp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build C# example
+        run: dotnet build cs-zerosmtp.csproj
+
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Build Java example
+        run: mvn -B compile
+
+  kotlin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10'
+      - name: Build Kotlin example
+        run: gradle build --no-daemon
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build Rust example
+        run: cargo build
+
+  swift:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+      - name: Build Swift example
+        run: swift build

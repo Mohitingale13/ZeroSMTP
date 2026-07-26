@@ -1,6 +1,6 @@
 // rust-zerosmtp.rs
 /**
- * Rust 1.81+ lettre 0.12 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Rust 1.81+ lettre 0.11 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | native-tls/rustls, anyhow::Result
  * NO dangerous_accept_invalid_certs()
  */

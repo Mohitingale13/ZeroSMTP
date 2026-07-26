@@ -19,7 +19,18 @@ spam:
 **This is why every example in this repository defaults to port `465`
 (implicit SSL/TLS) or `587` (STARTTLS), never port `25`.** If a script hangs
 until it times out rather than failing immediately, this is the first thing
-to check — try connecting from a different network to confirm:
+to check. Run the connectivity-only healthcheck (no credentials needed, no
+email sent):
+
+```bash
+./check-connection.sh
+```
+
+```powershell
+./check-connection.ps1
+```
+
+Or check manually:
 
 ```bash
 # Bash/Linux/macOS — quick manual connectivity check
@@ -65,6 +76,28 @@ your provider's support to unblock outbound SMTP for your account/instance.
   blocks STARTTLS negotiation on 587 but allows 465.
 - **25** — not supported by ZeroSMTP for client submission, and blocked by
   most providers anyway (see above).
+
+## Sending limits (rate limiting)
+
+Each ZeroSMTP account is rate-limited to keep the shared `msgwing.com`
+domain reputation high for everyone. Current limits (subject to change):
+
+| Window | Sustained rate | Short burst allowance |
+| --- | --- | --- |
+| Per minute | 5 messages/minute | up to 20 |
+| Per hour | 50 messages/hour | up to 100 |
+| Per day | 200 messages/day | 200 (hard cap, no extra burst) |
+
+Additionally, a single message can address **at most 15 recipients**
+(To + Cc + Bcc combined).
+
+If you hit a limit, the server will reject or temp-fail the send — treat
+that the same as any other transient SMTP error: back off and retry later
+rather than looping immediately (see [RELIABILITY.md](RELIABILITY.md)).
+These limits are sized for typical transactional use (notifications,
+password resets, contact forms, scan-to-email); if your application needs
+sustained volume above them, contact abuse@msgwing.com before you build
+around it.
 
 ## This project cannot receive email
 

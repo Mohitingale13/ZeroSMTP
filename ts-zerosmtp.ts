@@ -1,6 +1,6 @@
 // ts-zerosmtp.ts
 /**
- * TypeScript 5.6+ nodemailer 6.9.15 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * TypeScript 7.x nodemailer 9.x - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | Branded types, satisfies operator
  */
 

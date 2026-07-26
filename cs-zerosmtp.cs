@@ -1,7 +1,7 @@
 // cs-zerosmtp.cs
 /**
- * C# 13 .NET 10 MailKit 4.8 MimeKit 4.8 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
- * Production-ready | Let's Encrypt | Primary constructors, required members, NO SmtpClient
+ * C# 12+ .NET 8+ MailKit 4.8 MimeKit 4.8 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Production-ready | Let's Encrypt | Primary constructors, NO SmtpClient
  */
 
 using MailKit.Net.Smtp;
@@ -9,12 +9,14 @@ using MailKit.Security;
 using MimeKit;
 using System;
 
+// Positional record parameters are already mandatory via the constructor,
+// so no `required` modifier is needed (and isn't valid in this position).
 public record class EmailConfig(
-    required string Username,
-    required string Password,
-    required string From,
-    required string To,
-    required string Subject
+    string Username,
+    string Password,
+    string From,
+    string To,
+    string Subject
 );
 
 public static class ZeroSMTPMailer

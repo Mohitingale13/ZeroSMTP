@@ -1,6 +1,6 @@
 /**
  * java-zerosmtp.java
- * Java 23+ Jakarta Mail 3.0 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Java 21+ Jakarta Mail 2.1 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | Virtual threads, records, pattern matching
  */
 

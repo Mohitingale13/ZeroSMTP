@@ -37,7 +37,7 @@ Idealne dla:
 - Drukarek sieciowych (skan-do-mail)
 - Urządzeń IoT i innych sprzętów z obsługą SMTP
 
-Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md)
+Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) · [Niezawodność (ponawianie prób)](docs/RELIABILITY.md)
 
 ## Przykłady kodu
 
@@ -66,6 +66,23 @@ Każdy przykład pobiera dane logowania ze zmiennych środowiskowych
 `ZEROSMTP_*` (`ZEROSMTP_USERNAME`, `ZEROSMTP_PASSWORD`, `ZEROSMTP_FROM`,
 `ZEROSMTP_TO`, `ZEROSMTP_SUBJECT`) — nigdy nie wpisuj prawdziwych danych na
 sztywno w skrypcie.
+
+### Instalacja zależności
+
+Każdy przykład wymagający zewnętrznej biblioteki ma odpowiadający mu manifest
+w katalogu głównym repo, więc instalujesz standardową komendą danego
+ekosystemu, zamiast ręcznie szukać nazw i wersji bibliotek:
+
+| Język(i) | Instalacja |
+| --- | --- |
+| Node.js / TypeScript | `npm install` |
+| PHP | `composer install` |
+| Rust | `cargo build` (zależności pobierają się automatycznie) |
+| C# | `dotnet build cs-zerosmtp.csproj` |
+| Java | `mvn compile` |
+| Kotlin | `gradle build` |
+| Swift | `swift build` |
+| Python, Ruby, Go, Bash, PowerShell | brak — tylko biblioteka standardowa |
 
 Dane do konfiguracji:
 - Login: losowo wygenerowany adres @msgwing.com

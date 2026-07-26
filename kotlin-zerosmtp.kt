@@ -1,8 +1,13 @@
 /**
  * kotlin-zerosmtp.kt
- * Kotlin 2.0+ Jakarta Mail 3.0 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Kotlin 2.0+ Jakarta Mail 2.1 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | Sealed interfaces, Result<>
  */
+
+// Explicit JVM facade class name: the default derivation from the file name
+// would try to produce "Kotlin-zerosmtpKt", which contains an invalid
+// hyphen — Gradle's `application { mainClass }` needs a real class name.
+@file:JvmName("KotlinZerosmtp")
 
 import jakarta.mail.*
 import jakarta.mail.internet.InternetAddress

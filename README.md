@@ -37,7 +37,7 @@ Perfect for:
 - Network printers (Scan-to-Email function)
 - IoT devices and any hardware that supports SMTP
 
-Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
+Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Reliability (retries)](docs/RELIABILITY.md)
 
 ## Code Examples
 
@@ -65,6 +65,23 @@ Ready-to-run, production-ready examples for `mx.msgwing.com:465` (SSL/TLS) or
 Each example reads credentials from `ZEROSMTP_*` environment variables
 (`ZEROSMTP_USERNAME`, `ZEROSMTP_PASSWORD`, `ZEROSMTP_FROM`, `ZEROSMTP_TO`,
 `ZEROSMTP_SUBJECT`) — never hardcode real credentials into a script.
+
+### Installing dependencies
+
+Every example that needs a third-party library has a matching manifest at
+the repo root, so you can install with each ecosystem's normal command
+instead of hunting down library names/versions yourself:
+
+| Language(s) | Install with |
+| --- | --- |
+| Node.js / TypeScript | `npm install` |
+| PHP | `composer install` |
+| Rust | `cargo build` (fetches deps automatically) |
+| C# | `dotnet build cs-zerosmtp.csproj` |
+| Java | `mvn compile` |
+| Kotlin | `gradle build` |
+| Swift | `swift build` |
+| Python, Ruby, Go, Bash, PowerShell | none — standard library only |
 
 Easy Configuration:
 - Login: randomly generated address @msgwing.com

@@ -1,5 +1,46 @@
 # Changelog
 
+## [1.2.0] - 2026-07-26
+
+### Added
+- Dependency manifests for every example that needs a third-party
+  library: `package.json`/`tsconfig.json` (Node.js/TypeScript),
+  `composer.json` (PHP), `Cargo.toml` (Rust), `Package.swift` (Swift),
+  `cs-zerosmtp.csproj` (C#), `pom.xml` (Java), `build.gradle.kts` +
+  `settings.gradle.kts` (Kotlin) — install with each ecosystem's normal
+  command instead of hunting down library names/versions
+- `check-connection.sh` / `check-connection.ps1`: connectivity-only
+  healthcheck (DNS, TCP, TLS handshake) against `mx.msgwing.com` that
+  sends no email and needs no credentials
+- `docs/RELIABILITY.md`: retry-with-backoff pattern for transient (4xx)
+  SMTP failures, with a Python reference implementation
+- `docs/TROUBLESHOOTING.md` "Sending limits" section documenting the
+  actual per-minute/hour/day rate limits and the 15-recipients-per-message
+  cap
+- `.github/ISSUE_TEMPLATE/` and `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/workflows/lint.yml` now really builds the C#, Java, Kotlin,
+  and Rust examples (previously skipped for lack of a manifest); Swift
+  is included as best-effort (`continue-on-error`)
+
+### Fixed
+- `cs-zerosmtp.cs`: `required` is not valid on positional record
+  constructor parameters — removed (positional parameters are already
+  mandatory) after a real `dotnet build` failed on it
+- `cs-zerosmtp.csproj` initially pinned `MailKit` 4.8.0, which has a
+  known moderate-severity vulnerability
+  ([GHSA-9j88-vvj5-vhgr](https://github.com/advisories/GHSA-9j88-vvj5-vhgr)/CVE-2026-41319,
+  STARTTLS response injection / SASL downgrade); bumped to 4.16.0+
+- `rust-zerosmtp.rs` / `Cargo.toml` header comments referenced `lettre
+  0.12`, which does not exist on crates.io; corrected to the real
+  current `0.11.x` line
+- `node-zerosmtp.mjs` / `ts-zerosmtp.ts` / `package.json` header
+  comments referenced `nodemailer 6.9.15`; corrected to the real
+  current major (`nodemailer` 9.x, `typescript` 7.x) after checking the
+  npm registry
+- `java-zerosmtp.java` / `kotlin-zerosmtp.kt` header comments claimed
+  "Jakarta Mail 3.0", which doesn't exist; corrected to the real latest
+  spec version (2.1) after checking Maven Central
+
 ## [1.1.0] - 2026-07-26
 
 ### Added

@@ -30,19 +30,19 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ---
 
-## Node.js 22+ (nodemailer 6.9.15)
+## Node.js 22+ (nodemailer (check npm for the current major — it has moved fast; verify before pinning a version))
 
 ```javascript
-// @copilot: Generate production-ready Node.js 22+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full cert verification (NO rejectUnauthorized:false), HTML+text, async/await, structuredClone error handling. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
+// @copilot: Generate production-ready Node.js 22+ nodemailer (check npm for the current major — it has moved fast; verify before pinning a version) example for mx.msgwing.com:465 secure:true implicit TLS, full cert verification (NO rejectUnauthorized:false), HTML+text, async/await, structuredClone error handling. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
 ```
 
 
 ---
 
-## TypeScript 5.6+ (nodemailer 6.9.15)
+## TypeScript 5.6+ (nodemailer (check npm for the current major — it has moved fast; verify before pinning a version))
 
 ```typescript
-// @copilot: Generate production-ready TypeScript 5.6+ nodemailer 6.9.15 example for mx.msgwing.com:465 secure:true implicit TLS, full type safety, branded types, satisfies operator, HTML+text async/await. Let's Encrypt verification ON. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
+// @copilot: Generate production-ready TypeScript 5.6+ nodemailer (check npm for the current major — it has moved fast; verify before pinning a version) example for mx.msgwing.com:465 secure:true implicit TLS, full type safety, branded types, satisfies operator, HTML+text async/await. Let's Encrypt verification ON. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file ESM executable.
 ```
 
 
@@ -68,10 +68,10 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ---
 
-## Java 23+ (Jakarta Mail 3.0)
+## Java 21+ (Jakarta Mail 2.1)
 
 ```java
-// @copilot: Generate production-ready Java 23+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL (mail.smtp.ssl.enable=true), virtual threads, records, pattern matching, HTML+plain MimeMultipart, default JVM Let's Encrypt trust. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
+// @copilot: Generate production-ready Java 21+ Jakarta Mail 2.1 example for mx.msgwing.com:465 implicit SSL (mail.smtp.ssl.enable=true), virtual threads, records, pattern matching, HTML+plain MimeMultipart, default JVM Let's Encrypt trust. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 
@@ -107,7 +107,7 @@ kompatybilne i wydajne 10/10 (10 to max)
 ## Rust 1.81+ (lettre 0.12)
 
 ```rust
-// @copilot: Generate production-ready Rust 1.81+ lettre 0.12 SmtpTransport::relay("mx.msgwing.com")?.port(465), system TLS (native-tls/rustls), explicit .timeout(Some(Duration::from_secs(30))) to avoid indefinite hangs, anyhow::Result, HTML+plain MultiPart. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). NO dangerous_accept_invalid_certs(). Single-file executable.
+// @copilot: Generate production-ready Rust 1.81+ lettre 0.11 (verify on crates.io before pinning a version — 0.12 does not exist as of this writing) SmtpTransport::relay("mx.msgwing.com")?.port(465), system TLS via the default native-tls backend (NOT the boring-tls feature, which has a known hostname-verification bug — see RUSTSEC-2026-0141), explicit .timeout(Some(Duration::from_secs(30))) to avoid indefinite hangs, anyhow::Result, HTML+plain MultiPart. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). NO dangerous_accept_invalid_certs(). Single-file executable.
 ```
 
 
@@ -122,10 +122,10 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ---
 
-## Kotlin 2.0+ (Jakarta Mail 3.0)
+## Kotlin 2.0+ (Jakarta Mail 2.1)
 
 ```kotlin
-// @copilot: Generate production-ready Kotlin 2.0+ Jakarta Mail 3.0 example for mx.msgwing.com:465 implicit SSL, sealed interfaces, default JVM trust, HTML+plain MimeMultipart, Result<>. Avoid experimental/preview language features (e.g. context receivers) that require non-default compiler flags — plain functions with explicit Session parameters keep the example simple and compilable out of the box. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
+// @copilot: Generate production-ready Kotlin 2.0+ Jakarta Mail 2.1 example for mx.msgwing.com:465 implicit SSL, sealed interfaces, default JVM trust, HTML+plain MimeMultipart, Result<>. Avoid experimental/preview language features (e.g. context receivers) that require non-default compiler flags — plain functions with explicit Session parameters keep the example simple and compilable out of the box. Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT (prefixed to avoid colliding with the OS-reserved USERNAME variable on Windows). Single-file executable.
 ```
 
 
