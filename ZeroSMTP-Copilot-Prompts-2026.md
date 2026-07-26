@@ -131,10 +131,10 @@ kompatybilne i wydajne 10/10 (10 to max)
 
 ---
 
-## Swift 6.0+ (Swift-SMTP 7.0)
+## Swift 6.3+ (swift-smtp 2.18, SwiftNIO-based)
 
 ```swift
-// @copilot: Generate production-ready Swift 6.0+ Swift-SMTP 7.0 example for mx.msgwing.com:465 SSL, system trust store, actors, macros, HTML+plain Mail, async/await. Placeholders: username, password, from, to, subject. NO allowUnsafeCertificates. Single-file executable.
+// @copilot: Generate production-ready Swift 6.3+ example using sersoft-gmbh/swift-smtp (SwiftNIO-based; NOT the unmaintained Kitura/Swift-SMTP, which fails to build against current OpenSSL) for mx.msgwing.com:465, Configuration.Server with .ssl encryption, Configuration.Credentials, Email/Email.Contact/Email.Body.universal, async/await Mailer.send(). Env var placeholders: ZEROSMTP_USERNAME, ZEROSMTP_PASSWORD, ZEROSMTP_FROM, ZEROSMTP_TO, ZEROSMTP_SUBJECT. Single-file executable.
 ```
 
 

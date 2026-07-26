@@ -1,12 +1,19 @@
 // swift-zerosmtp.swift
 /**
- * Swift 6.0+ Swift-SMTP 7.0 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
- * Production-ready | Let's Encrypt | Actors, macros, async/await
- * NO allowUnsafeCertificates
+ * Swift 6.3+ swift-smtp 2.18 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Production-ready | Let's Encrypt | async/await, SwiftNIO-based
+ *
+ * NOTE: this file used to demonstrate Kitura/Swift-SMTP, which is
+ * unmaintained and fails to build against the OpenSSL version on current
+ * Linux distributions (a transitive dependency calls the removed/renamed
+ * SSL_get_peer_certificate). It now uses sersoft-gmbh/swift-smtp, an
+ * actively maintained, SwiftNIO-based library.
  */
 
 import Foundation
-import SMTP
+import NIOCore
+import NIOPosix
+import SwiftSMTP
 
 @main
 struct ZeroSMTPMailer {
@@ -21,10 +28,10 @@ struct ZeroSMTPMailer {
             subject: ProcessInfo.processInfo.environment["ZEROSMTP_SUBJECT"] ?? "Test Email from ZeroSMTP"
         )
 
-        let mailer = MailerActor(config: config)
-        let result = await mailer.sendEmail()
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        defer { try? group.syncShutdownGracefully() }
 
-        switch result {
+        switch await sendEmail(config: config, group: group) {
         case .success:
             print("Email sent successfully")
             exit(0)
@@ -48,50 +55,34 @@ enum MailResult {
     case failure(String)
 }
 
-actor MailerActor {
-    private let config: EmailConfig
+func sendEmail(config: EmailConfig, group: any EventLoopGroup) async -> MailResult {
+    let configuration = Configuration(
+        server: Configuration.Server(
+            hostname: "mx.msgwing.com",
+            port: 465,
+            encryption: .ssl
+        ),
+        credentials: Configuration.Credentials(
+            username: config.username,
+            password: config.password
+        )
+    )
+    let mailer = Mailer(group: group, configuration: configuration)
 
-    init(config: EmailConfig) {
-        self.config = config
-    }
+    let email = Email(
+        sender: Email.Contact(name: "ZeroSMTP User", emailAddress: config.from),
+        recipients: [Email.Contact(emailAddress: config.to)],
+        subject: config.subject,
+        body: .universal(
+            plain: "Hello from ZeroSMTP! This is plain text.",
+            html: "<html><body><h1>Hello from ZeroSMTP!</h1><p>This is an HTML email sent via mx.msgwing.com:465</p></body></html>"
+        )
+    )
 
-    func sendEmail() async -> MailResult {
-        do {
-            let smtp = SMTP(
-                hostname: "mx.msgwing.com",
-                email: config.username,
-                password: config.password,
-                port: 465,
-                tlsMode: .requireTLS,
-                tlsConfiguration: nil  // uses system trust store
-            )
-
-            let from = Mail.User(name: "ZeroSMTP", email: config.from)
-            let to = Mail.User(email: config.to)
-
-            let mail = Mail(
-                from: from,
-                to: [to],
-                subject: config.subject,
-                text: "Hello from ZeroSMTP! This is plain text.",
-                additionalHeaders: [
-                    "Content-Type": "text/plain; charset=UTF-8"
-                ]
-            )
-
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                smtp.send(mail) { error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                    } else {
-                        continuation.resume()
-                    }
-                }
-            }
-
-            return .success
-        } catch {
-            return .failure("SMTP error: \(error)")
-        }
+    do {
+        try await mailer.send(email)
+        return .success
+    } catch {
+        return .failure("SMTP error: \(error)")
     }
 }

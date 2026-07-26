@@ -3,13 +3,10 @@ name: Lint examples
 # Builds/syntax-checks every example on push/PR, using the manifest files
 # at the repo root (package.json, composer.json, Cargo.toml, Package.swift,
 # cs-zerosmtp.csproj, pom.xml, build.gradle.kts) that point at the relevant
-# single-file example. The Swift job is best-effort (continue-on-error):
-# our own Package.swift/swift-zerosmtp.swift resolve and start building
-# fine, but a transitive dependency of Kitura/Swift-SMTP (BlueSSLService)
-# fails to compile against the OpenSSL version on current Ubuntu runners
-# (SSL_get_peer_certificate was removed/renamed upstream). That's an
-# unmaintained-library problem, not something fixable in this repo without
-# replacing the Swift-SMTP dependency itself.
+# single-file example. The Swift job stays continue-on-error for one more
+# run: it was switched from the unmaintained Kitura/Swift-SMTP (which failed
+# to build against current OpenSSL) to sersoft-gmbh/swift-smtp, but that
+# hasn't been confirmed green here yet — remove continue-on-error once it is.
 
 on:
   push:
@@ -159,6 +156,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: swift-actions/setup-swift@v2
         with:
-          swift-version: "6.0"
+          # swift-smtp declares swift-tools-version 6.3, matching Package.swift.
+          swift-version: "6.3"
       - name: Build Swift example
         run: swift build
