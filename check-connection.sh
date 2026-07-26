@@ -30,7 +30,7 @@ for port in "${PORTS[@]}"; do
 
   echo "== TLS handshake on $HOST:$port =="
   if ! command -v openssl >/dev/null 2>&1; then
-    echo "openssl not found, skipping TLS handshake check"
+    echo "openssl not found, skipping TLS handshake check (see docs/LINUX.md for the install command on your distro)"
     continue
   fi
   if [ "$port" = "465" ]; then

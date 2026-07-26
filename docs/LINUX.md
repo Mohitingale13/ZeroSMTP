@@ -1,0 +1,59 @@
+# Linux Setup Guide (Debian, Ubuntu, Rocky Linux, Fedora, openSUSE)
+
+Every example in this repo runs on any of these distributions — the SMTP
+connection itself (port 587/465, TLS) is identical everywhere. What differs
+is how you install the prerequisites. This page is a quick reference so you
+don't have to guess package names per distro.
+
+## Base tools (curl, openssl)
+
+Needed for [`check-connection.sh`](../check-connection.sh) and
+[`bash-curl-zerosmtp.sh`](../bash-curl-zerosmtp.sh).
+
+| Distro | Command |
+| --- | --- |
+| Debian / Ubuntu | `sudo apt update && sudo apt install -y curl openssl` |
+| Rocky Linux | `sudo dnf install -y curl openssl` |
+| Fedora | `sudo dnf install -y curl openssl` |
+| openSUSE | `sudo zypper install -y curl openssl` |
+
+curl and openssl ship preinstalled on most of these distros already —
+this is only needed for minimal/container base images.
+
+## swaks (for [`bash-swaks-zerosmtp.sh`](../bash-swaks-zerosmtp.sh))
+
+`swaks` isn't in every distro's default repos the same way:
+
+| Distro | Command |
+| --- | --- |
+| Debian / Ubuntu | `sudo apt install -y swaks` |
+| Fedora | `sudo dnf install -y swaks` (in Fedora's own repos) |
+| Rocky Linux | `sudo dnf install -y epel-release && sudo dnf install -y swaks` (needs [EPEL](https://docs.fedoraproject.org/en-US/epel/)) |
+| openSUSE | `sudo zypper addrepo https://download.opensuse.org/repositories/server:mail/openSUSE_Tumbleweed/server:mail.repo && sudo zypper refresh && sudo zypper install -y swaks` (adjust the repo URL for your openSUSE version) |
+
+## Language runtimes
+
+Only install what you need for the example(s) you're using — see the
+[Code Examples table](../README.md#code-examples) for which file needs which.
+
+| Language | Debian/Ubuntu (`apt`) | Rocky/Fedora (`dnf`) | openSUSE (`zypper`) |
+| --- | --- | --- | --- |
+| Python | `python3` | `python3` | `python3` |
+| PHP + Composer | `php-cli composer` | `php-cli composer` | `php composer` |
+| Node.js / TypeScript | `nodejs npm` | `nodejs npm` | `nodejs npm` |
+| Ruby | `ruby` | `ruby` | `ruby` |
+| Go | `golang-go` | `golang` | `go` |
+| Java | `default-jdk` | `java-21-openjdk-devel` | `java-21-openjdk-devel` |
+| Kotlin | install [Gradle](https://gradle.org/install/) manually (no build needed — `gradle build` fetches Kotlin itself) | same | same |
+| .NET / C# | see [Microsoft's install docs](https://learn.microsoft.com/dotnet/core/install/linux) — package names vary by exact distro version | same | same |
+| Rust | `curl https://sh.rustup.rs -sSf \| sh` (via [rustup](https://rustup.rs/), same on every distro) | same | same |
+| Maven (for the Java example) | `maven` | `maven` | `maven` |
+
+## Connectivity
+
+Everything else — firewall rules, ports, TLS — behaves the same across all
+five distros; there's nothing distro-specific to configure for outbound
+SMTP. If a send hangs or times out, it's almost always the network (cloud
+provider or ISP blocking outbound SMTP), not the OS — run
+[`check-connection.sh`](../check-connection.sh) first and see
+[TROUBLESHOOTING.md](TROUBLESHOOTING.md).
