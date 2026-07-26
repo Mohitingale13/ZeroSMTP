@@ -49,6 +49,13 @@ Only install what you need for the example(s) you're using — see the
 | Rust | `curl https://sh.rustup.rs -sSf \| sh` (via [rustup](https://rustup.rs/), same on every distro) | same | same |
 | Maven (for the Java example) | `maven` | `maven` | `maven` |
 
+## Want the whole system to relay through ZeroSMTP?
+
+If you want cron jobs, `mail`/`sendmail`, or monitoring tools to send
+through ZeroSMTP instead of a specific script, see
+[SYSTEM-MTA.md](SYSTEM-MTA.md) for Postfix (satellite/smarthost mode),
+msmtp, and Exim4 configuration.
+
 ## Connectivity
 
 Everything else — firewall rules, ports, TLS — behaves the same across all
