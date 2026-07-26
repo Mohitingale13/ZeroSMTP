@@ -28,10 +28,10 @@
 # CONFIGURATION SECTION - Update with your credentials
 # ====================================================================
 
-$SmtpServer = "mx.msgwing.com"            # ZeroSMTP server
-$SmtpUser = "your-email@msgwing.com"      # Your registered ZeroSMTP account
-$SmtpPassword = "your-password"           # Your ZeroSMTP account password
-$TestRecipient = "test-XXXXX@srv1.mail-tester.com"  # Your unique test email from mail-tester.com
+$SmtpServer = "mx.msgwing.com"                  # ZeroSMTP server
+$SmtpUser = "your-email@msgwing.com"            # YOUR registered ZeroSMTP account (example format)
+$SmtpPassword = "your-password"                 # YOUR ZeroSMTP account password
+$TestRecipient = "test-XXXXX@srv1.mail-tester.com"  # YOUR unique test email from mail-tester.com
 
 # ====================================================================
 # SCRIPT EXECUTION
