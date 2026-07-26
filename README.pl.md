@@ -1,8 +1,27 @@
 **Czytaj po angielsku:** [README.md](README.md)
 
+[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+
 # Wysyłaj maile bez problemów. Za darmo.
 
 Darmowe konto SMTP w domenie @msgwing.com
+
+## Szybki start
+
+1. Zarejestruj i aktywuj darmowe konto na [msgwing.com](https://msgwing.com), a następnie skopiuj wygenerowany losowo login `@msgwing.com` i hasło.
+2. Skopiuj [`.env.example`](.env.example) do `.env` i uzupełnij swoimi danymi.
+3. Wyślij testowego maila przez curl (bez żadnych zależności poza samym curl):
+
+   ```bash
+   export $(grep -v '^#' .env | xargs)
+   curl --url "smtps://mx.msgwing.com:465" \
+     --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
+     --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
+     --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
+   ```
+
+   Albo wybierz swój język z tabeli [Przykłady kodu](#przykłady-kodu) poniżej — każdy przykład korzysta z tych samych zmiennych w `.env`.
+4. Coś nie działa? Zobacz [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) — najczęstszą przyczyną nieudanego pierwszego uruchomienia jest blokowanie wychodzących portów SMTP przez dostawcę chmury, a nie błąd w konfiguracji.
 
 Po rejestracji konto SMTP generuje się automatycznie i losowo - dzięki temu otrzymujesz adres z bardzo dobrą reputacją, co znacznie zwiększa szansę na dostarczenie maili do skrzynki odbiorcy.
 
@@ -18,7 +37,7 @@ Idealne dla:
 - Drukarek sieciowych (skan-do-mail)
 - Urządzeń IoT i innych sprzętów z obsługą SMTP
 
-Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md)
+Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md)
 
 ## Przykłady kodu
 

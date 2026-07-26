@@ -1,8 +1,27 @@
 **Czytaj po polsku:** [README.pl.md](README.pl.md)
 
+[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+
 # Send Emails Without Hassle. For Free.
 
 Free SMTP Account with @msgwing.com domain
+
+## Quickstart
+
+1. Register and activate a free account at [msgwing.com](https://msgwing.com), then copy your randomly generated `@msgwing.com` login and password.
+2. Copy [`.env.example`](.env.example) to `.env` and fill in your credentials.
+3. Send a test email with curl (no dependencies beyond curl itself):
+
+   ```bash
+   export $(grep -v '^#' .env | xargs)
+   curl --url "smtps://mx.msgwing.com:465" \
+     --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
+     --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
+     --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
+   ```
+
+   Or pick your language from the [Code Examples](#code-examples) table below — every example reads the same `.env` variables.
+4. Having trouble? See [Troubleshooting](docs/TROUBLESHOOTING.md) — most first-run failures are a cloud provider blocking outbound SMTP ports, not a misconfiguration.
 
 After registration, your SMTP account is automatically and randomly generated - giving you an email address with excellent reputation, which significantly improves email deliverability to the recipient's mailbox.
 
@@ -18,7 +37,7 @@ Perfect for:
 - Network printers (Scan-to-Email function)
 - IoT devices and any hardware that supports SMTP
 
-Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md)
+Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## Code Examples
 

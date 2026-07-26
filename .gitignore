@@ -1,0 +1,15 @@
+# Never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Per-language build artifacts / dependency caches, in case a
+# contributor sets up a local project around one of the examples
+vendor/
+node_modules/
+target/
+bin/
+obj/
+*.class
+.build/
+Packages/
