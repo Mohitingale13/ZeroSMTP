@@ -26,7 +26,24 @@ Dane do konfiguracji:
 
 Dbamy o Twoją prywatność - Twoje dane nie są przetwarzane w żadnych celach marketingowych ani handlowych.
 
-Jeśli masz pytania, napisz do nas: xigam.adg@gmail.com
+## Bezpieczeństwo i Dostarczalność
+
+**✓ Poprawa Reputacji Domeny**: Reputacja domeny msgwing.com została znacznie poprawiona, a wszystkie konta spamowe zostały zablokowane i usunięte. Gwarantujemy optymalną dostarczalność dla wszystkich legytymnych użytkowników.
+
+### Sprawdź Reputację Domeny Samodzielnie
+
+Chcesz zweryfikować reputację msgwing.com? Możesz to zrobić samodzielnie za pomocą [mail-tester.com](https://mail-tester.com/):
+
+1. Utwórz darmowe konto SMTP na stronie [msgwing.com](https://msgwing.com)
+2. Użyj naszego skryptu PowerShell: [SendEmailTest_mail-tester.com.ps1](SendEmailTest_mail-tester.com.ps1)
+3. Wygeneruj losowy email na mail-tester.com i wyślij wiadomość testową z Twojego adresu @msgwing.com
+4. Sprawdź wynik reputacji i szczegółową analizę
+
+**✓ Poprawki Bezpieczeństwa**: Wdrożyliśmy kompleksowe ulepszeń bezpieczeństwa usługi msgwing.com, w tym ulepszony protokół autoryzacji, wzmocnione monitorowanie nadużyć i ulepszony bezpieczeństwo infrastruktury.
+
+---
+
+Jeśli masz pytania, napisz do nas: abuse@msgwing.com
 
 Dobra dostarczalność • Losowa reputacja konta • Zero kosztów • Pełna prywatność • Działa z wszystkim
 
