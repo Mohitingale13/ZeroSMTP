@@ -1,6 +1,6 @@
 // swift-zerosmtp.swift
 /**
- * Swift 6.3+ swift-smtp 2.18 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
+ * Swift 6.2+ swift-smtp 2.16 - ZeroSMTP mx.msgwing.com:465 SSL/TLS
  * Production-ready | Let's Encrypt | async/await, SwiftNIO-based
  *
  * NOTE: this file used to demonstrate Kitura/Swift-SMTP, which is
