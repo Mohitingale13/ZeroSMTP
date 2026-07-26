@@ -11,10 +11,11 @@ let package = Package(
         .executableTarget(
             name: "zerosmtp-swift",
             dependencies: [
-                // `package:` must match the dependency's own declared
-                // package name ("SwiftSMTP"), not its repository name
-                // ("Swift-SMTP").
-                .product(name: "SwiftSMTP", package: "SwiftSMTP")
+                // Confirmed via `swift build`: SwiftPM resolves this
+                // dependency's package identity as "Swift-SMTP" (matching
+                // the repository name), even though the product itself is
+                // named "SwiftSMTP".
+                .product(name: "SwiftSMTP", package: "Swift-SMTP")
             ],
             path: ".",
             sources: ["swift-zerosmtp.swift"]

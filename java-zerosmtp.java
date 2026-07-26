@@ -9,6 +9,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 // NOTE: not `public` on purpose — a public top-level class must live in a
@@ -35,7 +36,7 @@ final class ZeroSMTPMailer {
             System.getenv("ZEROSMTP_TO") != null ? System.getenv("ZEROSMTP_TO") : "recipient@example.com",
             System.getenv("ZEROSMTP_SUBJECT") != null ? System.getenv("ZEROSMTP_SUBJECT") : "Test Email from ZeroSMTP"
         );
-        Thread.ofVirtual().start(() -> {
+        Thread thread = Thread.ofVirtual().start(() -> {
             try {
                 if (sendEmailViaZeroSMTP(config)) {
                     System.out.println("Email sent successfully");
@@ -48,7 +49,14 @@ final class ZeroSMTPMailer {
                 System.err.println("Messaging error: " + e.getMessage());
                 System.exit(1);
             }
-        }).join();
+        });
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Interrupted while waiting for the send to complete");
+            System.exit(1);
+        }
     }
 
     private static boolean sendEmailViaZeroSMTP(EmailConfig config) throws MessagingException {
@@ -103,6 +111,9 @@ final class ZeroSMTPMailer {
                     yield false;
                 }
             };
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("Invalid sender name encoding: " + e.getMessage());
+            return false;
         }
     }
 }

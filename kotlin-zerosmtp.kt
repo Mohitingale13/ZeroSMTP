@@ -29,7 +29,9 @@ data class EmailConfig(
     val subject: String,
 )
 
-fun createMultipartMessage(session: Session, config: EmailConfig): Message = MimeMessage(session).apply {
+// Typed as MimeMessage (not the base Message) because sendEmailViaZeroSMTP
+// below reads .messageID, which only MimeMessage exposes.
+fun createMultipartMessage(session: Session, config: EmailConfig): MimeMessage = MimeMessage(session).apply {
     setFrom(InternetAddress(config.from, "ZeroSMTP User"))
     setRecipients(Message.RecipientType.TO, InternetAddress.parse(config.to))
     subject = config.subject
