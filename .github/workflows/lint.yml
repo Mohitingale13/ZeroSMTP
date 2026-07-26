@@ -11,6 +11,13 @@ on:
     branches: [main]
   pull_request:
 
+# None of these jobs need to write anything — they only check out the repo
+# and run a build/syntax-check. Explicit minimal permissions (flagged by
+# CodeQL as "Workflow does not contain permissions" otherwise) instead of
+# relying on the default GITHUB_TOKEN scope.
+permissions:
+  contents: read
+
 jobs:
   bash:
     runs-on: ubuntu-latest
