@@ -26,11 +26,19 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
+            // NOTE: GitHub's issue search does bare-word AND matching, not
+            // strict adjacent-phrase matching, even with quotes — a query
+            // like '"free smtp"' still matches issues where those words
+            // appear separately, which produced a lot of noise in testing.
+            // Requiring several specific words together, restricted to the
+            // title, cuts that down a lot (a title mentioning all of
+            // "smtp", "free", and "relay" together is a strong signal).
             const queries = [
-              '"free smtp" is:issue is:open',
-              '"smtp relay" free is:issue is:open',
-              '"need smtp" is:issue is:open',
-              '"free transactional email" is:issue is:open',
+              'smtp free relay in:title is:issue is:open',
+              'smtp free server in:title is:issue is:open',
+              'smtp relay recommend in:title is:issue is:open',
+              'smtp alternative free in:title is:issue is:open',
+              'transactional email free in:title is:issue is:open',
             ];
 
             const sinceDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
