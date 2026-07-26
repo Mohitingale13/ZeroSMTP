@@ -11,7 +11,10 @@ let package = Package(
         .executableTarget(
             name: "zerosmtp-swift",
             dependencies: [
-                .product(name: "SwiftSMTP", package: "Swift-SMTP")
+                // `package:` must match the dependency's own declared
+                // package name ("SwiftSMTP"), not its repository name
+                // ("Swift-SMTP").
+                .product(name: "SwiftSMTP", package: "SwiftSMTP")
             ],
             path: ".",
             sources: ["swift-zerosmtp.swift"]

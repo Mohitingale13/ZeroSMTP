@@ -11,7 +11,11 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import java.util.Properties;
 
-public final class ZeroSMTPMailer {
+// NOTE: not `public` on purpose — a public top-level class must live in a
+// file of the same name (ZeroSMTPMailer.java), which conflicts with this
+// repo's <language>-zerosmtp.<ext> naming convention. A package-private
+// class works identically here since main() itself is still public.
+final class ZeroSMTPMailer {
 
     public record EmailConfig(
         String username,
