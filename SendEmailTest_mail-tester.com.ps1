@@ -6,6 +6,11 @@
 # This script demonstrates how to send test emails using ZeroSMTP
 # service (msgwing.com) to verify domain reputation on mail-tester.com.
 #
+# IMPORTANT: This script uses PORT 587 (STARTTLS) which is fully supported
+#            by PowerShell's Send-MailMessage cmdlet.
+#            Port 465 (Implicit SSL) is NOT supported by PowerShell's
+#            Send-MailMessage and will cause connection failures.
+#
 # Requirements:
 # - Active ZeroSMTP account at https://msgwing.com
 # - Credentials for your @msgwing.com email address
@@ -17,9 +22,6 @@
 # 3. Update the variables below with your credentials
 # 4. Run this script in PowerShell
 # 5. Check mail-tester.com for the reputation score and detailed report
-#
-# NOTE: This script uses Port 587 (STARTTLS) which is fully supported by PowerShell.
-#       Port 465 (Implicit SSL) is NOT reliably supported by PowerShell's Send-MailMessage.
 # ====================================================================
 
 # ====================================================================
@@ -70,7 +72,7 @@ Write-Host "  Port: 587"
 Write-Host "  Authentication: STARTTLS (Explicit TLS)"
 Write-Host "  From: $SmtpUser"
 Write-Host "  To: $TestRecipient"
-Write-Host "  Status: ✓ Fully supported by PowerShell`n"
+Write-Host "  Status: ✓ Fully supported by PowerShell Send-MailMessage`n"
 
 try {
     # Construct mail parameters for port 587
@@ -100,6 +102,7 @@ Email Authentication Checks:
 
 Thank you for using ZeroSMTP!
 "@
+        Encoding = "UTF8"
         ErrorAction = "Stop"
     }
 
@@ -122,33 +125,32 @@ catch {
     Write-Host "  - Check your network connectivity"
     Write-Host "  - Verify the mail-tester.com test email address is correct"
     Write-Host "  - Ensure TLS 1.2+ is supported by your system`n"
+    exit 1
 }
 
 # ====================================================================
-# PORT 465 ALTERNATIVE (Implicit SSL - .NET Implementation)
+# REFERENCE: Port 465 (Implicit SSL) - Why NOT Supported
 # ====================================================================
 
 Write-Host "=========================================`n" -ForegroundColor Cyan
-Write-Host "Port 465 (Implicit SSL/TLS) - Advanced Alternative" -ForegroundColor Yellow
+Write-Host "Reference: Port 465 (Implicit SSL) - Why Not in This Script" -ForegroundColor Yellow
 Write-Host "=========================================`n" -ForegroundColor Cyan
 
-Write-Host "NOTE: PowerShell's Send-MailMessage does NOT support port 465 (Implicit SSL)." -ForegroundColor Yellow
-Write-Host "This is a limitation of the PowerShell cmdlet itself.`n" -ForegroundColor Yellow
+Write-Host "PowerShell Send-MailMessage Limitation:" -ForegroundColor Yellow
+Write-Host "  ✗ Does NOT support port 465 (Implicit SSL)"
+Write-Host "  ✓ Only supports port 587 (STARTTLS/Explicit TLS)"
+Write-Host "  ✓ Only supports port 25 (Plain/STARTTLS)`n"
 
-Write-Host "For port 465, you would need to use .NET SmtpClient directly:" -ForegroundColor Cyan
-Write-Host @"
-`$client = New-Object System.Net.Mail.SmtpClient("mx.msgwing.com", 465)
-`$client.EnableSsl = `$true
-`$client.Credentials = New-Object System.Net.NetworkCredential("your-email@msgwing.com", "password")
-`$mail = New-Object System.Net.Mail.MailMessage("from@msgwing.com", "to@mail-tester.com")
-`$mail.Subject = "Test Email"
-`$mail.Body = "Test message"
-`$client.Send(`$mail)
+Write-Host "Technical Details:" -ForegroundColor Cyan
+Write-Host "  - Port 465: Requires immediate TLS encryption (Implicit SSL)"
+Write-Host "  - Port 587: Allows STARTTLS (explicit upgrade to TLS)"
+Write-Host "  - PowerShell: Only implements the port 587 pattern`n"
 
-`n" -ForegroundColor White
-
-Write-Host "RECOMMENDATION:" -ForegroundColor Green
-Write-Host "  ✓ Use Port 587 (STARTTLS) - Fully supported, industry standard, secure`n" -ForegroundColor Green
+Write-Host "If you need port 465:" -ForegroundColor Green
+Write-Host "  1. Use the Bash curl script: bash-curl-zerosmtp.sh"
+Write-Host "  2. Use .NET SmtpClient directly with advanced configuration"
+Write-Host "  3. Use third-party PowerShell modules like MailKit"
+Write-Host "  4. Use alternative scripting languages (Python, Node.js, etc.)`n"
 
 # ====================================================================
 # SUMMARY
@@ -172,9 +174,10 @@ Write-Host "  ☐ Reputation Score - Domain trustworthiness"
 Write-Host "  ☐ Blacklist Status - Check for any listing issues"
 Write-Host "  ☐ TLS Version - Verify secure connection`n"
 
-Write-Host "Port Comparison:" -ForegroundColor Yellow
-Write-Host "  Port 587 (STARTTLS) - ✓ Recommended, fully supported in PowerShell"
-Write-Host "  Port 465 (Implicit SSL) - ⚠ Use .NET SmtpClient or alternative tools`n"
+Write-Host "Supported Ports for PowerShell:" -ForegroundColor Yellow
+Write-Host "  ✓ Port 25 (Plain/STARTTLS) - Legacy, not recommended"
+Write-Host "  ✓ Port 587 (STARTTLS) - RECOMMENDED"
+Write-Host "  ✗ Port 465 (Implicit SSL) - NOT SUPPORTED by Send-MailMessage`n"
 
 Write-Host "For more information:" -ForegroundColor Cyan
 Write-Host "  - ZeroSMTP: https://msgwing.com"
@@ -183,5 +186,5 @@ Write-Host "  - Report Issues: abuse@msgwing.com"
 Write-Host "  - PowerShell Mail: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/send-mailmessage`n"
 
 Write-Host "=========================================" -ForegroundColor Cyan
-Write-Host "Script execution completed" -ForegroundColor Cyan
+Write-Host "Script execution completed successfully" -ForegroundColor Cyan
 Write-Host "=========================================" -ForegroundColor Cyan
