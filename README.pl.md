@@ -122,4 +122,4 @@ Rejestracja odbywa się na stronie: https://msgwing.com
 
 ## Historia gwiazdek
 
-[![Star History Chart](https://api.star-history.com/svg?repos=msgwing/ZeroSMTP&type=Date)](https://star-history.com/#msgwing/ZeroSMTP&Date)
+[![GitHub stars](https://img.shields.io/github/stars/msgwing/ZeroSMTP?style=social)](https://star-history.com/#msgwing/ZeroSMTP&Date)
