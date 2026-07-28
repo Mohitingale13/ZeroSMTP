@@ -5,6 +5,11 @@ connection itself (port 587/465, TLS) is identical everywhere. What differs
 is how you install the prerequisites. This page is a quick reference so you
 don't have to guess package names per distro.
 
+> Don't want to install anything locally at all? Open this repo in the
+> included [Dev Container](../.devcontainer/devcontainer.json) (or as a
+> GitHub Codespace via the badge in the [README](../README.md)) — every
+> runtime in the tables below comes preinstalled.
+
 ## Base tools (curl, openssl)
 
 Needed for [`check-connection.sh`](../check-connection.sh) and
