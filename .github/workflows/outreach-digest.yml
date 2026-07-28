@@ -60,6 +60,12 @@ jobs:
               for (const item of res.data.items) {
                 if (seen.has(item.html_url)) continue;
                 seen.add(item.html_url);
+                // Bot-authored issues are almost always auto-generated
+                // templates (e.g. recurring "daily challenge" issues) whose
+                // boilerplate body happens to contain enough of our keywords
+                // to match — genuine "I need a free SMTP relay" questions
+                // are asked by humans, not opened by github-actions[bot].
+                if (item.user && item.user.type === 'Bot') continue;
                 const repoPath = item.repository_url.split('/').slice(-2).join('/');
                 results.push(`- [${item.title}](${item.html_url}) — \`${repoPath}\``);
               }
