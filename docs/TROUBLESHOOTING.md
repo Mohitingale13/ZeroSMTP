@@ -59,13 +59,19 @@ your provider's support to unblock outbound SMTP for your account/instance.
 
 ## Certificate / TLS verification failed
 
-- Do not disable certificate verification to "fix" this (no example in this
-  repo does, and none should) — a cert error almost always means an
+- Do not disable certificate verification to "fix" this (no code example in
+  this repo does, and none should) — a cert error almost always means an
   intercepting proxy, an outdated system CA bundle, or a wrong hostname, not
   a problem with `mx.msgwing.com` itself.
 - Make sure you're connecting to `mx.msgwing.com` (not an IP address) so
   hostname verification succeeds.
-- Update your system's CA certificate bundle if it's very old.
+- Update your system's CA certificate bundle if it's very old — this is
+  especially common on embedded devices (printers, scanners) whose firmware
+  has a fixed, non-updatable root CA store that predates Let's Encrypt's
+  `ISRG Root X1` root. One confirmed case is documented in
+  [PRINTERS.md](PRINTERS.md#4-known-exception-canon-maxify-mb2755-requires-disabling-certificate-verification)
+  (Canon Maxify MB2755) — treat disabling verification as a last resort for
+  that specific class of device, not a general fix.
 
 ## Which port should I use?
 

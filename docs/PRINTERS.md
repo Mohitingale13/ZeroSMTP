@@ -66,7 +66,40 @@ Device web UI → `Properties` / `System Settings` → `Connectivity` →
 `Protocols` → `SMTP Server` → enter server, port, authentication, and
 encryption values from the table above.
 
-## 4. Verifying it works
+## 4. Known exception: Canon Maxify MB2755 requires disabling certificate verification
+
+Most printers validate `mx.msgwing.com`'s certificate correctly and should be
+left with certificate verification **enabled** — this is the safe default
+and the one recommended in [TROUBLESHOOTING.md](TROUBLESHOOTING.md). One
+confirmed exception is the **Canon Maxify MB2755** (2016-era consumer/SOHO
+inkjet MFP):
+
+- `mx.msgwing.com` serves a **Let's Encrypt R3** certificate.
+- Until September 2021, Let's Encrypt's chain was cross-signed by the
+  widely trusted `DST Root CA X3`. Since that root expired, Let's Encrypt
+  relies solely on its own `ISRG Root X1`.
+- The MB2755's firmware ships a fixed, non-updatable root CA store that was
+  never updated to trust `ISRG Root X1`. As a result, full certificate
+  validation fails on this model even though the certificate itself is
+  valid and correctly served — there is no way to import a root certificate
+  into this printer's firmware, and no firmware update exists that adds it.
+- On this specific model, disabling **"Nie weryfikuj certyfikat" / "Don't
+  verify certificate"** is the only setting that lets the connection
+  succeed. Everything else (server, port, SSL, authentication) uses the
+  same values as the table above.
+
+![Canon Maxify MB2755 mail server settings, sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
+
+> **Security note:** disabling certificate verification means the printer
+> no longer confirms it's actually talking to `mx.msgwing.com` rather than
+> an on-path attacker on the same network (the SMTP session is still
+> encrypted, but the server's identity is unverified). Only do this if your
+> device is genuinely affected by the root-CA gap above — for any printer
+> that isn't an old Canon Maxify (or a similarly outdated embedded device),
+> keep certificate verification enabled per
+> [TROUBLESHOOTING.md](TROUBLESHOOTING.md#certificate--tls-verification-failed).
+
+## 5. Verifying it works
 
 1. Send a test scan-to-email from the printer to your own inbox.
 2. If it fails, check the printer's event log for an authentication or TLS
