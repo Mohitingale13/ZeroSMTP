@@ -46,10 +46,14 @@ a browser go to the printer's IP address →
 `Scan to Email` → `Outgoing Email Profiles` → add a profile with the values
 from the table above.
 
-### Canon (imageRUNNER / imageCLASS / PIXMA business models)
+### Canon (imageRUNNER / imageCLASS / PIXMA business models / Maxify)
 Printer's web interface (Remote UI) → `Settings/Registration` →
 `TX Settings` → `E-Mail/I-Fax Settings` → `SMTP Server Settings` → enter
 server, port, authentication, and encryption values from the table above.
+On the **Maxify MB2755**, this same menu also has an SSL certificate
+verification toggle — see the
+[known exception below](#4-known-exception-canon-maxify-mb2755-requires-disabling-certificate-verification)
+if it needs to be turned off.
 
 ### Epson (WorkForce / EcoTank Pro with Scan-to-Email)
 Printer's web configuration page → `Network Scan` or `Basic` → `Email Server` →
