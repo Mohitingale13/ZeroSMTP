@@ -79,7 +79,11 @@ your provider's support to unblock outbound SMTP for your account/instance.
   client, library, and printer.
 - **465 (Implicit SSL/TLS)** — use this if your client/device offers an
   explicit "SSL" mode separate from "STARTTLS"/"TLS", or if your network
-  blocks STARTTLS negotiation on 587 but allows 465.
+  blocks STARTTLS negotiation on 587 but allows 465. Treat 465 as a
+  fallback, not a first choice, once 587 has been confirmed to work — see
+  the [Canon Maxify MB2755 update](PRINTERS.md#4-known-exception-canon-maxify-mb2755-requires-disabling-certificate-verification)
+  for a concrete case where production testing confirmed 587 as the
+  correct default and demoted 465 to an emergency-only setting.
 - **25** — not supported by ZeroSMTP for client submission, and blocked by
   most providers anyway (see above).
 

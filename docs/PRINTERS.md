@@ -91,8 +91,23 @@ inkjet MFP):
   verify certificate"** is the only setting that lets the connection
   succeed. Everything else (server, port, SSL, authentication) uses the
   same values as the table above.
+- **Update (production testing, 2026-07):** this printer also connects
+  successfully to `mx.msgwing.com` on port **`587`** with **"Bezpieczne
+  połącz. (SSL)" / "encrypted connection"** checked (same certificate
+  exception applies, since the root cause is the printer's fixed CA store,
+  not the port). **Port `587` should be treated as the default for this
+  model going forward; keep port `465` configured only as a fallback if
+  `587` is ever unreachable on a given network** (see "Which port should I
+  use?" in [TROUBLESHOOTING.md](TROUBLESHOOTING.md#which-port-should-i-use)).
 
-![Canon Maxify MB2755 mail server settings, sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
+![Canon Maxify MB2755 mail server settings on port 587 (recommended default), sender address redacted](assets/canon-maxify-mb2755-mail-settings-587.png)
+
+<details>
+<summary>Port 465 (fallback configuration only)</summary>
+
+![Canon Maxify MB2755 mail server settings on port 465 (fallback), sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
+
+</details>
 
 > **Security note:** disabling certificate verification means the printer
 > no longer confirms it's actually talking to `mx.msgwing.com` rather than
