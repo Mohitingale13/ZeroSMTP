@@ -87,30 +87,33 @@ inkjet MFP):
   validation fails on this model even though the certificate itself is
   valid and correctly served — there is no way to import a root certificate
   into this printer's firmware, and no firmware update exists that adds it.
-- On this specific model, disabling **"Nie weryfikuj certyfikat" / "Don't
-  verify certificate"** is the only setting that lets the connection
-  succeed. Everything else (server, port, SSL, authentication) uses the
-  same values as the table above.
+- On this specific model, using **port `465`** requires disabling **"Nie
+  weryfikuj certyfikat" / "Don't verify certificate"** — that is the only
+  setting that lets the connection succeed on `465`.
 - **Update (production testing, 2026-07):** this printer also connects
   successfully to `mx.msgwing.com` on port **`587`** with **"Bezpieczne
-  połącz. (SSL)" / "encrypted connection"** checked (same certificate
-  exception applies, since the root cause is the printer's fixed CA store,
-  not the port). **Port `587` should be treated as the default for this
-  model going forward; keep port `465` configured only as a fallback if
-  `587` is ever unreachable on a given network** (see "Which port should I
-  use?" in [TROUBLESHOOTING.md](TROUBLESHOOTING.md#which-port-should-i-use)).
+  połącz. (SSL)" / "encrypted connection"** checked — and on `587` it does
+  **not** need the certificate-verification workaround: leave "Nie
+  weryfikuj certyfikat" **unchecked** (certificate verification enabled).
+  **Port `587` should be treated as the default for this model going
+  forward, since it avoids the certificate-verification workaround
+  entirely; keep port `465` (with verification disabled) configured only
+  as a fallback if `587` is ever unreachable on a given network** (see
+  "Which port should I use?" in
+  [TROUBLESHOOTING.md](TROUBLESHOOTING.md#which-port-should-i-use)).
 
-![Canon Maxify MB2755 mail server settings on port 587 (recommended default), sender address redacted](assets/canon-maxify-mb2755-mail-settings-587.png)
+![Canon Maxify MB2755 mail server settings on port 587 (recommended default; certificate verification stays enabled), sender address redacted](assets/canon-maxify-mb2755-mail-settings-587.png)
 
 <details>
-<summary>Port 465 (fallback configuration only)</summary>
+<summary>Port 465 (fallback configuration only — requires disabling certificate verification)</summary>
 
 ![Canon Maxify MB2755 mail server settings on port 465 (fallback), sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
 
 </details>
 
-> **Security note:** disabling certificate verification means the printer
-> no longer confirms it's actually talking to `mx.msgwing.com` rather than
+> **Security note:** disabling certificate verification (only needed on
+> port `465` for this model) means the printer no longer confirms it's
+> actually talking to `mx.msgwing.com` rather than
 > an on-path attacker on the same network (the SMTP session is still
 > encrypted, but the server's identity is unverified). Only do this if your
 > device is genuinely affected by the root-CA gap above — for any printer
