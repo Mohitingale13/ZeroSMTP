@@ -8,6 +8,7 @@ Microsoft 365 turns off SMTP AUTH Basic auth.<br>
 No OAuth to implement. No credit card. No mail server to run.
 
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
+[![Basic auth countdown](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/countdown.json)](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
 [![15 languages](https://img.shields.io/badge/examples-15%20languages-blue)](#code-examples)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
