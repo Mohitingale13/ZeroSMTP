@@ -14,6 +14,31 @@ option among them.
 If that's the error you're seeing, start with
 [Exchange Online SMTP AUTH migration](EXCHANGE-ONLINE-SMTP-AUTH.md).
 
+<div id="zc-countdown" style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:16px 20px;margin:20px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <noscript>Basic authentication for SMTP AUTH is disabled by default on existing Microsoft 365 tenants at the end of December 2026.</noscript>
+</div>
+<script>
+(function(){
+  var el = document.getElementById('zc-countdown');
+  if (!el) return;
+  var deadline = new Date('2026-12-31T23:59:59Z');
+  function render(){
+    var diff = deadline - new Date();
+    if (diff <= 0) {
+      el.innerHTML = '<strong>The default has flipped.</strong> Basic authentication for SMTP AUTH is now disabled by default on existing Microsoft 365 tenants.';
+      return;
+    }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    el.innerHTML =
+      '<div style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#57606a;margin-bottom:4px;">Until Microsoft 365 disables Basic auth for SMTP AUTH by default</div>' +
+      '<div style="font-size:22px;font-weight:600;color:#0969da;">' + d + ' day' + (d === 1 ? '' : 's') + ', ' + h + ' hour' + (h === 1 ? '' : 's') + '</div>';
+  }
+  render();
+  setInterval(render, 3600000);
+})();
+</script>
+
 ---
 
 ## Start here
@@ -27,6 +52,8 @@ If that's the error you're seeing, start with
 | Manage Linux servers | [Linux](LINUX.md) · [system-wide relay](SYSTEM-MTA.md) |
 | Are sending from an app or script | [Code examples in 15 languages](CODE-EXAMPLES.md) |
 | Have it failing or timing out | [Troubleshooting](TROUBLESHOOTING.md) |
+| Have monitoring/alerting tools that need to send mail | [Monitoring alerts](MONITORING.md) |
+| Want to see confirmed fixes for specific hardware | [Device case studies](DEVICE-CASE-STUDIES.md) |
 | Just want the short answers | [FAQ](FAQ.md) |
 
 ## What is happening

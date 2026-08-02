@@ -153,6 +153,51 @@ Menu wording shifts between firmware versions, but locations are stable
 enough to be a reliable starting point. Each entry links to the vendor's own
 current documentation — check there if the wording has moved on your model.
 
+**Pick your brand for just that menu path**, or scroll down for all ten at once.
+
+<div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:16px 20px;margin:16px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;max-width:640px;">
+  <label for="zc-brand-picker" style="font-weight:600;display:block;margin-bottom:8px;">Printer brand</label>
+  <select id="zc-brand-picker" style="width:100%;padding:8px;border:1px solid #d0d7de;border-radius:6px;font-size:14px;margin-bottom:12px;">
+    <option value="">Select a brand…</option>
+  </select>
+  <div id="zc-brand-output" style="font-size:14px;"></div>
+</div>
+<script>
+(function(){
+  var select = document.getElementById('zc-brand-picker');
+  var output = document.getElementById('zc-brand-output');
+  if (!select || !output) return;
+
+  var brands = [
+    { name: "HP", path: "Embedded Web Server (browser → printer's IP) → <code>Networking</code> or <code>Scan</code> tab → <code>TCP/IP Settings</code> → <code>Outgoing Email</code> / <code>Scan to Email</code> → <code>Outgoing Email Profiles</code> → add a profile using the values above." },
+    { name: "Canon", path: "Remote UI (browser → printer's IP) → <code>Settings/Registration</code> → <code>TX Settings</code> → <code>E-Mail/I-Fax Settings</code> → <code>SMTP Server Settings</code>. Covers imageRUNNER, imageCLASS, Maxify and PIXMA business models. On the Maxify MB2755 this menu also holds a certificate-verification toggle — see the known exception further down this page." },
+    { name: "Ricoh", path: "Web Image Monitor (browser → printer's IP, log in as administrator) → <code>Device Management</code> → <code>Configuration</code> → <code>Email</code> (under Device Settings) → set <code>SMTP Server Name</code>, <code>SMTP Port No.</code>, and enable <code>SMTP Authentication</code>." },
+    { name: "Xerox", path: "Embedded Web Server → <code>Properties</code> → <code>Connectivity</code> → <code>Protocols</code> → <code>SMTP Server</code> → <code>General</code>. Newer app-based models use <code>Properties → Apps → Email → Setup</code> instead." },
+    { name: "Kyocera", path: "Command Center RX (browser → printer's IP, admin login) → <code>Advanced</code> → <code>E-mail</code> → <code>SMTP</code> → <code>General</code>. Set <code>SMTP Security</code> to match your chosen port, and confirm <code>SMTP (E-mail TX)</code> is <code>On</code> under <code>Network Settings → Protocol</code>." },
+    { name: "Konica Minolta", path: "Touch panel: <code>Utility</code> → <code>Administrator Settings</code> → <code>Network Settings</code> → <code>E-Mail Settings</code> → <code>E-Mail TX (SMTP)</code>. Web Connection: <code>Network</code> → <code>E-mail Setting</code> → <code>E-mail TX (SMTP)</code>." },
+    { name: "Sharp", path: "<code>Settings (Administrator)</code> → <code>System Settings</code> → <code>Network Settings</code> → <code>Service Settings</code> → <code>SMTP</code> tab. Some models expose this on the web page as <code>Settings → E-mail</code>. Set <code>Primary Server</code>, <code>Port Number</code>, <code>Sender Address</code>, and enable SMTP authentication and <code>SSL/TLS</code>." },
+    { name: "Brother", path: "Web Based Management (browser → printer's IP) → <code>Network</code> → <code>Protocol</code> → <code>SMTP Client</code>. Set <code>SSL/TLS</code> to <code>STARTTLS</code> for port 587, or <code>SSL</code> for 465." },
+    { name: "Epson", path: "Printer's web configuration page → <code>Network Scan</code> or <code>Basic</code> → <code>Email Server</code> → enter server, port and authentication values. Applies to WorkForce and EcoTank Pro models with Scan-to-Email." },
+    { name: "Lexmark", path: "Embedded Web Server → <code>Settings</code> → <code>E-mail/FTP Settings</code> → <code>SMTP Setup</code>. Server goes in <code>Primary SMTP Gateway</code>, port in <code>Primary SMTP Gateway Port</code>, and set <code>Use SSL/TLS</code> to <code>Required</code>." }
+  ];
+
+  brands.forEach(function(b, i){
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = b.name;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener('change', function(){
+    if (select.value === '') { output.innerHTML = ''; return; }
+    var b = brands[parseInt(select.value, 10)];
+    output.innerHTML =
+      '<p>' + b.path + '</p>' +
+      '<p style="color:#57606a;">Server: <code>mx.msgwing.com</code> &middot; Port: <code>587</code> (STARTTLS) or <code>465</code> (SSL/TLS) &middot; full settings table above.</p>';
+  });
+})();
+</script>
+
 ### HP
 Embedded Web Server (browser → printer's IP) → `Networking` or `Scan` tab →
 `TCP/IP Settings` → `Outgoing Email` / `Scan to Email` →
@@ -229,6 +274,10 @@ and set `Use SSL/TLS` to `Required`.
 ---
 
 ## Known exception: Canon Maxify MB2755
+
+*One entry in the growing [device case studies](DEVICE-CASE-STUDIES.md) list
+— hit something similar on your own hardware? See that page for how to
+report it.*
 
 Most printers validate `mx.msgwing.com`'s certificate correctly and should
 keep certificate verification **enabled** — the safe default recommended in

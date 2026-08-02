@@ -119,6 +119,105 @@ outbound 587/465 to a new host is often firewalled.
 
 ## Quick decision guide
 
+Answer two or three questions for a straight recommendation, or read the
+same logic as a flowchart below.
+
+<div id="zc-quiz" style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:20px;margin:20px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;max-width:520px;">
+  <noscript>JavaScript is off — use the flowchart below instead.</noscript>
+</div>
+<script>
+(function(){
+  var el = document.getElementById('zc-quiz');
+  if (!el) return;
+
+  var steps = {
+    start: {
+      q: "Does the mail have to come FROM your own domain?",
+      options: [
+        { label: "Yes", next: "codeControl" },
+        { label: "No", next: "volume" }
+      ]
+    },
+    codeControl: {
+      q: "Can you change the app's code?",
+      options: [
+        { label: "Yes", next: "result_oauth" },
+        { label: "No", next: "staticIp" }
+      ]
+    },
+    staticIp: {
+      q: "Do your devices sit behind a static public IP?",
+      options: [
+        { label: "Yes", next: "result_directsend" },
+        { label: "No", next: "result_relay_or_paid" }
+      ]
+    },
+    volume: {
+      q: "Is this low volume and non-critical (scans, device alerts, notifications)?",
+      options: [
+        { label: "Yes", next: "result_zerosmtp" },
+        { label: "No", next: "result_paid" }
+      ]
+    }
+  };
+
+  var results = {
+    result_oauth: {
+      title: "Option 1 — OAuth 2.0 / Microsoft Graph API",
+      body: "Microsoft's own recommended path, and since you control the code, it's the right one: full auditing, keeps your domain, no third party involved."
+    },
+    result_directsend: {
+      title: "Option 2 — Direct Send / SMTP relay connector",
+      body: "With a static public IP, Direct Send often solves this without touching the devices at all &mdash; but it only delivers to your own tenant's domains."
+    },
+    result_relay_or_paid: {
+      title: "Options 3 or 4 — on-prem relay or a paid SMTP service",
+      body: "Without a static IP, you need either your own relay (Postfix/IIS &mdash; see SYSTEM-MTA.md) or a paid provider (SendGrid, Mailgun, SES...) that supports your own domain."
+    },
+    result_zerosmtp: {
+      title: "Option 5 — ZeroSMTP fits this case",
+      body: "Free, three settings changed, done &mdash; as long as sending from <code>@msgwing.com</code> instead of your own domain is acceptable here. See the Quickstart."
+    },
+    result_paid: {
+      title: "Option 4 — a paid SMTP service",
+      body: "Higher volume or anything customer-facing needs a provider built for that (SendGrid, Mailgun, Brevo, SES...)."
+    }
+  };
+
+  function renderQuestion(key){
+    var step = steps[key];
+    var html = '<div style="font-weight:600;margin-bottom:10px;">' + step.q + '</div>';
+    step.options.forEach(function(opt){
+      html += '<button data-next="' + opt.next + '" style="display:block;width:100%;text-align:left;background:#fff;border:1px solid #d0d7de;border-radius:6px;padding:8px 12px;margin:6px 0;cursor:pointer;font-size:14px;">' + opt.label + '</button>';
+    });
+    el.innerHTML = html;
+    Array.prototype.forEach.call(el.querySelectorAll('button'), function(btn){
+      btn.addEventListener('click', function(){
+        var next = btn.getAttribute('data-next');
+        if (results[next]) { renderResult(next); } else { renderQuestion(next); }
+      });
+    });
+  }
+
+  function renderResult(key){
+    var r = results[key];
+    el.innerHTML =
+      '<div style="font-weight:600;margin-bottom:8px;">Recommendation</div>' +
+      '<div style="background:#dafbe1;border:1px solid #2ea043;border-radius:6px;padding:12px 14px;"><strong>' + r.title + '</strong><p style="margin:8px 0 0;">' + r.body + '</p></div>' +
+      '<a href="#" id="zc-restart" style="display:inline-block;margin-top:10px;font-size:13px;">&larr; start over</a>';
+    document.getElementById('zc-restart').addEventListener('click', function(e){
+      e.preventDefault();
+      renderQuestion("start");
+    });
+  }
+
+  renderQuestion("start");
+})();
+</script>
+
+<details>
+<summary>Same logic as a flowchart (for reference, or if JavaScript is off)</summary>
+
 ```
 Does the mail have to come FROM your own domain?
 ├── Yes ──► Can you change the app's code?
@@ -130,6 +229,8 @@ Does the mail have to come FROM your own domain?
             ├── Yes ──► ZeroSMTP                          (option 5)
             └── No  ──► Paid SMTP service                 (option 4)
 ```
+
+</details>
 
 ## "Can I just turn it back on?"
 

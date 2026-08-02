@@ -123,6 +123,21 @@ defaults:
       description: >-
         How to handle temporary SMTP failures correctly with backoff and
         retries instead of tight retry loops.
+  - scope:
+      path: "DEVICE-CASE-STUDIES.md"
+    values:
+      title: "Device case studies: real printer fixes"
+      description: >-
+        Confirmed, hardware-tested fixes for specific printer and MFP models
+        — certificate quirks and firmware issues manuals don't mention,
+        credited to whoever found them.
+  - scope:
+      path: "MONITORING.md"
+    values:
+      title: "Monitoring alerts via SMTP relay"
+      description: >-
+        Drop-in email alert configuration for Zabbix, Nagios/Icinga, Uptime
+        Kuma and PRTG using a free SMTP relay.
 
 exclude:
   - assets/*.py
