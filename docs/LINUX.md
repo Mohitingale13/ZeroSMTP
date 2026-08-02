@@ -6,14 +6,14 @@ is how you install the prerequisites. This page is a quick reference so you
 don't have to guess package names per distro.
 
 > Don't want to install anything locally at all? Open this repo in the
-> included [Dev Container](../.devcontainer/devcontainer.json) (or as a
-> GitHub Codespace via the badge in the [README](../README.md)) — every
+> included [Dev Container](https://github.com/msgwing/ZeroSMTP/blob/main/.devcontainer/devcontainer.json) (or as a
+> GitHub Codespace via the badge in the [README](https://github.com/msgwing/ZeroSMTP#readme)) — every
 > runtime in the tables below comes preinstalled.
 
 ## Base tools (curl, openssl)
 
-Needed for [`check-connection.sh`](../check-connection.sh) and
-[`bash-curl-zerosmtp.sh`](../bash-curl-zerosmtp.sh).
+Needed for [`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) and
+[`bash-curl-zerosmtp.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/bash-curl-zerosmtp.sh).
 
 | Distro | Command |
 | --- | --- |
@@ -25,7 +25,7 @@ Needed for [`check-connection.sh`](../check-connection.sh) and
 curl and openssl ship preinstalled on most of these distros already —
 this is only needed for minimal/container base images.
 
-## swaks (for [`bash-swaks-zerosmtp.sh`](../bash-swaks-zerosmtp.sh))
+## swaks (for [`bash-swaks-zerosmtp.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/bash-swaks-zerosmtp.sh))
 
 `swaks` isn't in every distro's default repos the same way:
 
@@ -39,7 +39,7 @@ this is only needed for minimal/container base images.
 ## Language runtimes
 
 Only install what you need for the example(s) you're using — see the
-[Code Examples table](../README.md#code-examples) for which file needs which.
+[Code Examples table](https://github.com/msgwing/ZeroSMTP#code-examples) for which file needs which.
 
 | Language | Debian/Ubuntu (`apt`) | Rocky/Fedora (`dnf`) | openSUSE (`zypper`) |
 | --- | --- | --- | --- |
@@ -67,5 +67,5 @@ Everything else — firewall rules, ports, TLS — behaves the same across all
 five distros; there's nothing distro-specific to configure for outbound
 SMTP. If a send hangs or times out, it's almost always the network (cloud
 provider or ISP blocking outbound SMTP), not the OS — run
-[`check-connection.sh`](../check-connection.sh) first and see
+[`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) first and see
 [TROUBLESHOOTING.md](TROUBLESHOOTING.md).

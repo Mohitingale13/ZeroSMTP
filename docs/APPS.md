@@ -20,7 +20,7 @@ IMAP / POP3 field these applications might also offer.
 
 ![Generic SMTP settings fields](assets/smtp-settings-fields.svg)
 
-See [README.md](../README.md) for how to obtain a login and password.
+See [README.md](https://github.com/msgwing/ZeroSMTP#readme) for how to obtain a login and password.
 
 ## WordPress (contact forms, WooCommerce, password resets)
 
@@ -85,8 +85,8 @@ Never set `skip_verify = true` — that disables certificate validation.
 If an application only exposes generic "SMTP" fields (most CMSs, monitoring
 tools, and backup software do), use the values from the table above. If the
 application asks for a library or protocol name, any of the language
-examples in the repository root (e.g. [python-zerosmtp.py](../python-zerosmtp.py),
-[node-zerosmtp.mjs](../node-zerosmtp.mjs), [php-zerosmtp.php](../php-zerosmtp.php))
+examples in the repository root (e.g. [python-zerosmtp.py](https://github.com/msgwing/ZeroSMTP/blob/main/python-zerosmtp.py),
+[node-zerosmtp.mjs](https://github.com/msgwing/ZeroSMTP/blob/main/node-zerosmtp.mjs), [php-zerosmtp.php](https://github.com/msgwing/ZeroSMTP/blob/main/php-zerosmtp.php))
 show the equivalent raw configuration for that ecosystem.
 
 ## Limitations

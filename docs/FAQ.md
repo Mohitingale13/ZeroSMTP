@@ -25,7 +25,7 @@ hosting or website runs on. Setup is three steps:
 
 This covers contact forms, password resets, and notifications from any
 hosting provider, plus the other use cases in the main
-[README](../README.md#quickstart) (apps, scripts, printers, IoT, etc.).
+[README](https://github.com/msgwing/ZeroSMTP#quickstart) (apps, scripts, printers, IoT, etc.).
 
 ## Will emails be sent from my own domain (e.g. you@yourdomain.com)?
 
@@ -67,7 +67,7 @@ not your own domain (see above), and sending is rate-limited per account to
 keep the shared domain's reputation good for everyone (see
 [Sending limits](TROUBLESHOOTING.md#sending-limits-rate-limiting)).
 
-Beyond that, per the [README](../README.md): your data isn't processed for
+Beyond that, per the [README](https://github.com/msgwing/ZeroSMTP#readme): your data isn't processed for
 marketing or resold, and abuse accounts are actively removed to protect
 deliverability for everyone else. If your use case needs more than what's
 documented here, ask at abuse@msgwing.com rather than assuming it isn't

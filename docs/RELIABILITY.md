@@ -20,7 +20,7 @@ retrying on **transient** failures instead of dropping the message:
 Retry a handful of times with an increasing delay, plus a small random
 jitter so multiple failed sends don't all retry at the exact same instant.
 Reference implementation in Python, built on
-[`python-zerosmtp.py`](../python-zerosmtp.py):
+[`python-zerosmtp.py`](https://github.com/msgwing/ZeroSMTP/blob/main/python-zerosmtp.py):
 
 ```python
 import random

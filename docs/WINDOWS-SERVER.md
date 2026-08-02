@@ -47,7 +47,7 @@ or environment-specific config transforms for production.
 
 ### PHP on IIS
 
-Use [PHPMailer](../php-zerosmtp.php) or [Symfony Mailer](../php-symfony-mailer-zerosmtp.php)
+Use [PHPMailer](https://github.com/msgwing/ZeroSMTP/blob/main/php-zerosmtp.php) or [Symfony Mailer](https://github.com/msgwing/ZeroSMTP/blob/main/php-symfony-mailer-zerosmtp.php)
 from this repo and point them at `mx.msgwing.com:587`/`:465` directly — no
 IIS-level SMTP configuration needed. This also sidesteps PHP's very
 limited built-in `mail()` function, which doesn't support authenticated
@@ -56,7 +56,7 @@ SMTP at all.
 ## For scheduled/background tasks: PowerShell + Task Scheduler
 
 For backup jobs, monitoring alerts, or anything else that isn't a web app,
-use [`pwsh-zerosmtp.ps1`](../pwsh-zerosmtp.ps1) from this repo (built on
+use [`pwsh-zerosmtp.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/pwsh-zerosmtp.ps1) from this repo (built on
 the actively maintained `Send-MailKitMessage` module — see that file for
 why, not the deprecated `Send-MailMessage` cmdlet) as a
 [scheduled task](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-create):
@@ -127,7 +127,7 @@ notice, treat this as a last resort, not a starting point.
 
 ## Verifying it works
 
-The [`check-connection.ps1`](../check-connection.ps1) script in this repo
+The [`check-connection.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.ps1) script in this repo
 works identically on Windows Server — run it first to confirm the network
 path to `mx.msgwing.com` is open before debugging application config. See
 [TROUBLESHOOTING.md](TROUBLESHOOTING.md) if it isn't (Windows Server on

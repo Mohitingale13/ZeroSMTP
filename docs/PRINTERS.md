@@ -271,8 +271,8 @@ keep certificate verification **enabled** — the safe default recommended in
 ## Testing and troubleshooting
 
 1. **Check the network path first.** Run
-   [`check-connection.sh`](../check-connection.sh) or
-   [`check-connection.ps1`](../check-connection.ps1) from a machine on the
+   [`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) or
+   [`check-connection.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.ps1) from a machine on the
    same network. A firewall blocking outbound 587/465 looks identical to an
    authentication problem from the printer's panel.
 2. **Send a test scan** to your own inbox.
@@ -282,8 +282,8 @@ keep certificate verification **enabled** — the safe default recommended in
    - the From address matches the username (many firmwares require this)
    - the password was retyped, not pasted with a trailing space
 4. **Deliverability testing** (SPF/DKIM/DMARC): see
-   [`SendEmailTest_mail-tester.com.ps1`](../SendEmailTest_mail-tester.com.ps1)
-   and the reputation section in the [README](../README.md).
+   [`SendEmailTest_mail-tester.com.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/SendEmailTest_mail-tester.com.ps1)
+   and the reputation section in the [README](https://github.com/msgwing/ZeroSMTP#readme).
 
 More causes and fixes in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 

@@ -143,6 +143,6 @@ a Direct Send connector, your own relay, or a paid service — all covered in
 the [migration guide](EXCHANGE-ONLINE-SMTP-AUTH.md), which recommends them
 over this project where they're the better answer.
 
-Test the network path first with [`check-connection.sh`](../check-connection.sh)
+Test the network path first with [`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh)
 — corporate firewalls often block outbound 587/465 to a new host, which looks
 identical to an authentication problem.

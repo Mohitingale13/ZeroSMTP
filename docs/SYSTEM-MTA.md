@@ -225,6 +225,6 @@ Run with `ansible-playbook -i inventory.ini zerosmtp-relay.yml --ask-vault-pass`
 
 ## Verifying it works
 
-Use [`check-connection.sh`](../check-connection.sh) first to confirm the
+Use [`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) first to confirm the
 network path to `mx.msgwing.com` is open before debugging the MTA config
 itself — see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) if it isn't.

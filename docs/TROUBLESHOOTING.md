@@ -55,7 +55,7 @@ your provider's support to unblock outbound SMTP for your account/instance.
 - Confirm the environment variables are actually set: a typo like `USERNAME`
   instead of `ZEROSMTP_USERNAME` will silently fall back to a placeholder
   value or (on Windows) your OS login name — see the note in
-  [`.env.example`](../.env.example).
+  [`.env.example`](https://github.com/msgwing/ZeroSMTP/blob/main/.env.example).
 
 ## Certificate / TLS verification failed
 
@@ -116,7 +116,7 @@ ZeroSMTP is outgoing-only: there is no inbox, IMAP, or POP3 access tied to a
 expected — send it to a mailbox you actually control (e.g. your personal
 email, or a service like [mail-tester.com](https://mail-tester.com)) to
 verify delivery, as shown in
-[`SendEmailTest_mail-tester.com.ps1`](../SendEmailTest_mail-tester.com.ps1).
+[`SendEmailTest_mail-tester.com.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/SendEmailTest_mail-tester.com.ps1).
 
 ## Still stuck?
 

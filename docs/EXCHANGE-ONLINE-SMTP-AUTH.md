@@ -111,10 +111,10 @@ So:
   regulated environment where the sending identity matters. Use option 1, 2,
   or 4 for those.
 
-If that trade-off works for your case, the [Quickstart](../README.md#quickstart)
+If that trade-off works for your case, the [Quickstart](https://github.com/msgwing/ZeroSMTP#quickstart)
 takes about a minute, and [PRINTERS.md](PRINTERS.md) has per-brand settings
 (Canon, Epson, Brother, HP, Ricoh…). Test the network path first with
-[`check-connection.sh`](../check-connection.sh) — on a corporate network,
+[`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) — on a corporate network,
 outbound 587/465 to a new host is often firewalled.
 
 ## Quick decision guide
