@@ -1,7 +1,6 @@
 **Czytaj po angielsku:** [README.md](README.md)
 
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
-[![CodeQL](https://github.com/msgwing/ZeroSMTP/actions/workflows/codeql.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/codeql.yml)
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
 
