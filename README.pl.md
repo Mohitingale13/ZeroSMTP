@@ -1,35 +1,52 @@
-**Czytaj po angielsku:** [README.md](README.md)
+<div align="center">
 
-[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+![ZeroSMTP](docs/assets/banner.png)
+
+**Wysyłaj maile z dowolnej aplikacji, skryptu, serwera czy drukarki — za darmo, w około minutę.**<br>
+Bez karty kredytowej. Bez własnego serwera SMTP. Bez progów cenowych za wolumen.
+
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
+[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+[![15 języków](https://img.shields.io/badge/przyk%C5%82ady-15%20j%C4%99zyk%C3%B3w-blue)](#przykłady-kodu)
+[![Licencja: MIT](https://img.shields.io/badge/licencja-MIT-green.svg)](LICENSE)
 
-Każde środowisko uruchomieniowe używane w przykładach poniżej (Python, PHP, Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) jest już zainstalowane, jeśli otworzysz to repo w [Dev Container lub Codespace](.devcontainer/devcontainer.json) — bez lokalnej konfiguracji.
+[**Załóż darmowe konto →**](https://msgwing.com) · [Szybki start](#szybki-start) · [Przykłady kodu](#przykłady-kodu) · [FAQ](docs/FAQ.md) · [English](README.md)
 
-# Wysyłaj maile bez problemów. Za darmo.
+</div>
 
-Darmowe konto SMTP w domenie @msgwing.com
+---
+
+```bash
+curl --url "smtps://mx.msgwing.com:465" \
+  --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
+  --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
+  --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
+```
+
+I to wszystko — żadnego SDK, żadnego klucza API, po prostu dane SMTP, które
+działają z czymkolwiek, co już obsługuje SMTP.
+
+| | |
+| --- | --- |
+| **Serwer** | `mx.msgwing.com` |
+| **Port** | `587` (STARTTLS) lub `465` (SSL/TLS) |
+| **Login** | Twój losowo wygenerowany adres `@msgwing.com` |
+| **Koszt** | za darmo — do 200 maili dziennie ([limity](docs/TROUBLESHOOTING.md#sending-limits-rate-limiting)) |
+| **Haczyk** | maile wychodzą *z* `@msgwing.com`, nie z Twojej domeny ([dlaczego](docs/FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)) |
 
 ## Szybki start
 
 1. Zarejestruj i aktywuj darmowe konto na [msgwing.com](https://msgwing.com), a następnie skopiuj wygenerowany losowo login `@msgwing.com` i hasło.
 2. Skopiuj [`.env.example`](.env.example) do `.env` i uzupełnij swoimi danymi.
-3. Wyślij testowego maila przez curl (bez żadnych zależności poza samym curl):
-
-   ```bash
-   export $(grep -v '^#' .env | xargs)
-   curl --url "smtps://mx.msgwing.com:465" \
-     --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
-     --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
-     --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
-   ```
-
-   Albo wybierz swój język z tabeli [Przykłady kodu](#przykłady-kodu) poniżej — każdy przykład korzysta z tych samych zmiennych w `.env`.
+3. Uruchom powyższy snippet curl (najpierw `export $(grep -v '^#' .env | xargs)`), albo wybierz swój język z tabeli [Przykłady kodu](#przykłady-kodu) — każdy przykład korzysta z tych samych zmiennych w `.env`.
 4. Coś nie działa? Zobacz [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) — najczęstszą przyczyną nieudanego pierwszego uruchomienia jest blokowanie wychodzących portów SMTP przez dostawcę chmury, a nie błąd w konfiguracji.
 
-Po rejestracji konto SMTP generuje się automatycznie i losowo - dzięki temu otrzymujesz adres z bardzo dobrą reputacją, co znacznie zwiększa szansę na dostarczenie maili do skrzynki odbiorcy.
+> Wolisz nie instalować niczego lokalnie? Każde środowisko używane poniżej
+> (Python, PHP, Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) jest już
+> zainstalowane w dołączonym [Dev Container / Codespace](.devcontainer/devcontainer.json).
+> [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
 
-Szybka rejestracja, natychmiastowe konto i pełna swoboda wysyłania.
+Po rejestracji konto SMTP generuje się automatycznie i losowo - dzięki temu otrzymujesz adres z bardzo dobrą reputacją, co znacznie zwiększa szansę na dostarczenie maili do skrzynki odbiorcy.
 
 Wysyłaj wiadomości z aplikacji, skryptów, stron internetowych oraz urządzeń drukujących - wszystko działa od razu.
 

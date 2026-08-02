@@ -1,35 +1,52 @@
-**Czytaj po polsku:** [README.pl.md](README.pl.md)
+<div align="center">
 
-[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+![ZeroSMTP](docs/assets/banner.png)
+
+**Send email from any app, script, server, or printer — free, in about a minute.**<br>
+No credit card. No SMTP server to run. No volume-based pricing tiers.
+
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
+[![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
+[![15 languages](https://img.shields.io/badge/examples-15%20languages-blue)](#code-examples)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Every language runtime used by the examples below (Python, PHP, Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) comes preinstalled if you open this repo in a [Dev Container or Codespace](.devcontainer/devcontainer.json) — no local setup needed.
+[**Get a free account →**](https://msgwing.com) · [Quickstart](#quickstart) · [Code examples](#code-examples) · [FAQ](docs/FAQ.md) · [Polski](README.pl.md)
 
-# Send Emails Without Hassle. For Free.
+</div>
 
-Free SMTP Account with @msgwing.com domain
+---
+
+```bash
+curl --url "smtps://mx.msgwing.com:465" \
+  --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
+  --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
+  --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
+```
+
+That's the whole thing — no SDK, no API key, just SMTP credentials that work
+with anything that already speaks SMTP.
+
+| | |
+| --- | --- |
+| **Server** | `mx.msgwing.com` |
+| **Port** | `587` (STARTTLS) or `465` (SSL/TLS) |
+| **Login** | your randomly generated `@msgwing.com` address |
+| **Cost** | free — up to 200 emails/day ([limits](docs/TROUBLESHOOTING.md#sending-limits-rate-limiting)) |
+| **Catch** | mail is sent *from* `@msgwing.com`, not your own domain ([why](docs/FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)) |
 
 ## Quickstart
 
 1. Register and activate a free account at [msgwing.com](https://msgwing.com), then copy your randomly generated `@msgwing.com` login and password.
 2. Copy [`.env.example`](.env.example) to `.env` and fill in your credentials.
-3. Send a test email with curl (no dependencies beyond curl itself):
-
-   ```bash
-   export $(grep -v '^#' .env | xargs)
-   curl --url "smtps://mx.msgwing.com:465" \
-     --user "$ZEROSMTP_USERNAME:$ZEROSMTP_PASSWORD" \
-     --mail-from "$ZEROSMTP_FROM" --mail-rcpt "$ZEROSMTP_TO" \
-     --upload-file <(printf 'Subject: Test\r\n\r\nHello from ZeroSMTP!') --ssl-reqd
-   ```
-
-   Or pick your language from the [Code Examples](#code-examples) table below — every example reads the same `.env` variables.
+3. Run the curl snippet above (`export $(grep -v '^#' .env | xargs)` first), or pick your language from the [Code Examples](#code-examples) table — every example reads the same `.env` variables.
 4. Having trouble? See [Troubleshooting](docs/TROUBLESHOOTING.md) — most first-run failures are a cloud provider blocking outbound SMTP ports, not a misconfiguration.
 
-After registration, your SMTP account is automatically and randomly generated - giving you an email address with excellent reputation, which significantly improves email deliverability to the recipient's mailbox.
+> Prefer not to install anything locally? Every runtime used below (Python, PHP,
+> Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) is preinstalled in the
+> included [Dev Container / Codespace](.devcontainer/devcontainer.json).
+> [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
 
-Quick registration, instant account, and total freedom to send emails.
+After registration, your SMTP account is automatically and randomly generated - giving you an email address with excellent reputation, which significantly improves email deliverability to the recipient's mailbox.
 
 Send messages from your apps, scripts, websites, and even network printers - everything works right away.
 
