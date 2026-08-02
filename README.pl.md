@@ -12,7 +12,7 @@ Bez wdrażania OAuth. Bez karty kredytowej. Bez własnego serwera pocztowego.
 [![15 języków](https://img.shields.io/badge/przyk%C5%82ady-15%20j%C4%99zyk%C3%B3w-blue)](#przykłady-kodu)
 [![Licencja: MIT](https://img.shields.io/badge/licencja-MIT-green.svg)](LICENSE)
 
-[**Załóż darmowe konto →**](https://msgwing.com) · [**Migracja z Exchange Online →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Szybki start](#szybki-start) · [Przykłady kodu](#przykłady-kodu) · [FAQ](docs/FAQ.md) · [English](README.md)
+[**Załóż darmowe konto →**](https://msgwing.com) · [**Migracja z Exchange Online →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Strona dokumentacji](https://msgwing.github.io/ZeroSMTP/) · [Szybki start](#szybki-start) · [Przykłady kodu](#przykłady-kodu) · [FAQ](docs/FAQ.md) · [English](README.md)
 
 </div>
 
