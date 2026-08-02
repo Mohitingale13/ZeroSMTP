@@ -15,8 +15,8 @@ description: >-
   Microsoft 365 SMTP AUTH Basic authentication shutdown. Plain
   username/password auth, no OAuth required.
 
-url: https://msgwing.github.io
-baseurl: /ZeroSMTP
+url: https://docs.msgwing.com
+baseurl: ""
 
 theme: jekyll-theme-primer
 

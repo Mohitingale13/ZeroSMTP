@@ -12,7 +12,7 @@ No OAuth to implement. No credit card. No mail server to run.
 [![15 languages](https://img.shields.io/badge/examples-15%20languages-blue)](#code-examples)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-[**Get a free account →**](https://msgwing.com) · [**Exchange Online migration →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Documentation site](https://msgwing.github.io/ZeroSMTP/) · [Quickstart](#quickstart) · [Code examples](#code-examples) · [FAQ](docs/FAQ.md) · [Polski](README.pl.md)
+[**Get a free account →**](https://msgwing.com) · [**Exchange Online migration →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Documentation site](https://docs.msgwing.com/) · [Quickstart](#quickstart) · [Code examples](#code-examples) · [FAQ](docs/FAQ.md) · [Polski](README.pl.md)
 
 </div>
 
