@@ -38,6 +38,9 @@ scans out, but cannot check or receive email.
 Menu wording changes between firmware versions, but the location is
 consistent enough to be a reliable starting point. Always confirm against
 your exact model's manual, since manufacturers do rename menus over time.
+Each entry below links to that vendor's own current documentation rather
+than a paraphrase, so you can check your exact model/firmware if the wording
+has moved since this was written.
 
 ### HP (via the printer's Embedded Web Server / EWS)
 `Settings → Networking → TCP/IP Settings` (to find the printer's IP), then in
@@ -65,10 +68,59 @@ Printer's web management page (Web Based Management) → `Network` →
 from the table above. Set `SSL/TLS` to `STARTTLS` for port 587 or `SSL` for
 port 465.
 
-### Xerox / Konica Minolta (typical enterprise MFPs)
-Device web UI → `Properties` / `System Settings` → `Connectivity` →
-`Protocols` → `SMTP Server` → enter server, port, authentication, and
-encryption values from the table above.
+### Ricoh
+Web Image Monitor (browser → printer's IP, log in as administrator) →
+`Device Management` → `Configuration` → `Email` (under Device Settings) →
+enter `SMTP Server Name`, `SMTP Port No.`, and enable `SMTP Authentication`
+with the values from the table above. Field names are consistent across most
+Ricoh models even when the surrounding menu layout differs — see
+[Ricoh's own SMTP authentication guide](https://kb.gsd.ricoh.com/app/answers/detail/a_id/288857/~/how-to-set-up-smtp-authentication-for-scan-to-email).
+Ricoh has also published an
+[advisory specifically about the Exchange Online Basic auth phase-out](https://www.ricoh-ap.com/news/2025/05/20/ricohs-response-to-basic-authentication-phase-out-in-microsoft-exchange-online-smtp-authentication)
+worth reading if that's why you're here.
+
+### Kyocera (Command Center RX)
+Browser → printer's IP → Command Center RX admin login → `Advanced` →
+`E-mail` → `SMTP` → `General` → enter the server/port/authentication values
+from the table above and set `SMTP Security` to match the port you chose.
+See [Kyocera's Command Center RX e-mail settings guide](https://sites.google.com/view/howtoguidesforkyoceraprinters/the-command-center-rx/function-settings/e-mail).
+
+### Xerox (WorkCentre / VersaLink / AltaLink)
+Embedded Web Server → `Properties` → `Connectivity` → `Protocols` →
+`SMTP Server` → `General` → enter server, port, and connection security from
+the table above. Newer app-based models instead use
+`Properties → Apps → Email → Setup`. See
+[Xerox's own SMTP configuration article](https://www.support.xerox.com/en-us/article/en/2119372)
+for your exact model.
+
+### Konica Minolta (bizhub)
+Either from the touch panel — `Utility` → `Administrator Settings` →
+`Network Settings` → `E-Mail Settings` → `E-Mail TX (SMTP)` — or from the web
+admin page — `Network` → `E-mail Setting` → `E-mail TX (SMTP)`. See
+[Konica Minolta's E-mail TX (SMTP) manual page](https://manuals.konicaminolta.eu/bizhub-C554-C454-C364-C284-C224/EN/contents/id08-0072.html)
+for the exact wording on your model.
+
+### Sharp
+`Settings (Administrator)` → `System Settings` → `Network Settings` →
+`Service Settings` → `SMTP` tab (some models expose this at the web page's
+`Settings → E-mail` instead) — enter `Primary Server`, `Port Number`, and
+enable `SMTP Authentication`/`SSL-TLS` from the table above. See
+[Sharp's network settings manual](https://global.sharp/restricted/products/copier/downloads/manuals/bpb550wd/en/contents_09-07_018.html).
+
+### Lexmark
+Embedded Web Server → `Settings` → `E-mail/FTP Settings` → `SMTP Setup` →
+enter the server as `Primary SMTP Gateway`, the port as
+`Primary SMTP Gateway Port`, and set `Use SSL/TLS` to `Required`. See
+[Lexmark's e-mail SMTP settings guide](https://support.lexmark.com/content/support/guides/en/ug250010/email/configuring-the-email-smtp-settings-v59011346.html).
+
+> **Have a device from one of these brands and a few minutes?** The Canon
+> Maxify MB2755 section below exists because a contributor
+> ([`@kevinbytnar`](https://github.com/msgwing/ZeroSMTP/discussions/6)) tested
+> it on real hardware and reported back exactly what worked. If you confirm
+> (or need to correct) any of the paths above on your own device, please
+> [open an issue](https://github.com/msgwing/ZeroSMTP/issues/new/choose) or a
+> PR with a screenshot — real, hardware-confirmed reports are far more useful
+> here than anything written from a manual alone.
 
 ## 4. Known exception: Canon Maxify MB2755 requires disabling certificate verification
 
