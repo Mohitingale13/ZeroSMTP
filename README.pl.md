@@ -55,6 +55,20 @@ Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne ap
 Warunki darmowych planów powyżej zmieniają się w czasie — przed wyborem
 sprawdź aktualny cennik danego dostawcy.
 
+### A co z samodzielnym hostowaniem własnego serwera pocztowego?
+
+Popularne, samodzielnie hostowane rozwiązania jak [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver),
+[Mailu](https://github.com/Mailu/Mailu) czy [mailcow](https://github.com/mailcow/mailcow-dockerized)
+dają skrzynkę na własnej domenie i pełną kontrolę — ale to Ty utrzymujesz
+Postfix, DKIM/SPF/DMARC, filtrowanie spamu i reputację IP/domeny, co jest
+realną, ciągłą pracą, a nie jednorazową konfiguracją. ZeroSMTP to drugi
+biegun tego kompromisu: zero konfiguracji i zero utrzymania, w zamian za
+wysyłkę ze wspólnego adresu `@msgwing.com` zamiast własnej domeny. Jeśli
+już prowadzisz jedno z tych rozwiązań i działa — nie ma powodu, żeby
+zmieniać. Jeśli nie jesteś pewien, czy ten wysiłek się opłaca dla skryptu,
+formularza kontaktowego czy projektu pobocznego — ZeroSMTP nic nie
+kosztuje, żeby spróbować najpierw.
+
 ## GitHub Actions
 
 Używasz ZeroSMTP z poziomu workflow (alerty o błędach CI, powiadomienia o

@@ -55,6 +55,19 @@ Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](doc
 Free-tier terms above change over time — check each provider's current
 pricing page before committing to one.
 
+### What about self-hosting my own mail server?
+
+Popular self-hosted options like [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver),
+[Mailu](https://github.com/Mailu/Mailu), or [mailcow](https://github.com/mailcow/mailcow-dockerized)
+give you a mailbox on your own domain and full control — but you're the one
+running Postfix, DKIM/SPF/DMARC, spam filtering, and IP/domain reputation,
+which is real ongoing maintenance, not a one-time setup. ZeroSMTP is the
+other end of that trade-off: zero setup and zero maintenance, in exchange
+for sending from the shared `@msgwing.com` address instead of your own
+domain. If you already run one of those and it's working, there's no reason
+to switch. If you're not sure the effort is worth it yet for a script,
+contact form, or side project, ZeroSMTP costs nothing to try first.
+
 ## GitHub Actions
 
 Using ZeroSMTP from a workflow (CI failure alerts, deploy notifications,
