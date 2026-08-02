@@ -1,3 +1,5 @@
+![ZeroSMTP — free SMTP relay for developers and sysadmins, mx.msgwing.com, port 587/465, TLS](assets/banner.png)
+
 # ZeroSMTP — a free SMTP relay that still accepts basic auth
 
 **Your printer, scanner or app stopped sending email through Microsoft 365?**
