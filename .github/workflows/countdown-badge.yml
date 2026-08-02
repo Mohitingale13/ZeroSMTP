@@ -1,0 +1,78 @@
+name: Dec 2026 countdown badge
+
+# Publishes a shields.io endpoint badge showing days remaining until
+# Microsoft disables Basic authentication for SMTP AUTH by default on
+# existing tenants (end of December 2026). Same publishing pattern as
+# service-healthcheck.yml: writes a small JSON file to the orphan
+# "status" branch (not main), which the README badge reads via
+# img.shields.io/endpoint. Runs once a day - a days-remaining counter
+# doesn't need the 6-hour cadence the connectivity check uses.
+
+on:
+  schedule:
+    - cron: '5 0 * * *' # once a day, just after midnight UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  countdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compute days remaining and publish badge data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          DEADLINE="2026-12-31T23:59:59Z"
+          NOW_EPOCH=$(date -u +%s)
+          DEADLINE_EPOCH=$(date -u -d "$DEADLINE" +%s)
+          DIFF=$(( (DEADLINE_EPOCH - NOW_EPOCH) / 86400 ))
+
+          if [ "$DIFF" -lt 0 ]; then
+            MESSAGE="default has flipped"
+            COLOR="red"
+          elif [ "$DIFF" -eq 0 ]; then
+            MESSAGE="today"
+            COLOR="red"
+          elif [ "$DIFF" -eq 1 ]; then
+            MESSAGE="1 day left"
+            COLOR="red"
+          elif [ "$DIFF" -le 30 ]; then
+            MESSAGE="${DIFF} days left"
+            COLOR="red"
+          elif [ "$DIFF" -le 90 ]; then
+            MESSAGE="${DIFF} days left"
+            COLOR="orange"
+          else
+            MESSAGE="${DIFF} days left"
+            COLOR="blue"
+          fi
+
+          WORKDIR=$(mktemp -d)
+          cd "$WORKDIR"
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git fetch -q origin status 2>/dev/null; then
+            git checkout -q -B status origin/status
+          else
+            git checkout -q --orphan status
+            git rm -rf . -q 2>/dev/null || true
+          fi
+
+          cat > countdown.json <<JSON
+          {"schemaVersion":1,"label":"Basic auth (SMTP AUTH) shutdown","message":"${MESSAGE}","color":"${COLOR}"}
+          JSON
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add countdown.json
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Update countdown: ${MESSAGE}"
+            git push -q origin status
+          else
+            echo "Countdown unchanged (${MESSAGE}), nothing to push"
+          fi
