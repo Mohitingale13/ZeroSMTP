@@ -14,28 +14,94 @@ option among them.
 If that's the error you're seeing, start with
 [Exchange Online SMTP AUTH migration](EXCHANGE-ONLINE-SMTP-AUTH.md).
 
-<div id="zc-countdown" style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:16px 20px;margin:20px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<div id="zc-fc" style="
+  position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 120%, #2d1b4e 0%, #0d0620 55%, #050310 100%);
+  border:1px solid #ff2ec4;border-radius:12px;max-width:640px;
+  padding:28px 20px 22px;margin:20px auto;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  text-align:center;
+  box-shadow:0 0 30px rgba(255,46,196,.25), inset 0 0 60px rgba(60,20,120,.4);
+">
   <noscript>Basic authentication for SMTP AUTH is disabled by default on existing Microsoft 365 tenants at the end of December 2026.</noscript>
+  <div id="zc-fc-stars" style="position:absolute;inset:0;pointer-events:none;"></div>
+
+  <div style="position:relative;font-size:11px;letter-spacing:.25em;text-transform:uppercase;
+              color:#ff2ec4;text-shadow:0 0 8px #ff2ec4;margin-bottom:10px;font-weight:700;">
+    🚀 It's the final countdown <span style="opacity:.6;">&mdash; for Basic Auth on SMTP AUTH</span>
+  </div>
+
+  <div id="zc-fc-digits" style="position:relative;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;"></div>
+
+  <div style="position:relative;font-size:12px;color:#8be9fd;margin-top:12px;text-shadow:0 0 6px rgba(139,233,253,.6);">
+    Microsoft disables it by default on existing tenants &mdash; end of December 2026
+  </div>
+
+  <span style="position:absolute;left:-9999px;">
+    Countdown to the Microsoft 365 SMTP AUTH Basic authentication default change, end of December 2026.
+  </span>
 </div>
+<style>
+  @keyframes zc-fc-pulse { 0%,100%{ text-shadow:0 0 12px currentColor,0 0 24px currentColor; } 50%{ text-shadow:0 0 20px currentColor,0 0 40px currentColor; } }
+  @keyframes zc-fc-twinkle { 0%,100%{ opacity:.15; } 50%{ opacity:.9; } }
+  .zc-fc-unit { min-width:64px; }
+  .zc-fc-num {
+    font-family:'Courier New',monospace; font-weight:700; font-size:2.4rem; line-height:1;
+    color:#8be9fd; animation:zc-fc-pulse 2.2s ease-in-out infinite;
+  }
+  .zc-fc-label { font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#c792ea;margin-top:4px; }
+  .zc-fc-sep { font-size:2.4rem;font-weight:700;color:#ff2ec4;align-self:flex-start;text-shadow:0 0 10px #ff2ec4; }
+</style>
 <script>
 (function(){
-  var el = document.getElementById('zc-countdown');
-  if (!el) return;
+  var wrap = document.getElementById('zc-fc');
+  var digitsEl = document.getElementById('zc-fc-digits');
+  var starsEl = document.getElementById('zc-fc-stars');
+  if (!wrap || !digitsEl) return;
+
+  for (var i = 0; i < 40; i++) {
+    var s = document.createElement('div');
+    var size = Math.random() < 0.8 ? 1 : 2;
+    s.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;' +
+      'left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;' +
+      'background:#fff;border-radius:50%;' +
+      'animation:zc-fc-twinkle ' + (2 + Math.random()*3).toFixed(1) + 's ease-in-out infinite;' +
+      'animation-delay:' + (Math.random()*3).toFixed(1) + 's;';
+    starsEl.appendChild(s);
+  }
+
   var deadline = new Date('2026-12-31T23:59:59Z');
+
+  function pad(n){ return String(n).padStart(2, '0'); }
+
+  function unit(value, label){
+    return '<div class="zc-fc-unit"><div class="zc-fc-num">' + value + '</div>' +
+           '<div class="zc-fc-label">' + label + '</div></div>';
+  }
+
   function render(){
     var diff = deadline - new Date();
     if (diff <= 0) {
-      el.innerHTML = '<strong>The default has flipped.</strong> Basic authentication for SMTP AUTH is now disabled by default on existing Microsoft 365 tenants.';
+      digitsEl.innerHTML = '<div class="zc-fc-num" style="font-size:1.4rem;">The default has flipped &mdash; Basic auth is off.</div>';
       return;
     }
     var d = Math.floor(diff / 86400000);
     var h = Math.floor((diff % 86400000) / 3600000);
-    el.innerHTML =
-      '<div style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#57606a;margin-bottom:4px;">Until Microsoft 365 disables Basic auth for SMTP AUTH by default</div>' +
-      '<div style="font-size:22px;font-weight:600;color:#0969da;">' + d + ' day' + (d === 1 ? '' : 's') + ', ' + h + ' hour' + (h === 1 ? '' : 's') + '</div>';
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+
+    digitsEl.innerHTML =
+      unit(d, d === 1 ? 'day' : 'days') +
+      '<div class="zc-fc-sep">:</div>' +
+      unit(pad(h), 'hrs') +
+      '<div class="zc-fc-sep">:</div>' +
+      unit(pad(m), 'min') +
+      '<div class="zc-fc-sep">:</div>' +
+      unit(pad(s), 'sec');
   }
+
   render();
-  setInterval(render, 3600000);
+  setInterval(render, 1000);
 })();
 </script>
 
