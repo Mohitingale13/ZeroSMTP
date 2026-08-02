@@ -1,0 +1,121 @@
+# GitHub Pages configuration for the ZeroSMTP documentation site.
+#
+# Serves docs/ at https://msgwing.github.io/ZeroSMTP/ so the guides are
+# indexable as ordinary HTML pages. Raw .md files under github.com/*/blob/*
+# are poorly ranked by search engines; someone searching an SMTP error
+# message mid-outage needs to actually find these.
+#
+# Only plugins on GitHub Pages' supported list are used, so the site builds
+# natively without a custom Actions workflow.
+
+title: ZeroSMTP
+tagline: Free SMTP relay that still accepts basic username/password auth
+description: >-
+  Free SMTP relay for printers, scanners and legacy apps affected by the
+  Microsoft 365 SMTP AUTH Basic authentication shutdown. Plain
+  username/password auth, no OAuth required.
+
+url: https://msgwing.github.io
+baseurl: /ZeroSMTP
+
+theme: jekyll-theme-primer
+
+plugins:
+  - jekyll-seo-tag           # <title>, meta description, canonical, JSON-LD
+  - jekyll-sitemap           # sitemap.xml for crawlers
+  - jekyll-relative-links    # rewrites [x](FAQ.md) to working site URLs
+  - jekyll-optional-front-matter  # render .md files that have no front matter
+
+relative_links:
+  enabled: true
+  collections: false
+
+# Per-page titles and descriptions live here rather than in front matter so
+# the .md files stay clean when read on github.com.
+defaults:
+  - scope:
+      path: "index.md"
+    values:
+      title: "ZeroSMTP — free SMTP relay that still accepts basic auth"
+      description: >-
+        Free SMTP relay for printers, scanners and legacy apps hit by the
+        Microsoft 365 SMTP AUTH Basic authentication shutdown. No OAuth, no
+        credit card, no mail server to run.
+  - scope:
+      path: "EXCHANGE-ONLINE-SMTP-AUTH.md"
+    values:
+      title: "Exchange Online is disabling SMTP AUTH Basic auth — migration options"
+      description: >-
+        Microsoft disables Basic authentication for SMTP AUTH by default at the
+        end of December 2026. Timeline, the 535 5.7.139 error, and every
+        migration option for printers and legacy apps that cannot use OAuth.
+  - scope:
+      path: "AFFECTED-SYSTEMS.md"
+    values:
+      title: "What breaks when Microsoft 365 disables SMTP AUTH Basic auth"
+      description: >-
+        Risk assessment of printers, NAS units, backup jobs, monitoring tools
+        and line-of-business apps that stop sending email, with a PowerShell
+        audit to find your exposure.
+  - scope:
+      path: "PRINTERS.md"
+    values:
+      title: "Printer scan-to-email SMTP setup — Ricoh, Canon, Xerox, HP, Kyocera and more"
+      description: >-
+        Fix scan-to-email after Microsoft 365 disables Basic auth. Per-brand
+        SMTP settings for Ricoh, Canon, Xerox, HP, Kyocera, Konica Minolta,
+        Sharp, Brother, Epson and Lexmark, plus common error codes.
+  - scope:
+      path: "TROUBLESHOOTING.md"
+    values:
+      title: "SMTP troubleshooting — blocked ports, TLS errors, auth failures"
+      description: >-
+        Why SMTP sending hangs or fails: cloud providers blocking outbound
+        ports, certificate verification problems, authentication errors and
+        rate limits.
+  - scope:
+      path: "FAQ.md"
+    values:
+      title: "ZeroSMTP FAQ — custom domains, usernames, limits"
+      description: >-
+        Can I use ZeroSMTP with my own hosting and domain? Will mail come from
+        my domain? Sending limits, custom usernames, and why it is free.
+  - scope:
+      path: "WINDOWS-SERVER.md"
+    values:
+      title: "Windows Server SMTP setup — IIS, ASP.NET, PowerShell, Exchange"
+      description: >-
+        Send email from Windows Server without a local relay: ASP.NET
+        web.config, PHP on IIS, scheduled PowerShell tasks, and Exchange send
+        connectors.
+  - scope:
+      path: "SYSTEM-MTA.md"
+    values:
+      title: "System-wide mail relay on Linux — Postfix, msmtp, Exim4"
+      description: >-
+        Route all system mail (cron, monitoring, unattended-upgrades) through
+        an SMTP relay, with systemd failure alerts and an Ansible rollout
+        playbook.
+  - scope:
+      path: "LINUX.md"
+    values:
+      title: "Linux SMTP setup — Debian, Ubuntu, Rocky, Fedora, openSUSE"
+      description: >-
+        Per-distribution package names and setup for sending email from Linux
+        scripts and applications.
+  - scope:
+      path: "APPS.md"
+    values:
+      title: "SMTP settings for popular applications"
+      description: >-
+        Ready-to-use SMTP configuration for common applications and platforms.
+  - scope:
+      path: "RELIABILITY.md"
+    values:
+      title: "Reliable email sending — retries and transient SMTP errors"
+      description: >-
+        How to handle temporary SMTP failures correctly with backoff and
+        retries instead of tight retry loops.
+
+exclude:
+  - assets/*.py
