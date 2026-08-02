@@ -25,7 +25,7 @@ If that's the error you're seeing, start with
 | Have a printer or MFP to reconfigure | [Printer scan-to-email setup by brand](PRINTERS.md) |
 | Manage Windows Server / IIS / Exchange | [Windows Server guide](WINDOWS-SERVER.md) |
 | Manage Linux servers | [Linux](LINUX.md) · [system-wide relay](SYSTEM-MTA.md) |
-| Are sending from an app or script | [Code examples in 15 languages](https://github.com/msgwing/ZeroSMTP#code-examples) |
+| Are sending from an app or script | [Code examples in 15 languages](CODE-EXAMPLES.md) |
 | Have it failing or timing out | [Troubleshooting](TROUBLESHOOTING.md) |
 | Just want the short answers | [FAQ](FAQ.md) |
 
