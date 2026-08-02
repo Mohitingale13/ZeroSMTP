@@ -1,0 +1,155 @@
+name: mx.msgwing.com healthcheck
+
+# Runs periodically and checks that mx.msgwing.com is reachable on ports
+# 587 and 465: TCP connect + TLS/STARTTLS handshake only, same checks as
+# check-connection.sh, just automated. No credentials are used and no
+# email is sent — this only proves the relay is up and reachable, not that
+# authenticated sending works end-to-end.
+#
+# On failure it opens (or comments on) a single tracking issue labeled
+# "service-alert" so repeated failures don't spam new issues. On the next
+# successful run it comments "recovered" and closes that issue. A healthy
+# run is otherwise silent.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check TCP + TLS connectivity
+        id: check
+        run: |
+          HOST="mx.msgwing.com"
+          overall_ok=true
+          lines=()
+
+          check_port() {
+            local port="$1"
+            local tcp_ok=false
+            local tls_ok=false
+
+            if timeout 10 bash -c "exec 3<>/dev/tcp/$HOST/$port" 2>/dev/null; then
+              tcp_ok=true
+            fi
+
+            if [ "$tcp_ok" = true ]; then
+              local tls_check
+              if [ "$port" = "465" ]; then
+                tls_check=$(timeout 15 openssl s_client -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+              else
+                tls_check=$(timeout 15 openssl s_client -starttls smtp -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+              fi
+              if echo "$tls_check" | grep -q "Verify return code: 0"; then
+                tls_ok=true
+              fi
+            fi
+
+            if [ "$tcp_ok" = true ] && [ "$tls_ok" = true ]; then
+              lines+=("- Port ${port}: TCP connect OK, TLS handshake OK")
+            elif [ "$tcp_ok" = true ]; then
+              lines+=("- Port ${port}: TCP connect OK, TLS handshake FAILED")
+              overall_ok=false
+            else
+              lines+=("- Port ${port}: TCP connect FAILED")
+              overall_ok=false
+            fi
+          }
+
+          check_port 587
+          check_port 465
+
+          printf '%s\n' "${lines[@]}"
+
+          {
+            echo "summary<<EOF_SUMMARY"
+            printf '%s\n' "${lines[@]}"
+            echo "EOF_SUMMARY"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ "$overall_ok" = true ]; then
+            echo "status=ok" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Manage alert issue
+        uses: actions/github-script@v7
+        env:
+          CHECK_STATUS: ${{ steps.check.outputs.status }}
+          CHECK_SUMMARY: ${{ steps.check.outputs.summary }}
+        with:
+          script: |
+            const status = process.env.CHECK_STATUS;
+            const summary = process.env.CHECK_SUMMARY;
+            const title = 'mx.msgwing.com connectivity check failing';
+            const now = new Date().toISOString();
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const docsUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/main/docs/TROUBLESHOOTING.md`;
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'service-alert',
+            });
+            const openIssue = existing.data.find((i) => i.title === title);
+
+            if (status === 'fail') {
+              if (openIssue) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: openIssue.number,
+                  body: `Still failing as of ${now}.\n\n${summary}\n\nWorkflow run: ${runUrl}`,
+                });
+              } else {
+                const body = [
+                  `Automated healthcheck against \`mx.msgwing.com\` (ports 587/465) failed as of ${now}.`,
+                  '',
+                  summary,
+                  '',
+                  `Workflow run: ${runUrl}`,
+                  '',
+                  `_This check only verifies TCP connectivity and TLS handshake — no email is sent. See [TROUBLESHOOTING.md](${docsUrl}) for context on what this can and can't detect._`,
+                ].join('\n');
+
+                try {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title,
+                    body,
+                    labels: ['service-alert'],
+                  });
+                } catch (err) {
+                  core.warning(`Label may not exist yet, retrying without labels: ${err.message}`);
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title,
+                    body,
+                  });
+                }
+              }
+            } else if (openIssue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: openIssue.number,
+                body: `Recovered as of ${now} — both ports passed TCP connect + TLS handshake.\n\n${summary}`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: openIssue.number,
+                state: 'closed',
+              });
+            }
