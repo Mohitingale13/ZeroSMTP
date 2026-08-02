@@ -10,6 +10,10 @@ name: mx.msgwing.com healthcheck
 # "service-alert" so repeated failures don't spam new issues. On the next
 # successful run it comments "recovered" and closes that issue. A healthy
 # run is otherwise silent.
+#
+# It also publishes a status.json to an orphan "status" branch (not to
+# main, to avoid cluttering history) so README can show a live
+# shields.io endpoint badge of the current result.
 
 on:
   schedule:
@@ -18,7 +22,7 @@ on:
 
 permissions:
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   healthcheck:
@@ -78,6 +82,48 @@ jobs:
             echo "status=ok" >> "$GITHUB_OUTPUT"
           else
             echo "status=fail" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish status badge data
+        if: always() && steps.check.outputs.status != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS: ${{ steps.check.outputs.status }}
+        run: |
+          set -euo pipefail
+
+          if [ "$STATUS" = "ok" ]; then
+            MESSAGE="operational"
+            COLOR="brightgreen"
+          else
+            MESSAGE="degraded"
+            COLOR="red"
+          fi
+
+          WORKDIR=$(mktemp -d)
+          cd "$WORKDIR"
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git fetch -q origin status 2>/dev/null; then
+            git checkout -q -B status origin/status
+          else
+            git checkout -q --orphan status
+            git rm -rf . -q 2>/dev/null || true
+          fi
+
+          cat > status.json <<JSON
+          {"schemaVersion":1,"label":"mx.msgwing.com","message":"${MESSAGE}","color":"${COLOR}"}
+          JSON
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add status.json
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Update status: ${MESSAGE}"
+            git push -q origin status
+          else
+            echo "Status unchanged (${MESSAGE}), nothing to push"
           fi
 
       - name: Manage alert issue

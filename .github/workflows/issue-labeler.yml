@@ -1,0 +1,56 @@
+name: Issue labeler
+
+# Labels newly opened issues based on keywords in the title/body, so triage
+# doesn't require manually reading every issue first. Best-effort keyword
+# matching only — it never assigns, closes, or comments; a human still
+# reviews and can add/remove labels themselves.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const RULES = [
+              { label: 'printers', color: '5319e7', keywords: ['printer', 'scan-to-email', 'scan to email', 'canon', 'epson', 'brother', 'hp printer'] },
+              { label: 'windows', color: '0e8a16', keywords: ['windows server', 'powershell', 'iis', 'exchange'] },
+              { label: 'linux', color: 'fbca04', keywords: ['ubuntu', 'debian', 'rocky', 'fedora', 'opensuse', 'postfix', 'msmtp', 'exim'] },
+              { label: 'docs', color: '0075ca', keywords: ['documentation', 'readme', 'typo', 'docs/'] },
+              { label: 'question', color: 'd876e3', keywords: ['how do i', 'how to', 'can i', 'is it possible'] },
+              { label: 'bug', color: 'd73a4a', keywords: ['error', 'failed', 'failure', 'exception', 'traceback', 'not working', "doesn't work", 'timeout'] },
+            ];
+
+            const title = (context.payload.issue.title || '').toLowerCase();
+            const body = (context.payload.issue.body || '').toLowerCase();
+            const text = `${title}\n${body}`;
+
+            const matched = RULES.filter((r) => r.keywords.some((k) => text.includes(k)));
+            if (matched.length === 0) return;
+
+            for (const rule of matched) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: rule.label,
+                  color: rule.color,
+                });
+              } catch (err) {
+                // Already exists — fine.
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              labels: matched.map((r) => r.label),
+            });
