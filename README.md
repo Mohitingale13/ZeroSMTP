@@ -2,17 +2,24 @@
 
 ![ZeroSMTP](docs/assets/banner.png)
 
-**Send email from any app, script, server, or printer — free, in about a minute.**<br>
-No credit card. No SMTP server to run. No volume-based pricing tiers.
+**A free SMTP relay that still accepts plain username-and-password auth.**<br>
+Built for the printers, scanners, and legacy apps left behind when
+Microsoft 365 turns off SMTP AUTH Basic auth.<br>
+No OAuth to implement. No credit card. No mail server to run.
 
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
 [![15 languages](https://img.shields.io/badge/examples-15%20languages-blue)](#code-examples)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-[**Get a free account →**](https://msgwing.com) · [Quickstart](#quickstart) · [Code examples](#code-examples) · [FAQ](docs/FAQ.md) · [Polski](README.pl.md)
+[**Get a free account →**](https://msgwing.com) · [**Exchange Online migration →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Quickstart](#quickstart) · [Code examples](#code-examples) · [FAQ](docs/FAQ.md) · [Polski](README.pl.md)
 
 </div>
+
+> **Getting `535 5.7.139 Authentication unsuccessful, basic authentication is disabled`?**
+> That's Microsoft switching off Basic auth for SMTP AUTH — [here's what to do
+> about it](docs/EXCHANGE-ONLINE-SMTP-AUTH.md), including the options that
+> aren't this project.
 
 ---
 

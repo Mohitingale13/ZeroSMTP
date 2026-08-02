@@ -1,5 +1,21 @@
 # Exchange Online is turning off SMTP AUTH Basic auth — options for printers and legacy apps
 
+**Landed here from an error message?** You're in the right place if your
+printer, scanner, or app suddenly started returning one of these against
+`smtp.office365.com`:
+
+```
+535 5.7.139 Authentication unsuccessful, basic authentication is disabled
+535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant
+535 5.7.3  Authentication unsuccessful
+```
+
+Nothing is wrong with your password. Microsoft is switching off the
+username-and-password (Basic auth) method these devices use. Jump straight
+to [your options](#your-options-honestly), or read the timeline first.
+
+---
+
 If you have a network printer, scanner, NAS, backup job, or line-of-business
 app that sends mail through `smtp.office365.com` with a username and
 password, that setup has an expiry date. This page explains the timeline,
@@ -114,6 +130,27 @@ Does the mail have to come FROM your own domain?
             ├── Yes ──► ZeroSMTP                          (option 5)
             └── No  ──► Paid SMTP service                 (option 4)
 ```
+
+## "Can I just turn it back on?"
+
+Until the end of December 2026, yes — an admin can re-enable SMTP AUTH
+per-tenant or per-mailbox:
+
+```powershell
+# Tenant-wide (not recommended — re-enables it for every mailbox)
+Set-TransportConfig -SmtpClientAuthenticationDisabled $false
+
+# Better: leave it off tenant-wide, enable only the one mailbox that needs it
+Set-CASMailbox -Identity printer@yourdomain.com -SmtpClientAuthenticationDisabled $false
+```
+
+Also check that a **Conditional Access policy blocking legacy
+authentication** or **Security Defaults** isn't the actual cause — both
+produce the same error, and neither is fixed by the commands above.
+
+Treat this as breathing room to plan a real migration, not a solution.
+Microsoft announces the final removal date in the second half of 2027, and
+new tenants created after December 2026 don't get the option at all.
 
 ## Related
 

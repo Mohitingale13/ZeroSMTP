@@ -2,17 +2,24 @@
 
 ![ZeroSMTP](docs/assets/banner.png)
 
-**Wysyłaj maile z dowolnej aplikacji, skryptu, serwera czy drukarki — za darmo, w około minutę.**<br>
-Bez karty kredytowej. Bez własnego serwera SMTP. Bez progów cenowych za wolumen.
+**Darmowy relay SMTP, który nadal przyjmuje zwykłe logowanie loginem i hasłem.**<br>
+Stworzony dla drukarek, skanerów i starszych aplikacji porzuconych, gdy
+Microsoft 365 wyłącza SMTP AUTH z uwierzytelnianiem Basic.<br>
+Bez wdrażania OAuth. Bez karty kredytowej. Bez własnego serwera pocztowego.
 
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
 [![15 języków](https://img.shields.io/badge/przyk%C5%82ady-15%20j%C4%99zyk%C3%B3w-blue)](#przykłady-kodu)
 [![Licencja: MIT](https://img.shields.io/badge/licencja-MIT-green.svg)](LICENSE)
 
-[**Załóż darmowe konto →**](https://msgwing.com) · [Szybki start](#szybki-start) · [Przykłady kodu](#przykłady-kodu) · [FAQ](docs/FAQ.md) · [English](README.md)
+[**Załóż darmowe konto →**](https://msgwing.com) · [**Migracja z Exchange Online →**](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Szybki start](#szybki-start) · [Przykłady kodu](#przykłady-kodu) · [FAQ](docs/FAQ.md) · [English](README.md)
 
 </div>
+
+> **Dostajesz `535 5.7.139 Authentication unsuccessful, basic authentication is disabled`?**
+> To Microsoft wyłącza uwierzytelnianie Basic dla SMTP AUTH — [tutaj jest, co
+> z tym zrobić](docs/EXCHANGE-ONLINE-SMTP-AUTH.md), łącznie z opcjami, które
+> nie są tym projektem.
 
 ---
 
