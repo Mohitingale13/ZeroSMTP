@@ -46,19 +46,34 @@ with anything that already speaks SMTP.
 > included [Dev Container / Codespace](.devcontainer/devcontainer.json).
 > [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
 
-After registration, your SMTP account is automatically and randomly generated - giving you an email address with excellent reputation, which significantly improves email deliverability to the recipient's mailbox.
+![Connectivity check against mx.msgwing.com](docs/assets/connection-check.png)
 
-Send messages from your apps, scripts, websites, and even network printers - everything works right away.
+## Why ZeroSMTP?
 
-Perfect for:
-- Web and mobile applications
-- Automation scripts (Python, PHP, Node.js, etc.)
-- Contact forms and notifications
-- Password resets and transactional emails
-- Network printers (Scan-to-Email function)
-- IoT devices and any hardware that supports SMTP
+- **Nothing to run and nothing to pay for.** No mail server, no API key, no
+  credit card, no per-email pricing tier to graduate into.
+- **Works with anything that already speaks SMTP** — apps, scripts, network
+  printers, NAS boxes, IoT hardware. If it has a "SMTP server" field, it works.
+- **Plain SMTP AUTH still accepted.** No OAuth2 flow to implement, which is
+  the whole point for old devices that will never get a firmware update.
+- **Managed reputation.** Accounts are randomly generated on a domain that's
+  actively monitored for abuse, so you're not warming up an IP yourself.
+- **15 copy-paste examples**, all reading the same environment variables, plus
+  setup guides for Windows Server, Linux, and printers by brand.
+- **Verifiably up** — the status badge above is a real check that runs against
+  `mx.msgwing.com` every 6 hours, not a static image.
 
-Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [System-wide mail relay (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Reliability (retries)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
+Good for: contact forms · password resets · CI/CD and monitoring alerts ·
+scan-to-email · IoT and device notifications · homelabs.
+
+> ### ⚠️ Losing SMTP AUTH on Exchange Online / Microsoft 365?
+> Microsoft disables Basic authentication for SMTP AUTH by default at the
+> **end of December 2026**, which breaks printers and legacy apps that can't
+> do OAuth. **[Read the migration guide →](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)**
+> — it covers every option (Graph API, Direct Send, on-prem relay, paid
+> services), not just this one.
+
+Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [System-wide mail relay (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Exchange Online SMTP AUTH migration](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Reliability (retries)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
 
 ## How does this compare to other options?
 

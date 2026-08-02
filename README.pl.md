@@ -46,19 +46,34 @@ działają z czymkolwiek, co już obsługuje SMTP.
 > zainstalowane w dołączonym [Dev Container / Codespace](.devcontainer/devcontainer.json).
 > [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/msgwing/ZeroSMTP)
 
-Po rejestracji konto SMTP generuje się automatycznie i losowo - dzięki temu otrzymujesz adres z bardzo dobrą reputacją, co znacznie zwiększa szansę na dostarczenie maili do skrzynki odbiorcy.
+![Sprawdzenie połączenia z mx.msgwing.com](docs/assets/connection-check.png)
 
-Wysyłaj wiadomości z aplikacji, skryptów, stron internetowych oraz urządzeń drukujących - wszystko działa od razu.
+## Dlaczego ZeroSMTP?
 
-Idealne dla:
-- Aplikacji webowych i mobilnych
-- Automatyzacji i skryptów (Python, PHP, Node.js itp.)
-- Formularzy kontaktowych i powiadomień
-- Resetów haseł i maili transakcyjnych
-- Drukarek sieciowych (skan-do-mail)
-- Urządzeń IoT i innych sprzętów z obsługą SMTP
+- **Nic nie trzeba utrzymywać i nic nie trzeba płacić.** Bez serwera
+  pocztowego, bez klucza API, bez karty, bez progów cenowych za wolumen.
+- **Działa ze wszystkim, co już obsługuje SMTP** — aplikacje, skrypty,
+  drukarki sieciowe, NAS-y, sprzęt IoT. Jeśli ma pole „serwer SMTP", zadziała.
+- **Zwykłe SMTP AUTH nadal akceptowane.** Żadnego OAuth2 do wdrożenia — a to
+  właśnie sedno problemu dla starych urządzeń bez aktualizacji firmware'u.
+- **Zarządzana reputacja.** Konta są generowane losowo w domenie aktywnie
+  monitorowanej pod kątem nadużyć, więc nie rozgrzewasz własnego IP.
+- **15 gotowych przykładów** korzystających z tych samych zmiennych
+  środowiskowych, plus przewodniki dla Windows Server, Linuksa i drukarek.
+- **Sprawdzalnie działa** — odznaka statusu powyżej to realny test wykonywany
+  na `mx.msgwing.com` co 6 godzin, a nie statyczny obrazek.
 
-Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [Systemowy relay pocztowy (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) · [Niezawodność (ponawianie prób)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
+Dobre do: formularzy kontaktowych · resetów haseł · alertów z CI/CD i
+monitoringu · skan-do-mail · powiadomień IoT · homelabów.
+
+> ### ⚠️ Tracisz SMTP AUTH w Exchange Online / Microsoft 365?
+> Microsoft domyślnie wyłącza uwierzytelnianie Basic dla SMTP AUTH z
+> **końcem grudnia 2026**, co zepsuje drukarki i starsze aplikacje bez
+> obsługi OAuth. **[Przeczytaj przewodnik migracji →](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)**
+> — omawia wszystkie opcje (Graph API, Direct Send, własny relay, usługi
+> płatne), nie tylko tę jedną.
+
+Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [Systemowy relay pocztowy (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Migracja z Exchange Online SMTP AUTH](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) · [Niezawodność (ponawianie prób)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
 
 ## Jak to wypada na tle innych opcji?
 
