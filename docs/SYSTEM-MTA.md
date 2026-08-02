@@ -128,6 +128,101 @@ sudo update-exim4.conf
 sudo systemctl restart exim4
 ```
 
+## Bonus: alert on systemd service failures
+
+Once system mail routes through ZeroSMTP (via the Postfix/msmtp/Exim4 setup
+above), you can wire any systemd unit to send an email the moment it fails,
+using systemd's own `OnFailure=` directive — no extra monitoring agent
+needed.
+
+`/etc/systemd/system/notify-failure@.service` (a reusable template unit):
+
+```ini
+[Unit]
+Description=Email notification for failed unit %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mail -s "Unit %i failed on %H" you@example.com
+```
+
+Then add `OnFailure=` to whichever unit you want watched, e.g.
+`/etc/systemd/system/my-backup.service`:
+
+```ini
+[Unit]
+Description=My backup job
+OnFailure=notify-failure@%n.service
+```
+
+```bash
+sudo systemctl daemon-reload
+```
+
+Test it by forcing a failure (`sudo systemctl start --job-mode=fail
+my-nonexistent.service` or a script that exits non-zero) and confirming the
+notification email arrives.
+
+## Automating rollout with Ansible
+
+Rolling this out to more than a handful of servers by hand doesn't scale —
+here's a minimal Ansible playbook for the Postfix satellite setup above:
+
+```yaml
+---
+- hosts: all
+  become: true
+  vars:
+    zerosmtp_username: "your-username@msgwing.com"
+    # Keep the real password in ansible-vault or your inventory's secrets
+    # file — never commit it in plain text alongside the playbook.
+    zerosmtp_password: "{{ vault_zerosmtp_password }}"
+  tasks:
+    - name: Install Postfix and dependencies
+      apt:
+        name: [postfix, mailutils, libsasl2-modules]
+        state: present
+
+    - name: Configure Postfix as a satellite system
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regexp: '^relayhost ='
+        line: "relayhost = [mx.msgwing.com]:587"
+        create: true
+      notify: Restart postfix
+
+    - name: Set SASL auth options
+      blockinfile:
+        path: /etc/postfix/main.cf
+        block: |
+          smtp_sasl_auth_enable = yes
+          smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+          smtp_sasl_security_options = noanonymous
+          smtp_tls_security_level = encrypt
+      notify: Restart postfix
+
+    - name: Deploy SASL credentials
+      copy:
+        content: "[mx.msgwing.com]:587 {{ zerosmtp_username }}:{{ zerosmtp_password }}\n"
+        dest: /etc/postfix/sasl_passwd
+        mode: '0600'
+      notify:
+        - Postmap sasl_passwd
+        - Restart postfix
+
+  handlers:
+    - name: Postmap sasl_passwd
+      command: postmap /etc/postfix/sasl_passwd
+
+    - name: Restart postfix
+      service:
+        name: postfix
+        state: restarted
+```
+
+Run with `ansible-playbook -i inventory.ini zerosmtp-relay.yml --ask-vault-pass`
+(or however your vault secret is normally supplied).
+
 ## Verifying it works
 
 Use [`check-connection.sh`](../check-connection.sh) first to confirm the

@@ -71,6 +71,43 @@ Store real credentials as a scheduled-task-scoped environment variable or
 via `Register-ScheduledTask` with a secured credential object — not in
 plain text in the task definition.
 
+## Exchange Server: Send Connector to a ZeroSMTP smart host
+
+**Read this caveat first:** mail relayed through ZeroSMTP always goes out
+`From` an `@msgwing.com` address (see the [FAQ](FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom))
+— it will **not** preserve your Exchange organization's own domain. That
+rules this out as a replacement for your main mail flow. Where it's
+genuinely useful is for **system-generated notifications you don't need to
+come from your own domain** — DAG/replication alerts, transport queue
+warnings, message-tracking reports — routed through a dedicated Send
+Connector scoped narrowly to just that traffic, not your whole
+organization's mail flow.
+
+Exchange Admin Center: **Mail flow → Send connectors → New** → type
+*Internet* → **"Route mail through smart hosts"** → add `mx.msgwing.com` →
+smart host authentication: **Basic Authentication over TLS** with your
+ZeroSMTP username/password → scope the **address space** and **source
+server(s)** to whatever specific system/application is sending this
+notification traffic, not `*` for the whole org.
+
+Exchange Management Shell equivalent:
+
+```powershell
+$cred = Get-Credential  # ZeroSMTP username + password
+New-SendConnector -Name "ZeroSMTP notifications" `
+  -AddressSpaces "SMTP:*;1" `
+  -SmartHosts "mx.msgwing.com" `
+  -SmartHostAuthMechanism BasicAuthRequireTLS `
+  -AuthenticationCredential $cred `
+  -Port 587 `
+  -RequireTLS $true `
+  -SourceTransportServers "YourMailboxServerName"
+```
+
+Narrow `-SourceTransportServers` (and, if your topology needs it, a
+transport rule matching just the relevant sender) so this connector only
+ever handles the specific notification traffic it's meant for.
+
 ## Legacy: the classic IIS SMTP relay (not recommended for new setups)
 
 If you're maintaining an old application that only supports "deliver to
