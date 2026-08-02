@@ -1,44 +1,52 @@
 # FAQ
 
+Answers to the questions we get asked most often about using ZeroSMTP.
+
+- [Can I use ZeroSMTP with my own hosting and my own domain?](#can-i-use-zerosmtp-with-my-own-hosting-and-my-own-domain)
+- [Will emails be sent from my own domain (e.g. you@yourdomain.com)?](#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)
+- [Can I get a custom username instead of the randomly generated one?](#can-i-get-a-custom-username-instead-of-the-randomly-generated-one)
+- [What are the sending limits?](#what-are-the-sending-limits)
+- [Can ZeroSMTP receive email too?](#can-zerosmtp-receive-email-too)
+- [Still have questions?](#still-have-questions)
+
 ## Can I use ZeroSMTP with my own hosting and my own domain?
 
-Yes. ZeroSMTP is a relay: your app, script, website, or hosting connects to
-`mx.msgwing.com` and authenticates with your `@msgwing.com` SMTP credentials,
-regardless of which domain your hosting or website itself uses. In short:
+Yes. ZeroSMTP is an SMTP **relay** — it doesn't care which domain your
+hosting or website runs on. Setup is three steps:
 
-1. Register a free account at [msgwing.com](https://msgwing.com) and get a
-   randomly generated address on the `@msgwing.com` domain.
-2. Use that account's SMTP credentials in your app/script/website/hosting
-   (server: `mx.msgwing.com`, port `587` with STARTTLS or `465` with SSL/TLS).
-3. Your application can then send emails through the relay right away, no
-   matter which domain your own hosting or website uses.
+1. **Register** a free account at [msgwing.com](https://msgwing.com) and get
+   a randomly generated address on the `@msgwing.com` domain.
+2. **Configure** that account's SMTP credentials in your app, script,
+   website, or hosting panel (server: `mx.msgwing.com`, port `587` with
+   STARTTLS or `465` with SSL/TLS).
+3. **Send** — your application delivers mail through the relay immediately,
+   regardless of your hosting's own domain.
 
-This works great for contact forms, password resets, and notifications sent
-from any hosting, and for the other use cases listed in the main
+This covers contact forms, password resets, and notifications from any
+hosting provider, plus the other use cases in the main
 [README](../README.md#quickstart) (apps, scripts, printers, IoT, etc.).
 
 ## Will emails be sent from my own domain (e.g. you@yourdomain.com)?
 
-No, and this is by design. Emails are always sent **from an `@msgwing.com`
-address**, never from your own domain. ZeroSMTP only handles sending through
-the `msgwing.com` domain and does not relay mail on behalf of arbitrary
-sender domains — mainly for anti-spam and deliverability reasons.
+No — by design. Every message is sent **from an `@msgwing.com` address**,
+never from your own domain. ZeroSMTP only relays mail through the
+`msgwing.com` domain and does not send on behalf of arbitrary sender
+domains, mainly for anti-spam and deliverability reasons.
 
-- If you just need reliable outgoing mail for your app/site/hosting (contact
-  forms, password resets, notifications, etc.), ZeroSMTP works great,
-  regardless of your hosting's domain.
-- If you specifically need the "From" address to show your own domain,
-  that's not something this service does — it would require your own
-  dedicated mail server setup instead.
+| Your need | Does ZeroSMTP fit? |
+| --- | --- |
+| Reliable outgoing mail for your app/site (contact forms, password resets, notifications) | ✅ Yes, regardless of your hosting's domain |
+| "From" address must show *your* domain | ❌ No — that requires your own dedicated mail server |
 
 ## Can I get a custom username instead of the randomly generated one?
 
-By default, registration generates a random `@msgwing.com` address. If you'd
-like a specific username instead (e.g. `you@msgwing.com`), first register an
-account at [msgwing.com](https://msgwing.com), then email your request to
-abuse@msgwing.com with the username you'd like and the address of the account
-you just registered. Once confirmed, it can be set permanently on your
-account.
+Yes. Registration generates a random `@msgwing.com` address by default, but
+you can request a specific one (e.g. `you@msgwing.com`):
+
+1. Register an account at [msgwing.com](https://msgwing.com).
+2. Email your request to **abuse@msgwing.com** with the username you'd like
+   and the address of the account you just registered.
+3. Once confirmed, the custom username is set permanently on your account.
 
 ## What are the sending limits?
 
@@ -47,8 +55,9 @@ in the troubleshooting guide.
 
 ## Can ZeroSMTP receive email too?
 
-No — see [This project cannot receive email](TROUBLESHOOTING.md#this-project-cannot-receive-email).
+No. See [This project cannot receive email](TROUBLESHOOTING.md#this-project-cannot-receive-email)
+— ZeroSMTP is outgoing-only.
 
 ## Still have questions?
 
-Contact abuse@msgwing.com, or open an issue on this repository.
+Contact **abuse@msgwing.com**, or open an issue on this repository.
