@@ -154,6 +154,9 @@ new tenants created after December 2026 don't get the option at all.
 
 ## Related
 
+- [AFFECTED-SYSTEMS.md](AFFECTED-SYSTEMS.md) — **what to audit**: which
+  printers, NAS units, backup jobs, monitoring tools and line-of-business
+  apps stop sending, with an Exchange Online PowerShell audit to find them
 - [PRINTERS.md](PRINTERS.md) — per-brand scan-to-email settings
 - [SYSTEM-MTA.md](SYSTEM-MTA.md) — Postfix/msmtp/Exim4 as a system relay
 - [WINDOWS-SERVER.md](WINDOWS-SERVER.md) — IIS, ASP.NET, Exchange connectors

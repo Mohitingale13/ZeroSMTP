@@ -17,9 +17,16 @@ Bez wdrażania OAuth. Bez karty kredytowej. Bez własnego serwera pocztowego.
 </div>
 
 > **Dostajesz `535 5.7.139 Authentication unsuccessful, basic authentication is disabled`?**
-> To Microsoft wyłącza uwierzytelnianie Basic dla SMTP AUTH — [tutaj jest, co
-> z tym zrobić](docs/EXCHANGE-ONLINE-SMTP-AUTH.md), łącznie z opcjami, które
-> nie są tym projektem.
+> Microsoft domyślnie wyłącza uwierzytelnianie Basic dla SMTP AUTH z
+> **końcem grudnia 2026**. Drukarki, NAS-y, zadania backupu i monitoring,
+> które nie potrafią OAuth, przestają wysyłać — a te alarmowe padają
+> *po cichu*, więc dowiadujesz się o tym dopiero w trakcie awarii, o której
+> miały ostrzec.
+>
+> **[Przewodnik migracji →](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)** omawia
+> wszystkie opcje (Graph API, Direct Send, własny relay, usługi płatne), nie
+> tylko tę jedną. **[Co się zepsuje →](docs/AFFECTED-SYSTEMS.md)** to lista
+> do audytu, z PowerShellem do znalezienia swojej ekspozycji.
 
 ---
 

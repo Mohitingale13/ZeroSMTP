@@ -75,10 +75,15 @@ scan-to-email · IoT and device notifications · homelabs.
 
 > ### ⚠️ Losing SMTP AUTH on Exchange Online / Microsoft 365?
 > Microsoft disables Basic authentication for SMTP AUTH by default at the
-> **end of December 2026**, which breaks printers and legacy apps that can't
-> do OAuth. **[Read the migration guide →](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)**
-> — it covers every option (Graph API, Direct Send, on-prem relay, paid
-> services), not just this one.
+> **end of December 2026**. Printers, NAS boxes, backup jobs and monitoring
+> tools that can't do OAuth stop sending — and the alerting ones fail
+> *silently*, so you find out during the incident they should have warned
+> you about.
+>
+> **[Migration guide →](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)** covers every
+> option (Graph API, Direct Send, on-prem relay, paid services), not just
+> this one. **[What breaks →](docs/AFFECTED-SYSTEMS.md)** is the audit list,
+> with PowerShell to find your exposure.
 
 Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [System-wide mail relay (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Exchange Online SMTP AUTH migration](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Reliability (retries)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
 

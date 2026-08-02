@@ -1,12 +1,14 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
-      "mcp__claude-in-chrome__navigate",
-      "mcp__claude-in-chrome__get_page_text",
-      "mcp__claude-in-chrome__find",
-      "mcp__claude-in-chrome__tabs_context_mcp",
-      "Bash(gh codespace list)",
-      "mcp__claude-in-chrome__read_network_requests"
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Grep",
+      "Glob",
+      "LS"
     ]
   }
 }
