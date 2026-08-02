@@ -55,6 +55,24 @@ Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne ap
 Warunki darmowych planów powyżej zmieniają się w czasie — przed wyborem
 sprawdź aktualny cennik danego dostawcy.
 
+## GitHub Actions
+
+Używasz ZeroSMTP z poziomu workflow (alerty o błędach CI, powiadomienia o
+wdrożeniu, raporty cykliczne)? [`msgwing/send-email-action`](https://github.com/msgwing/send-email-action)
+z [GitHub Marketplace](https://github.com/marketplace/actions/zerosmtp-send-email)
+zamyka poniższą konfigurację w jednym kroku:
+
+```yaml
+- uses: msgwing/send-email-action@v1
+  with:
+    username: ${{ secrets.ZEROSMTP_USERNAME }}
+    password: ${{ secrets.ZEROSMTP_PASSWORD }}
+    from: ${{ secrets.ZEROSMTP_USERNAME }}
+    to: you@example.com
+    subject: "Build nieudany"
+    body: "Zobacz przebieg: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+```
+
 ## Przykłady kodu
 
 Gotowe do użycia przykłady dla `mx.msgwing.com:465` (SSL/TLS) lub `:587`

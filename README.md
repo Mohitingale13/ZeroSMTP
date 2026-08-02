@@ -55,6 +55,24 @@ Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](doc
 Free-tier terms above change over time — check each provider's current
 pricing page before committing to one.
 
+## GitHub Actions
+
+Using ZeroSMTP from a workflow (CI failure alerts, deploy notifications,
+scheduled reports)? [`msgwing/send-email-action`](https://github.com/msgwing/send-email-action)
+on the [GitHub Marketplace](https://github.com/marketplace/actions/zerosmtp-send-email)
+wraps the setup below into one step:
+
+```yaml
+- uses: msgwing/send-email-action@v1
+  with:
+    username: ${{ secrets.ZEROSMTP_USERNAME }}
+    password: ${{ secrets.ZEROSMTP_PASSWORD }}
+    from: ${{ secrets.ZEROSMTP_USERNAME }}
+    to: you@example.com
+    subject: "Build failed"
+    body: "See the run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+```
+
 ## Code Examples
 
 Ready-to-run, production-ready examples for `mx.msgwing.com:465` (SSL/TLS) or
