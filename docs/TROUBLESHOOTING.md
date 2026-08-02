@@ -69,7 +69,7 @@ your provider's support to unblock outbound SMTP for your account/instance.
   especially common on embedded devices (printers, scanners) whose firmware
   has a fixed, non-updatable root CA store that predates Let's Encrypt's
   `ISRG Root X1` root. One confirmed case is documented in
-  [PRINTERS.md](PRINTERS.md#4-known-exception-canon-maxify-mb2755-requires-disabling-certificate-verification)
+  [PRINTERS.md](PRINTERS.md#known-exception-canon-maxify-mb2755)
   (Canon Maxify MB2755) — treat disabling verification as a last resort for
   that specific class of device, not a general fix.
 
@@ -81,7 +81,7 @@ your provider's support to unblock outbound SMTP for your account/instance.
   explicit "SSL" mode separate from "STARTTLS"/"TLS", or if your network
   blocks STARTTLS negotiation on 587 but allows 465. Treat 465 as a
   fallback, not a first choice, once 587 has been confirmed to work — see
-  the [Canon Maxify MB2755 update](PRINTERS.md#4-known-exception-canon-maxify-mb2755-requires-disabling-certificate-verification)
+  the [Canon Maxify MB2755 update](PRINTERS.md#known-exception-canon-maxify-mb2755)
   for a concrete case where production testing confirmed 587 as the
   correct default and demoted 465 to an emergency-only setting.
 - **25** — not supported by ZeroSMTP for client submission, and blocked by
