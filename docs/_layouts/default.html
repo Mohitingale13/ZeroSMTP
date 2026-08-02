@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% seo %}
+
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+
+    <style>
+      /* Site header: the wordmark is navigation, not the page's heading —
+         the page's own <h1> must stay the single top-level heading. */
+      .site-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: .35rem 1.25rem;
+        padding-bottom: .75rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #d0d7de;
+      }
+      .site-header .wordmark {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #24292f;
+        text-decoration: none;
+      }
+      .site-header nav a { font-size: .95rem; margin-right: 1rem; }
+      .site-footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #d0d7de;
+        font-size: .9rem;
+        color: #57606a;
+      }
+      @media (prefers-color-scheme: dark) {
+        .site-header, .site-footer { border-color: #30363d; }
+        .site-header .wordmark { color: #e6edf3; }
+        .site-footer { color: #8b949e; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+
+      <header class="site-header">
+        <a class="wordmark" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        <nav>
+          <a href="{{ '/EXCHANGE-ONLINE-SMTP-AUTH.html' | relative_url }}">Exchange Online migration</a>
+          <a href="{{ '/PRINTERS.html' | relative_url }}">Printers</a>
+          <a href="{{ '/FAQ.html' | relative_url }}">FAQ</a>
+          <a href="https://github.com/msgwing/ZeroSMTP">GitHub</a>
+        </nav>
+      </header>
+
+      {{ content }}
+
+      <footer class="site-footer">
+        <p>
+          <a href="https://msgwing.com">Get a free account</a> ·
+          <a href="https://github.com/msgwing/ZeroSMTP">Source on GitHub</a> ·
+          <a href="https://github.com/msgwing/ZeroSMTP/issues/new/choose">Report an issue</a>
+        </p>
+      </footer>
+
+    </div>
+  </body>
+</html>
