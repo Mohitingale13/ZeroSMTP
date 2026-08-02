@@ -76,3 +76,62 @@ supported.
 ## Still have questions?
 
 Contact **abuse@msgwing.com**, or open an issue on this repository.
+
+{% raw %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can I use ZeroSMTP with my own hosting and my own domain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. ZeroSMTP is an SMTP relay, so it doesn't care which domain your hosting or website runs on. Register a free account at msgwing.com to get a randomly generated @msgwing.com address, configure that account's SMTP credentials in your app or hosting panel (server mx.msgwing.com, port 587 with STARTTLS or 465 with SSL/TLS), and your application can send mail through the relay immediately, regardless of your hosting's own domain."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will emails be sent from my own domain (e.g. you@yourdomain.com)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, by design. Every message is sent from an @msgwing.com address, never from your own domain. ZeroSMTP only relays mail through the msgwing.com domain and does not send on behalf of arbitrary sender domains, mainly for anti-spam and deliverability reasons. If you need the From address to show your own domain, that requires your own dedicated mail server instead."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get a custom username instead of the randomly generated one?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Registration generates a random @msgwing.com address by default, but you can request a specific one. Register an account at msgwing.com, then email your request to abuse@msgwing.com with the username you'd like and the address of the account you just registered. Once confirmed, the custom username is set permanently on your account."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the sending limits?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ZeroSMTP is rate-limited per account to keep the shared domain's reputation good for everyone: up to 200 emails per day, with hourly and per-minute caps as well. See the Troubleshooting guide's sending limits section for the exact numbers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can ZeroSMTP receive email too?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. ZeroSMTP is outgoing-only: there is no inbox, IMAP, or POP3 access tied to an @msgwing.com account."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is ZeroSMTP free? What's the catch?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "There isn't a hidden one. The trade-offs are the ones already documented: mail always goes out from a shared @msgwing.com address, not your own domain, and sending is rate-limited per account to keep the shared domain's reputation good for everyone. Beyond that, your data isn't processed for marketing or resold, and abuse accounts are actively removed to protect deliverability for everyone else."
+      }
+    }
+  ]
+}
+</script>
+{% endraw %}
