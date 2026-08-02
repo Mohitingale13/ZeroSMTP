@@ -7,6 +7,7 @@ Answers to the questions we get asked most often about using ZeroSMTP.
 - [Can I get a custom username instead of the randomly generated one?](#can-i-get-a-custom-username-instead-of-the-randomly-generated-one)
 - [What are the sending limits?](#what-are-the-sending-limits)
 - [Can ZeroSMTP receive email too?](#can-zerosmtp-receive-email-too)
+- [Why is ZeroSMTP free? What's the catch?](#why-is-zerosmtp-free-whats-the-catch)
 - [Still have questions?](#still-have-questions)
 
 ## Can I use ZeroSMTP with my own hosting and my own domain?
@@ -57,6 +58,20 @@ in the troubleshooting guide.
 
 No. See [This project cannot receive email](TROUBLESHOOTING.md#this-project-cannot-receive-email)
 — ZeroSMTP is outgoing-only.
+
+## Why is ZeroSMTP free? What's the catch?
+
+There isn't a hidden one — the trade-offs are the ones already documented
+on this page: mail always goes out from a shared `@msgwing.com` address,
+not your own domain (see above), and sending is rate-limited per account to
+keep the shared domain's reputation good for everyone (see
+[Sending limits](TROUBLESHOOTING.md#sending-limits-rate-limiting)).
+
+Beyond that, per the [README](../README.md): your data isn't processed for
+marketing or resold, and abuse accounts are actively removed to protect
+deliverability for everyone else. If your use case needs more than what's
+documented here, ask at abuse@msgwing.com rather than assuming it isn't
+supported.
 
 ## Still have questions?
 

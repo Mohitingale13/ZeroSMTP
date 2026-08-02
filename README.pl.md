@@ -43,6 +43,18 @@ Idealne dla:
 
 Przewodniki konfiguracji: [Drukarki sieciowe](docs/PRINTERS.md) · [Popularne aplikacje](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [Systemowy relay pocztowy (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Rozwiązywanie problemów](docs/TROUBLESHOOTING.md) · [Niezawodność (ponawianie prób)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
 
+## Jak to wypada na tle innych opcji?
+
+|  | ZeroSMTP | Gmail SMTP relay | Amazon SES | Mailgun / SendGrid / Brevo (typowy darmowy plan) |
+| --- | --- | --- | --- | --- |
+| Koszt | Darmowe, bez karty | Darmowe (osobiste konto Google) | Płatność za email (limitowana darmowa pula tylko z AWS EC2, pierwsze 12 miesięcy) | Darmowy plan, zwykle mocno ograniczony i wymagający rejestracji + weryfikacji domeny |
+| Konfiguracja | Rejestracja, kopiujesz dane SMTP, gotowe | Wymaga konta Google; regulamin Google odradza automatyczną/masową wysyłkę tą drogą | Wymaga konta AWS oraz wniosku o "production access" przed wysyłką do niezweryfikowanych adresów | Rejestracja + weryfikacja domeny dla pełnej funkcjonalności |
+| Własna domena w "From" | Nie — zawsze `@msgwing.com` (zobacz [FAQ](docs/FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)) | Tak, Twój adres Gmail/Workspace | Tak | Tak, po zweryfikowaniu domeny |
+| Najlepsze do | Formularzy kontaktowych, resetów haseł, powiadomień, drukarek/IoT — wszędzie tam, gdzie adres nadawcy nie musi być Twoją domeną | Skryptów osobistych o niskim wolumenie | Aplikacji produkcyjnych, które tego potrzebują i udźwigną konfigurację AWS | Firm potrzebujących brandowanej wysyłki, które udźwigną konfigurację |
+
+Warunki darmowych planów powyżej zmieniają się w czasie — przed wyborem
+sprawdź aktualny cennik danego dostawcy.
+
 ## Przykłady kodu
 
 Gotowe do użycia przykłady dla `mx.msgwing.com:465` (SSL/TLS) lub `:587`

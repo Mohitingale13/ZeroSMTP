@@ -43,6 +43,18 @@ Perfect for:
 
 Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](docs/APPS.md) · [Linux (Debian/Ubuntu/Rocky/Fedora/openSUSE)](docs/LINUX.md) · [System-wide mail relay (Postfix/msmtp/Exim4)](docs/SYSTEM-MTA.md) · [Windows Server](docs/WINDOWS-SERVER.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Reliability (retries)](docs/RELIABILITY.md) · [FAQ](docs/FAQ.md)
 
+## How does this compare to other options?
+
+|  | ZeroSMTP | Gmail SMTP relay | Amazon SES | Mailgun / SendGrid / Brevo (typical free tier) |
+| --- | --- | --- | --- | --- |
+| Cost | Free, no card required | Free (personal Google account) | Pay-per-email (a limited free allowance only applies from AWS EC2, first 12 months) | Free tier, usually capped low and gated behind signup + domain verification |
+| Setup | Register, copy SMTP credentials, done | Needs a Google account; Google's terms discourage automated/bulk sending over it | Needs an AWS account, plus a "production access" request before sending to unverified addresses | Signup + domain verification for full features |
+| Custom "From" domain | No — always `@msgwing.com` (see [FAQ](docs/FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)) | Yes, your Gmail/Workspace address | Yes | Yes, once your domain is verified |
+| Best fit | Contact forms, password resets, notifications, printers/IoT — anywhere the from-address doesn't need to be your own domain | Low-volume personal scripts | Production apps that need it and can handle the AWS setup | Businesses that need branded sending and can handle the setup |
+
+Free-tier terms above change over time — check each provider's current
+pricing page before committing to one.
+
 ## Code Examples
 
 Ready-to-run, production-ready examples for `mx.msgwing.com:465` (SSL/TLS) or
