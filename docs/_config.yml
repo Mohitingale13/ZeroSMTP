@@ -18,6 +18,9 @@ description: >-
 url: https://docs.msgwing.com
 baseurl: ""
 
+# Preview image used when a docs link is shared in Slack, Teams, Reddit, etc.
+image: /assets/banner.png
+
 theme: jekyll-theme-primer
 
 plugins:
