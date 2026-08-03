@@ -10,15 +10,19 @@ whoever found it.
 
 ## Case studies
 
-### Canon Maxify MB2755 — certificate verification must stay off on port 465
+### Canon Maxify MB2755 — certificate verification must stay off, on either port
 
 **Reported by:** [`@kevinbytnar`](https://github.com/msgwing/ZeroSMTP/discussions/6)
 
 This 2016-era SOHO inkjet MFP fails certificate validation against
-`mx.msgwing.com`'s Let's Encrypt certificate on port 465, because its
-firmware's root CA store was never updated to trust `ISRG Root X1`. On port
-587 it connects successfully with certificate verification left **on** — no
-workaround needed there.
+`mx.msgwing.com`'s Let's Encrypt certificate, because its firmware ships a
+fixed root CA store that predates modern Let's Encrypt roots — confirmed
+with `openssl s_client` and unchanged after a firmware update. Which exact
+chain the server presents can shift over time (an ECDSA chain through
+`ISRG Root X2` as of this writing, an RSA chain through `ISRG Root X1`
+earlier) — the printer's frozen trust store doesn't recognize either, so
+the fix is the same regardless: disable certificate verification on the
+device, on whichever port you use.
 
 Full writeup, screenshots and the technical explanation:
 [PRINTERS.md → Known exception: Canon Maxify MB2755](PRINTERS.md#known-exception-canon-maxify-mb2755).
