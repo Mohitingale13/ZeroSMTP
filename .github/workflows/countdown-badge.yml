@@ -64,7 +64,7 @@ jobs:
           fi
 
           cat > countdown.json <<JSON
-          {"schemaVersion":1,"label":"Basic auth (SMTP AUTH) shutdown","message":"${MESSAGE}","color":"${COLOR}"}
+          {"schemaVersion":1,"label":"Exchange Online Basic auth (SMTP AUTH)","message":"${MESSAGE}","color":"${COLOR}"}
           JSON
 
           git config user.name "github-actions[bot]"
