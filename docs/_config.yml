@@ -48,6 +48,7 @@ defaults:
         Free SMTP relay for printers, scanners and legacy apps hit by the
         Microsoft 365 SMTP AUTH Basic authentication shutdown. No OAuth, no
         credit card, no mail server to run.
+      widget: countdown
   - scope:
       path: "EXCHANGE-ONLINE-SMTP-AUTH.md"
     values:
@@ -56,6 +57,7 @@ defaults:
         Microsoft disables Basic authentication for SMTP AUTH by default at the
         end of December 2026. Timeline, the 535 5.7.139 error, and every
         migration option for printers and legacy apps that cannot use OAuth.
+      widget: quiz
   - scope:
       path: "AFFECTED-SYSTEMS.md"
     values:
@@ -73,6 +75,7 @@ defaults:
         SMTP settings for Ricoh, Canon, Xerox, HP, Kyocera, Konica Minolta,
         Sharp, Brother, Epson and Lexmark, plus common error codes.
       schema: printers-howto
+      widget: printers
   - scope:
       path: "TROUBLESHOOTING.md"
     values:
