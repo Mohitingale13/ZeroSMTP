@@ -46,6 +46,24 @@ jobs:
         env:
           JEKYLL_ENV: production
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Removes the theme's unused selectors (jekyll-theme-primer ships a
+      # full GitHub-style stylesheet; this site only uses a fraction of it)
+      # by checking which ones actually appear in the built HTML. Runs
+      # after the Jekyll build so it sees the real, final markup - verified
+      # locally against every page (nav/footer links, tables, code blocks,
+      # images, dark-mode overrides, the printer-brand picker) before
+      # landing this step.
+      - name: Purge unused CSS
+        working-directory: docs
+        run: |
+          npx --yes purgecss --css _site/assets/css/style.css --content "_site/**/*.html" -o _site/assets/css/style.css
+          sed -i '/sourceMappingURL/d' _site/assets/css/style.css
+          rm -f _site/assets/css/style.css.map
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/_site

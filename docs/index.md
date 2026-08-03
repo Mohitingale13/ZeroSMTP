@@ -1,4 +1,7 @@
-<img src="assets/banner.png" width="1280" height="340" alt="ZeroSMTP — free SMTP relay for developers and sysadmins, mx.msgwing.com, port 587/465, TLS">
+<picture>
+  <source srcset="assets/banner.webp" type="image/webp">
+  <img src="assets/banner.png" width="1280" height="340" alt="ZeroSMTP — free SMTP relay for developers and sysadmins, mx.msgwing.com, port 587/465, TLS">
+</picture>
 
 # ZeroSMTP — a free SMTP relay that still accepts basic auth
 

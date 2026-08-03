@@ -23,5 +23,3 @@ plugins:
 # rely on for readability isn't a concern here since minifier only strips
 # CSS/JS comments and whitespace, not logic.
 jekyll-minifier:
-  uglifier_args:
-    harmony: true
