@@ -6,6 +6,13 @@
 # Local Claude Code tool config — machine-specific, not project source
 .claude/
 
+# Jekyll build output and Bundler cache for docs/
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/Gemfile.lock
+docs/vendor/
+
 # Per-language build artifacts / dependency caches, in case a
 # contributor sets up a local project around one of the examples
 vendor/
