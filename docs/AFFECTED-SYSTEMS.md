@@ -57,7 +57,7 @@ breakage publicly.
 | **Fax servers (e.g. Faxination)** | [Vendor timeline notice](https://faxination.com/microsoft-timeline-for-basic-authentication-deprecation-in-exchange-online-smtp-auth/) | |
 | **Cisco Unity Connection** | Named in [Microsoft's own deprecation docs](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) | |
 | **Microsoft Teams Rooms** | Named in Microsoft's docs as needing modern auth enabled | |
-| **QNAP NAS** | [Community confirmation](https://forum.qnap.com/viewtopic.php?t=164027) that QNAP does not support OAuth for notifications | [Gist](https://gist.github.com/msgwing/39958d909e085ae9cc0e6b3584d930bf) |
+| **QNAP NAS** | QNAP's own notification settings don't support OAuth for Microsoft 365 SMTP, only username/password | [Gist](https://gist.github.com/msgwing/39958d909e085ae9cc0e6b3584d930bf) |
 | **Veeam (older versions)** | [Veeam docs](https://helpcenter.veeam.com/docs/vbo365/guide/smtp_server.html) — some versions support only SMTP basic auth; newer ones added OAuth | [Gist](https://gist.github.com/msgwing/ac5e126b0389c38cd7c13517eeec44a4) |
 | **Kyocera "Send Error 1102"** | Kyocera's device-side code for an SMTP auth failure | [Gist](https://gist.github.com/msgwing/882d045c3dfa9750e1cb3f020a5f4304) |
 | **Generic `535 5.7.3` from `smtp.office365.com`** | Same root cause, different wording | [Gist](https://gist.github.com/msgwing/66c97a2c9a399861bac89fcefc00ea67) |
