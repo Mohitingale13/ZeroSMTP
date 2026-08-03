@@ -159,6 +159,22 @@
         color: #57606a;
       }
       .site-footer a { text-decoration: underline; }
+
+      /* Body-content links: the theme underlines these on hover only,
+         which Lighthouse flags as distinguishable by color alone. */
+      .markdown-body a[href]:not(.anchor) {
+        text-decoration: underline;
+      }
+
+      /* The theme sets max-width: 100% on content images but no height
+         rule, so a fixed height="" attribute (kept for CLS) stretches the
+         image once its width is scaled down. height: auto lets the browser
+         derive the box from the width/height attributes' aspect ratio
+         instead, so it stays proportional at any container width. */
+      .markdown-body img {
+        height: auto;
+      }
+
       @media (prefers-color-scheme: dark) {
         .site-header, .site-footer { border-color: #30363d; }
         .site-header .wordmark { color: #e6edf3; }
