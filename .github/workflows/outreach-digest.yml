@@ -71,17 +71,23 @@ jobs:
               }
             }
 
-            const body = results.length
-              ? [
-                  `Found ${results.length} recent public issue(s) (last 7 days) that may be`,
-                  `genuinely asking about free SMTP/email-sending options:`,
-                  '',
-                  ...results,
-                  '',
-                  '_Discovery digest only — nothing was posted anywhere automatically._',
-                  '_Read each one yourself and decide if/how a genuine, on-topic reply makes sense._',
-                ].join('\n')
-              : 'No matching public issues found this week.';
+            if (!results.length) {
+              core.summary
+                .addHeading('Weekly outreach digest')
+                .addRaw('No matching public issues found this week.')
+                .write();
+              return;
+            }
+
+            const body = [
+              `Found ${results.length} recent public issue(s) (last 7 days) that may be`,
+              `genuinely asking about free SMTP/email-sending options:`,
+              '',
+              ...results,
+              '',
+              '_Discovery digest only — nothing was posted anywhere automatically._',
+              '_Read each one yourself and decide if/how a genuine, on-topic reply makes sense._',
+            ].join('\n');
 
             const title = `Outreach digest — week of ${sinceDate}`;
 
