@@ -39,7 +39,21 @@ relative_links:
 
 # Per-page titles and descriptions live here rather than in front matter so
 # the .md files stay clean when read on github.com.
+#
+# The top-level `image:` key above is NOT picked up by jekyll-seo-tag for
+# og:image/twitter:image - that plugin's ImageDrop (lib/jekyll-seo-tag/
+# image_drop.rb) only reads page["image"], never site.image, "to preserve
+# backwards compatibility" per its own source. So every page needs its own
+# `image` value; setting it here, in a scope matching every page, is the one
+# place to do that instead of repeating it in each entry below. This also
+# fixes the Twitter card type: the plugin's template only emits
+# summary_large_image when an image is present, and falls back to the
+# smaller `summary` card otherwise.
 defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/banner.png
   - scope:
       path: "index.md"
     values:
@@ -121,6 +135,14 @@ defaults:
       title: "SMTP settings for popular applications"
       description: >-
         Ready-to-use SMTP configuration for common applications and platforms.
+  - scope:
+      path: "CODE-EXAMPLES.md"
+    values:
+      title: "SMTP send-email code examples, 15 languages"
+      description: >-
+        Ready-to-run SMTP send-email examples for mx.msgwing.com in Python,
+        PHP, Node.js, TypeScript, Java, C#, Go, Ruby, Rust, Kotlin, Swift,
+        PowerShell and Bash.
   - scope:
       path: "RELIABILITY.md"
     values:
