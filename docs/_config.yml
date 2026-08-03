@@ -9,8 +9,10 @@
 # " | ZeroSMTP" to every one (~11 chars), and anything past ~60 total gets
 # truncated or flagged by Bing/Google as "title too long".
 #
-# Only plugins on GitHub Pages' supported list are used, so the site builds
-# natively without a custom Actions workflow.
+# Built by .github/workflows/pages-deploy.yml (a custom Actions workflow,
+# not GitHub Pages' classic "Deploy from a branch" build) so that
+# jekyll-last-modified-at - not on the classic build's allowed-plugin list -
+# can run and populate sitemap.xml's <lastmod> from real git history.
 
 title: ZeroSMTP
 tagline: Free SMTP relay that still accepts basic username/password auth
@@ -32,6 +34,7 @@ plugins:
   - jekyll-sitemap           # sitemap.xml for crawlers
   - jekyll-relative-links    # rewrites [x](FAQ.md) to working site URLs
   - jekyll-optional-front-matter  # render .md files that have no front matter
+  - jekyll-last-modified-at  # <lastmod> in sitemap.xml, from real git history
 
 relative_links:
   enabled: true
