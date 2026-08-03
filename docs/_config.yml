@@ -68,9 +68,9 @@ defaults:
     values:
       title: "Exchange Online SMTP AUTH Basic auth shutdown"
       description: >-
-        Microsoft disables Basic authentication for SMTP AUTH by default at the
-        end of December 2026. Timeline, the 535 5.7.139 error, and every
-        migration option for printers and legacy apps that cannot use OAuth.
+        Microsoft disables Basic auth for SMTP AUTH at the end of 2026.
+        Timeline, the 535 5.7.139 error, and every migration option for
+        printers and legacy apps.
       widget: quiz
   - scope:
       path: "AFFECTED-SYSTEMS.md"
@@ -79,7 +79,7 @@ defaults:
       description: >-
         Risk assessment of printers, NAS units, backup jobs, monitoring tools
         and line-of-business apps that stop sending email, with a PowerShell
-        audit to find your exposure.
+        audit.
   - scope:
       path: "PRINTERS.md"
     values:
@@ -87,7 +87,7 @@ defaults:
       description: >-
         Fix scan-to-email after Microsoft 365 disables Basic auth. Per-brand
         SMTP settings for Ricoh, Canon, Xerox, HP, Kyocera, Konica Minolta,
-        Sharp, Brother, Epson and Lexmark, plus common error codes.
+        Sharp and more.
       schema: printers-howto
       widget: printers
   - scope:
@@ -155,9 +155,8 @@ defaults:
     values:
       title: "Device case studies: real printer fixes"
       description: >-
-        Confirmed, hardware-tested fixes for specific printer and MFP models
-        — certificate quirks and firmware issues manuals don't mention,
-        credited to whoever found them.
+        Confirmed, hardware-tested fixes for specific printer and MFP models:
+        certificate quirks and firmware issues manuals don't mention.
   - scope:
       path: "MONITORING.md"
     values:
