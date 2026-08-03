@@ -13,3 +13,15 @@ plugins:
   - jekyll-relative-links
   - jekyll-optional-front-matter
   - jekyll-last-modified-at
+  - jekyll-minifier
+
+# jekyll-minifier: strips whitespace/comments from the built HTML, inline
+# <style>/<script>, and the linked style.css - pure syntactic minification,
+# doesn't touch selectors or behavior, so it can't break rendering the way
+# a CSS purge tool could. Addresses PageSpeed's "Minify CSS" opportunity.
+# Preserve the countdown/quiz widgets' template literals and comments they
+# rely on for readability isn't a concern here since minifier only strips
+# CSS/JS comments and whitespace, not logic.
+jekyll-minifier:
+  uglifier_args:
+    harmony: true
