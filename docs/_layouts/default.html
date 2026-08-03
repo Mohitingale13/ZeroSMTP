@@ -150,7 +150,7 @@
         color: #24292f;
         text-decoration: none;
       }
-      .site-header nav a { font-size: .95rem; margin-right: 1rem; }
+      .site-header nav a { font-size: .95rem; margin-right: 1rem; text-decoration: underline; }
       .site-footer {
         margin-top: 3rem;
         padding-top: 1rem;
@@ -158,6 +158,7 @@
         font-size: .9rem;
         color: #57606a;
       }
+      .site-footer a { text-decoration: underline; }
       @media (prefers-color-scheme: dark) {
         .site-header, .site-footer { border-color: #30363d; }
         .site-header .wordmark { color: #e6edf3; }
@@ -179,7 +180,9 @@
         </nav>
       </header>
 
-      {{ content }}
+      <main id="content">
+        {{ content }}
+      </main>
 
       <footer class="site-footer">
         <p>
