@@ -182,5 +182,237 @@
       </footer>
 
     </div>
+
+    {% comment %}
+      Interactive page widgets (countdown, decision quiz, printer brand
+      picker), keyed off page.widget (set via defaults: in _config.yml, same
+      reasoning as page.schema above). These render only through this Jekyll
+      layout: a <script>/<style> block placed directly inside a .md file's
+      body shows up as literal, unrendered text on github.com, since GitHub's
+      markdown renderer doesn't run Liquid and strips raw <script> tags. Each
+      page instead carries only an empty mount point (e.g. <div id="zc-fc">)
+      plus a plain-text or plain-Markdown fallback, so it still reads cleanly
+      and correctly with JavaScript unavailable, i.e. on github.com.
+    {% endcomment %}
+    {% if page.widget == "countdown" %}
+    <style>
+      #zc-fc {
+        position:relative;overflow:hidden;
+        background:radial-gradient(ellipse at 50% 120%, #2d1b4e 0%, #0d0620 55%, #050310 100%);
+        border:1px solid #ff2ec4;border-radius:12px;max-width:640px;
+        padding:28px 20px 22px;margin:20px auto;
+        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+        text-align:center;
+        box-shadow:0 0 30px rgba(255,46,196,.25), inset 0 0 60px rgba(60,20,120,.4);
+      }
+      @keyframes zc-fc-pulse { 0%,100%{ text-shadow:0 0 12px currentColor,0 0 24px currentColor; } 50%{ text-shadow:0 0 20px currentColor,0 0 40px currentColor; } }
+      @keyframes zc-fc-twinkle { 0%,100%{ opacity:.15; } 50%{ opacity:.9; } }
+      .zc-fc-unit { min-width:64px; }
+      .zc-fc-num {
+        font-family:'Courier New',monospace; font-weight:700; font-size:2.4rem; line-height:1;
+        color:#8be9fd; animation:zc-fc-pulse 2.2s ease-in-out infinite;
+      }
+      .zc-fc-label { font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#c792ea;margin-top:4px; }
+      .zc-fc-sep { font-size:2.4rem;font-weight:700;color:#ff2ec4;align-self:flex-start;text-shadow:0 0 10px #ff2ec4; }
+    </style>
+    <script>
+    (function(){
+      var wrap = document.getElementById('zc-fc');
+      if (!wrap) return;
+
+      wrap.innerHTML =
+        '<div id="zc-fc-stars" style="position:absolute;inset:0;pointer-events:none;"></div>' +
+        '<div style="position:relative;font-size:11px;letter-spacing:.25em;text-transform:uppercase;' +
+        'color:#ff2ec4;text-shadow:0 0 8px #ff2ec4;margin-bottom:10px;font-weight:700;">' +
+        '🚀 It’s the final countdown <span style="opacity:.6;">&mdash; for Basic Auth on SMTP AUTH</span></div>' +
+        '<div id="zc-fc-digits" style="position:relative;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;"></div>' +
+        '<div style="position:relative;font-size:12px;color:#8be9fd;margin-top:12px;text-shadow:0 0 6px rgba(139,233,253,.6);">' +
+        'Microsoft disables it by default on existing tenants &mdash; end of December 2026</div>';
+
+      var digitsEl = document.getElementById('zc-fc-digits');
+      var starsEl = document.getElementById('zc-fc-stars');
+
+      for (var i = 0; i < 40; i++) {
+        var s = document.createElement('div');
+        var size = Math.random() < 0.8 ? 1 : 2;
+        s.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;' +
+          'left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;' +
+          'background:#fff;border-radius:50%;' +
+          'animation:zc-fc-twinkle ' + (2 + Math.random()*3).toFixed(1) + 's ease-in-out infinite;' +
+          'animation-delay:' + (Math.random()*3).toFixed(1) + 's;';
+        starsEl.appendChild(s);
+      }
+
+      var deadline = new Date('2026-12-31T23:59:59Z');
+
+      function pad(n){ return String(n).padStart(2, '0'); }
+
+      function unit(value, label){
+        return '<div class="zc-fc-unit"><div class="zc-fc-num">' + value + '</div>' +
+               '<div class="zc-fc-label">' + label + '</div></div>';
+      }
+
+      function render(){
+        var diff = deadline - new Date();
+        if (diff <= 0) {
+          digitsEl.innerHTML = '<div class="zc-fc-num" style="font-size:1.4rem;">The default has flipped &mdash; Basic auth is off.</div>';
+          return;
+        }
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        digitsEl.innerHTML =
+          unit(d, d === 1 ? 'day' : 'days') +
+          '<div class="zc-fc-sep">:</div>' +
+          unit(pad(h), 'hrs') +
+          '<div class="zc-fc-sep">:</div>' +
+          unit(pad(m), 'min') +
+          '<div class="zc-fc-sep">:</div>' +
+          unit(pad(s), 'sec');
+      }
+
+      render();
+      setInterval(render, 1000);
+    })();
+    </script>
+    {% elsif page.widget == "quiz" %}
+    <script>
+    (function(){
+      var el = document.getElementById('zc-quiz');
+      if (!el) return;
+      el.style.cssText = 'background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:20px;margin:20px 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;max-width:520px;';
+
+      var steps = {
+        start: {
+          q: "Does the mail have to come FROM your own domain?",
+          options: [
+            { label: "Yes", next: "codeControl" },
+            { label: "No", next: "volume" }
+          ]
+        },
+        codeControl: {
+          q: "Can you change the app's code?",
+          options: [
+            { label: "Yes", next: "result_oauth" },
+            { label: "No", next: "staticIp" }
+          ]
+        },
+        staticIp: {
+          q: "Do your devices sit behind a static public IP?",
+          options: [
+            { label: "Yes", next: "result_directsend" },
+            { label: "No", next: "result_relay_or_paid" }
+          ]
+        },
+        volume: {
+          q: "Is this low volume and non-critical (scans, device alerts, notifications)?",
+          options: [
+            { label: "Yes", next: "result_zerosmtp" },
+            { label: "No", next: "result_paid" }
+          ]
+        }
+      };
+
+      var results = {
+        result_oauth: {
+          title: "Option 1 — OAuth 2.0 / Microsoft Graph API",
+          body: "Microsoft's own recommended path, and since you control the code, it's the right one: full auditing, keeps your domain, no third party involved."
+        },
+        result_directsend: {
+          title: "Option 2 — Direct Send / SMTP relay connector",
+          body: "With a static public IP, Direct Send often solves this without touching the devices at all &mdash; but it only delivers to your own tenant's domains."
+        },
+        result_relay_or_paid: {
+          title: "Options 3 or 4 — on-prem relay or a paid SMTP service",
+          body: "Without a static IP, you need either your own relay (Postfix/IIS &mdash; see SYSTEM-MTA.md) or a paid provider (SendGrid, Mailgun, SES...) that supports your own domain."
+        },
+        result_zerosmtp: {
+          title: "Option 5 — ZeroSMTP fits this case",
+          body: "Free, three settings changed, done &mdash; as long as sending from <code>@msgwing.com</code> instead of your own domain is acceptable here. See the Quickstart."
+        },
+        result_paid: {
+          title: "Option 4 — a paid SMTP service",
+          body: "Higher volume or anything customer-facing needs a provider built for that (SendGrid, Mailgun, Brevo, SES...)."
+        }
+      };
+
+      function renderQuestion(key){
+        var step = steps[key];
+        var html = '<div style="font-weight:600;margin-bottom:10px;">' + step.q + '</div>';
+        step.options.forEach(function(opt){
+          html += '<button data-next="' + opt.next + '" style="display:block;width:100%;text-align:left;background:#fff;border:1px solid #d0d7de;border-radius:6px;padding:8px 12px;margin:6px 0;cursor:pointer;font-size:14px;">' + opt.label + '</button>';
+        });
+        el.innerHTML = html;
+        Array.prototype.forEach.call(el.querySelectorAll('button'), function(btn){
+          btn.addEventListener('click', function(){
+            var next = btn.getAttribute('data-next');
+            if (results[next]) { renderResult(next); } else { renderQuestion(next); }
+          });
+        });
+      }
+
+      function renderResult(key){
+        var r = results[key];
+        el.innerHTML =
+          '<div style="font-weight:600;margin-bottom:8px;">Recommendation</div>' +
+          '<div style="background:#dafbe1;border:1px solid #2ea043;border-radius:6px;padding:12px 14px;"><strong>' + r.title + '</strong><p style="margin:8px 0 0;">' + r.body + '</p></div>' +
+          '<a href="#" id="zc-restart" style="display:inline-block;margin-top:10px;font-size:13px;">&larr; start over</a>';
+        document.getElementById('zc-restart').addEventListener('click', function(e){
+          e.preventDefault();
+          renderQuestion("start");
+        });
+      }
+
+      renderQuestion("start");
+    })();
+    </script>
+    {% elsif page.widget == "printers" %}
+    <script>
+    (function(){
+      var mount = document.getElementById('zc-brand-picker-mount');
+      if (!mount) return;
+
+      mount.style.cssText = 'background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:16px 20px;margin:16px 0;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;max-width:640px;';
+      mount.innerHTML =
+        '<label for="zc-brand-picker" style="font-weight:600;display:block;margin-bottom:8px;">Printer brand</label>' +
+        '<select id="zc-brand-picker" style="width:100%;padding:8px;border:1px solid #d0d7de;border-radius:6px;font-size:14px;margin-bottom:12px;">' +
+        '<option value="">Select a brand…</option></select>' +
+        '<div id="zc-brand-output" style="font-size:14px;"></div>';
+
+      var select = document.getElementById('zc-brand-picker');
+      var output = document.getElementById('zc-brand-output');
+
+      var brands = [
+        { name: "HP", path: "Embedded Web Server (browser → printer's IP) → <code>Networking</code> or <code>Scan</code> tab → <code>TCP/IP Settings</code> → <code>Outgoing Email</code> / <code>Scan to Email</code> → <code>Outgoing Email Profiles</code> → add a profile using the values above." },
+        { name: "Canon", path: "Remote UI (browser → printer's IP) → <code>Settings/Registration</code> → <code>TX Settings</code> → <code>E-Mail/I-Fax Settings</code> → <code>SMTP Server Settings</code>. Covers imageRUNNER, imageCLASS, Maxify and PIXMA business models. On the Maxify MB2755 this menu also holds a certificate-verification toggle — see the known exception further down this page." },
+        { name: "Ricoh", path: "Web Image Monitor (browser → printer's IP, log in as administrator) → <code>Device Management</code> → <code>Configuration</code> → <code>Email</code> (under Device Settings) → set <code>SMTP Server Name</code>, <code>SMTP Port No.</code>, and enable <code>SMTP Authentication</code>." },
+        { name: "Xerox", path: "Embedded Web Server → <code>Properties</code> → <code>Connectivity</code> → <code>Protocols</code> → <code>SMTP Server</code> → <code>General</code>. Newer app-based models use <code>Properties → Apps → Email → Setup</code> instead." },
+        { name: "Kyocera", path: "Command Center RX (browser → printer's IP, admin login) → <code>Advanced</code> → <code>E-mail</code> → <code>SMTP</code> → <code>General</code>. Set <code>SMTP Security</code> to match your chosen port, and confirm <code>SMTP (E-mail TX)</code> is <code>On</code> under <code>Network Settings → Protocol</code>." },
+        { name: "Konica Minolta", path: "Touch panel: <code>Utility</code> → <code>Administrator Settings</code> → <code>Network Settings</code> → <code>E-Mail Settings</code> → <code>E-Mail TX (SMTP)</code>. Web Connection: <code>Network</code> → <code>E-mail Setting</code> → <code>E-mail TX (SMTP)</code>." },
+        { name: "Sharp", path: "<code>Settings (Administrator)</code> → <code>System Settings</code> → <code>Network Settings</code> → <code>Service Settings</code> → <code>SMTP</code> tab. Some models expose this on the web page as <code>Settings → E-mail</code>. Set <code>Primary Server</code>, <code>Port Number</code>, <code>Sender Address</code>, and enable SMTP authentication and <code>SSL/TLS</code>." },
+        { name: "Brother", path: "Web Based Management (browser → printer's IP) → <code>Network</code> → <code>Protocol</code> → <code>SMTP Client</code>. Set <code>SSL/TLS</code> to <code>STARTTLS</code> for port 587, or <code>SSL</code> for 465." },
+        { name: "Epson", path: "Printer's web configuration page → <code>Network Scan</code> or <code>Basic</code> → <code>Email Server</code> → enter server, port and authentication values. Applies to WorkForce and EcoTank Pro models with Scan-to-Email." },
+        { name: "Lexmark", path: "Embedded Web Server → <code>Settings</code> → <code>E-mail/FTP Settings</code> → <code>SMTP Setup</code>. Server goes in <code>Primary SMTP Gateway</code>, port in <code>Primary SMTP Gateway Port</code>, and set <code>Use SSL/TLS</code> to <code>Required</code>." }
+      ];
+
+      brands.forEach(function(b, i){
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = b.name;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', function(){
+        if (select.value === '') { output.innerHTML = ''; return; }
+        var b = brands[parseInt(select.value, 10)];
+        output.innerHTML =
+          '<p>' + b.path + '</p>' +
+          '<p style="color:#57606a;">Server: <code>mx.msgwing.com</code> &middot; Port: <code>587</code> (STARTTLS) or <code>465</code> (SSL/TLS) &middot; full settings table above.</p>';
+      });
+    })();
+    </script>
+    {% endif %}
   </body>
 </html>
