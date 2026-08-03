@@ -1,0 +1,15 @@
+# Config override, merged on top of _config.yml ONLY by the Actions-based
+# build (jekyll build --config _config.yml,_config_actions.yml). The
+# classic "deploy from a branch" build never reads this file, so it can't
+# break that build the way listing this plugin directly in _config.yml did
+# - jekyll-last-modified-at isn't on the classic build's allowed-plugin list.
+#
+# Delete this file and fold `plugins:` back into _config.yml once the
+# repo's Pages source is switched to "GitHub Actions" and the classic
+# build is no longer in play at all.
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-last-modified-at

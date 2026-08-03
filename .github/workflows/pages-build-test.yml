@@ -24,12 +24,15 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
           working-directory: docs
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile.pages-actions-migration
 
       - name: Build with Jekyll
         working-directory: docs
-        run: bundle exec jekyll build --destination _site --trace
+        run: bundle exec jekyll build --destination _site --config _config.yml,_config_actions.yml --trace
         env:
           JEKYLL_ENV: production
+          BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile.pages-actions-migration
 
       - name: Show output and confirm lastmod is present
         working-directory: docs
