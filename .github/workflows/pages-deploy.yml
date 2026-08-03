@@ -4,7 +4,8 @@ name: Deploy docs to GitHub Pages
 # "deploy from a branch" build, which can only use plugins on GitHub's own
 # allowed list. jekyll-last-modified-at (for sitemap.xml's <lastmod>, from
 # real git history) isn't on it - this workflow is what unlocks it.
-# Validated first via pages-build-test.yml before this went live.
+# The repo's Pages source is set to "GitHub Actions" (not "Deploy from a
+# branch") for this to actually publish anything.
 
 on:
   push:
@@ -36,8 +37,6 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
           working-directory: docs
-        env:
-          BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile.pages-actions-migration
 
       - uses: actions/configure-pages@v5
 
@@ -46,7 +45,6 @@ jobs:
         run: bundle exec jekyll build --destination _site --config _config.yml,_config_actions.yml
         env:
           JEKYLL_ENV: production
-          BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile.pages-actions-migration
 
       - uses: actions/upload-pages-artifact@v3
         with:
