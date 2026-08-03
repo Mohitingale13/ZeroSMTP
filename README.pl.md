@@ -8,7 +8,7 @@ Microsoft 365 wyłącza SMTP AUTH z uwierzytelnianiem Basic.<br>
 Bez wdrażania OAuth. Bez karty kredytowej. Bez własnego serwera pocztowego.
 
 [![mx.msgwing.com status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json)](https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml)
-[![Odliczanie do wyłączenia Basic auth](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/countdown.json)](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)
+[![Odliczanie do wyłączenia Basic auth w Exchange Online](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/countdown.json)](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
 [![15 języków](https://img.shields.io/badge/przyk%C5%82ady-15%20j%C4%99zyk%C3%B3w-blue)](#przykłady-kodu)
 [![Licencja: MIT](https://img.shields.io/badge/licencja-MIT-green.svg)](LICENSE)
