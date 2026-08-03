@@ -9,10 +9,10 @@
 # " | ZeroSMTP" to every one (~11 chars), and anything past ~60 total gets
 # truncated or flagged by Bing/Google as "title too long".
 #
-# Still built via GitHub Pages' classic "Deploy from a branch" build as of
-# this writing - migrating to a custom Actions workflow (see docs/Gemfile
-# and .github/workflows/pages-build-test.yml) to unlock jekyll-last-modified-at
-# is in progress but not yet switched over.
+# Built via a custom Actions workflow (.github/workflows/pages-deploy.yml,
+# docs/Gemfile), not GitHub Pages' classic "Deploy from a branch" build -
+# needed for jekyll-last-modified-at (see docs/_config_actions.yml), which
+# isn't on that build's allowed-plugin list.
 
 title: ZeroSMTP
 tagline: Free SMTP relay that still accepts basic username/password auth
