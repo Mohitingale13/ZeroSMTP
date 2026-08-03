@@ -232,7 +232,10 @@
         text-align:center;
         box-shadow:0 0 30px rgba(255,46,196,.25), inset 0 0 60px rgba(60,20,120,.4);
       }
-      @keyframes zc-fc-pulse { 0%,100%{ text-shadow:0 0 12px currentColor,0 0 24px currentColor; } 50%{ text-shadow:0 0 20px currentColor,0 0 40px currentColor; } }
+      /* filter, not text-shadow: Lighthouse flags animated text-shadow as a
+         non-composited (main-thread) animation. filter: drop-shadow gives
+         the same glow but runs on the compositor. */
+      @keyframes zc-fc-pulse { 0%,100%{ filter:drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor); } 50%{ filter:drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor); } }
       @keyframes zc-fc-twinkle { 0%,100%{ opacity:.15; } 50%{ opacity:.9; } }
       .zc-fc-unit { min-width:64px; }
       .zc-fc-num {
