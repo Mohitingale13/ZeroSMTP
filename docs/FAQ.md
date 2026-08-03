@@ -7,6 +7,7 @@ Answers to the questions we get asked most often about using ZeroSMTP.
 - [Can I get a custom username instead of the randomly generated one?](#can-i-get-a-custom-username-instead-of-the-randomly-generated-one)
 - [What are the sending limits?](#what-are-the-sending-limits)
 - [Can ZeroSMTP receive email too?](#can-zerosmtp-receive-email-too)
+- [My printer/device shows a certificate error — do I need to disable certificate verification?](#my-printerdevice-shows-a-certificate-error--do-i-need-to-disable-certificate-verification)
 - [Why is ZeroSMTP free? What's the catch?](#why-is-zerosmtp-free-whats-the-catch)
 - [Still have questions?](#still-have-questions)
 
@@ -58,6 +59,42 @@ in the troubleshooting guide.
 
 No. See [This project cannot receive email](TROUBLESHOOTING.md#this-project-cannot-receive-email)
 — ZeroSMTP is outgoing-only.
+
+## My printer/device shows a certificate error — do I need to disable certificate verification?
+
+Sometimes, yes — but only for **specific older devices**, and it's not a
+setting we recommend as a general fix.
+
+**Why this happens:** `mx.msgwing.com` uses a standard Let's Encrypt TLS
+certificate, which every modern operating system, browser and mail client
+trusts without issue. Some older embedded devices — certain printers,
+scanners, NAS units — ship with a **fixed, non-updatable root certificate
+store** baked into their firmware. If that firmware predates the specific
+Let's Encrypt certificate chain currently in use, the device has no way to
+recognize it as trustworthy, even though the certificate itself is entirely
+valid. A firmware update rarely fixes this on consumer-grade hardware, and
+which exact chain gets presented can shift over time as certificate
+authorities rotate intermediates — so this isn't necessarily a one-time,
+stays-fixed problem for a given device.
+
+**What to do, in order:**
+1. First rule out a network or configuration problem rather than assuming
+   it's this — see
+   [Certificate / TLS verification failed](TROUBLESHOOTING.md#certificate--tls-verification-failed)
+   for how to tell the difference.
+2. If you've confirmed it's this specific old-firmware limitation, disabling
+   the device's own certificate check (often labeled *"Don't verify
+   certificate"* / *"Nie weryfikuj certyfikat"*) is the accepted workaround
+   **for that device** — see the fully documented
+   [Canon Maxify MB2755 case](PRINTERS.md#known-exception-canon-maxify-mb2755)
+   for a real example, including how to confirm the root cause yourself.
+
+**What that trade-off actually costs:** with verification disabled, that one
+device no longer confirms it's really talking to `mx.msgwing.com` rather
+than an on-path attacker on the same network — the session is still
+encrypted, just without checking who's on the other end. Only accept that
+for the specific device that needs it; leave verification enabled
+everywhere else.
 
 ## Why is ZeroSMTP free? What's the catch?
 
@@ -121,6 +158,14 @@ Contact **abuse@msgwing.com**, or open an issue on this repository.
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "No. ZeroSMTP is outgoing-only: there is no inbox, IMAP, or POP3 access tied to an @msgwing.com account."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "My printer/device shows a certificate error - do I need to disable certificate verification?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sometimes, for specific older devices only - not as a general fix. mx.msgwing.com uses a standard Let's Encrypt certificate that every modern OS and client trusts, but some older printers, scanners and NAS units have a fixed, non-updatable root certificate store in their firmware that predates the Let's Encrypt certificate chain currently in use, so they can't recognize a perfectly valid certificate as trustworthy. A firmware update rarely fixes this on consumer hardware. First rule out a network or configuration problem instead of assuming this is the cause. If confirmed, disabling that device's own certificate verification is the accepted workaround for that device only - see the Canon Maxify MB2755 case study for a documented example. Doing this means the device no longer confirms it is talking to the real server rather than an on-path attacker, though the connection stays encrypted; only accept that trade-off for the specific device that needs it."
       }
     },
     {
