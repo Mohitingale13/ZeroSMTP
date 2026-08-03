@@ -284,33 +284,34 @@ keep certificate verification **enabled** — the safe default recommended in
 [TROUBLESHOOTING.md](TROUBLESHOOTING.md). One confirmed exception is the
 **Canon Maxify MB2755** (2016-era SOHO inkjet MFP):
 
-- `mx.msgwing.com` serves a **Let's Encrypt** certificate.
-- Until September 2021 that chain was cross-signed by the widely trusted
-  `DST Root CA X3`. Since that root expired, Let's Encrypt relies solely on
-  its own `ISRG Root X1`.
-- The MB2755's firmware ships a fixed, non-updatable root CA store that never
-  gained `ISRG Root X1`. Validation therefore fails on this model even though
-  the certificate is valid and correctly served. There's no way to import a
-  root certificate, and no firmware update adds it.
-- On port **`465`**, this model requires disabling *"Nie weryfikuj
-  certyfikat" / "Don't verify certificate"* — that's the only way the
-  connection succeeds there.
-- **Update (production testing, 2026-07):** on port **`587`** with
-  *"Bezpieczne połącz. (SSL)" / "encrypted connection"* checked, it connects
-  successfully **without** the workaround — leave *"Nie weryfikuj
-  certyfikat"* **unchecked**. **Treat `587` as the default for this model**,
-  and keep `465` (with verification disabled) only as a fallback if `587` is
-  unreachable on a given network. See
-  [Which port should I use?](TROUBLESHOOTING.md#which-port-should-i-use).
+- The MB2755's firmware ships a **fixed, non-updatable root CA store** that
+  predates modern Let's Encrypt root certificates. There's no way to import a
+  root certificate, and — confirmed by re-testing after a firmware update —
+  no firmware update adds one either.
+- Which exact Let's Encrypt chain `mx.msgwing.com` presents can change over
+  time (certificate authorities rotate intermediates and occasionally change
+  which root a chain is built on). An `openssl s_client -connect
+  mx.msgwing.com:587 -starttls smtp` on **2026-08-03** showed a chain built
+  entirely on elliptic-curve (ECDSA) certificates — leaf → `Let's Encrypt
+  YE1` → `ISRG, Root YE` → `ISRG Root X2` — rather than the classic RSA chain
+  through `ISRG Root X1` seen in earlier testing. Modern OS trust stores
+  accept this fine; the MB2755's frozen CA store, already missing the more
+  common `ISRG Root X1`, has no path to trust this newer chain either.
+- **On both `465` and `587`, this model currently requires disabling *"Nie
+  weryfikuj certyfikat" / "Don't verify certificate"***. An earlier version
+  of this page reported `587` working without that workaround — that was
+  accurate for the chain being served at the time, but isn't a setting on
+  the printer; it depends on which chain the server happens to present at
+  connection time, which can change. Treat "disable verification on this
+  model" as the durable answer rather than tying it to a specific port.
 
-![Canon Maxify MB2755 mail server settings on port 587 (recommended default; certificate verification stays enabled), sender address redacted](assets/canon-maxify-mb2755-mail-settings-587.png)
+![Canon Maxify MB2755 mail server settings with certificate verification disabled — the setting that actually matters here, regardless of port number, sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
 
-<details>
-<summary>Port 465 (fallback only — requires disabling certificate verification)</summary>
-
-![Canon Maxify MB2755 mail server settings on port 465 (fallback), sender address redacted](assets/canon-maxify-mb2755-mail-settings.png)
-
-</details>
+*A screenshot previously shown here for port `587` had "Nie weryfikuj
+certyfikat" unchecked — that reflected the chain the server was presenting
+at the time, not a setting specific to that port. It's been removed rather
+than left up as a now-inaccurate example; use the screenshot above (verify
+certificate: off) for either port.*
 
 > **Security note:** disabling certificate verification means the printer no
 > longer confirms it's talking to `mx.msgwing.com` rather than an on-path
