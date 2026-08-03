@@ -72,6 +72,7 @@ defaults:
         Fix scan-to-email after Microsoft 365 disables Basic auth. Per-brand
         SMTP settings for Ricoh, Canon, Xerox, HP, Kyocera, Konica Minolta,
         Sharp, Brother, Epson and Lexmark, plus common error codes.
+      schema: printers-howto
   - scope:
       path: "TROUBLESHOOTING.md"
     values:
@@ -87,6 +88,7 @@ defaults:
       description: >-
         Can I use ZeroSMTP with my own hosting and domain? Will mail come from
         my domain? Sending limits, custom usernames, and why it is free.
+      schema: faq
   - scope:
       path: "WINDOWS-SERVER.md"
     values:
