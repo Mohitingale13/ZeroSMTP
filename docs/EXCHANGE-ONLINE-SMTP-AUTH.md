@@ -82,7 +82,9 @@ changes, but it's another server to run, patch, and monitor. Our
 Commercial relays (SendGrid, Mailgun, Brevo, SMTP2GO, Amazon SES…) accept
 plain SMTP AUTH and let you verify your own domain, so devices keep working
 with just a credential change. This is the usual paid answer, and for a
-business sending on its own domain it's typically the right one.
+business sending on its own domain it's typically the right one — see
+[ZeroSMTP vs. other free relays](ALTERNATIVES.md) for exactly what that
+verification step involves.
 
 ### 5. ZeroSMTP — where it actually fits
 
