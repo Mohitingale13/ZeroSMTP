@@ -94,6 +94,14 @@
             "@type": "Answer",
             "text": "There isn't a hidden one. The trade-offs are the ones already documented: mail always goes out from a shared @msgwing.com address, not your own domain, and sending is rate-limited per account to keep the shared domain's reputation good for everyone. Beyond that, your data isn't processed for marketing or resold, and abuse accounts are actively removed to protect deliverability for everyone else."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "Can you share details about your infrastructure or how deliverability is maintained?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. We don't publish operational specifics - server setup, IP reputation management, abuse monitoring, or anything else about how the relay is kept off blacklists - beyond what's already documented (rate limits, SPF/DKIM/DMARC alignment, and the abuse policy). Sharing that level of detail would make it easier to abuse the shared domain's reputation, which is exactly what those trade-offs exist to protect against for everyone using the service."
+          }
         }
       ]
     }
