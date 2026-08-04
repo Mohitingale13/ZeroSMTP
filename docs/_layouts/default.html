@@ -232,15 +232,19 @@
         text-align:center;
         box-shadow:0 0 30px rgba(255,46,196,.25), inset 0 0 60px rgba(60,20,120,.4);
       }
-      /* filter, not text-shadow: Lighthouse flags animated text-shadow as a
-         non-composited (main-thread) animation. filter: drop-shadow gives
-         the same glow but runs on the compositor. */
-      @keyframes zc-fc-pulse { 0%,100%{ filter:drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor); } 50%{ filter:drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor); } }
+      /* transform + opacity, not text-shadow or animated filter: Lighthouse
+         flags both as non-composited (animated filter still forces a
+         paint-bounds recompute for the blur radius, even though it's not
+         main-thread like text-shadow). The glow itself is a static filter
+         (never animated, so it's free); only scale/opacity pulse. */
+      @keyframes zc-fc-pulse { 0%,100%{ transform:scale(1); opacity:.85; } 50%{ transform:scale(1.06); opacity:1; } }
       @keyframes zc-fc-twinkle { 0%,100%{ opacity:.15; } 50%{ opacity:.9; } }
       .zc-fc-unit { min-width:64px; }
       .zc-fc-num {
         font-family:'Courier New',monospace; font-weight:700; font-size:2.4rem; line-height:1;
-        color:#8be9fd; animation:zc-fc-pulse 2.2s ease-in-out infinite;
+        color:#8be9fd;
+        filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor);
+        animation:zc-fc-pulse 2.2s ease-in-out infinite;
       }
       .zc-fc-label { font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#c792ea;margin-top:4px; }
       .zc-fc-sep { font-size:2.4rem;font-weight:700;color:#ff2ec4;align-self:flex-start;text-shadow:0 0 10px #ff2ec4; }
