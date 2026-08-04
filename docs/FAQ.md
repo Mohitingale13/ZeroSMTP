@@ -129,31 +129,13 @@ supported.
 
 ## Can you share details about your infrastructure or how deliverability is maintained?
 
-No. We don't publish operational specifics — server setup, IP reputation
-management, abuse monitoring, or anything else about how the relay is kept
-off blacklists — beyond what's already documented on this page (rate
-limits, SPF/DKIM/DMARC alignment, and the abuse policy above). Sharing
-that level of detail would make it easier to abuse the shared domain's
-reputation, which is exactly what those trade-offs exist to protect
-against for everyone using the service.
-
-If you're evaluating ZeroSMTP for a legitimate use case and have specific
-questions about *your own* integration rather than our internals, reach
-out at abuse@msgwing.com.
+No — see the [Security Policy](https://github.com/msgwing/ZeroSMTP/blob/main/SECURITY.md#infrastructure-and-third-party-integration-inquiries)
+for what we do and don't disclose, and why.
 
 ## Do you accept third-party plugins, widgets, or scripts on the docs site?
 
-No. This documentation site intentionally ships with zero third-party
-JavaScript — no analytics, no trackers, no chat widgets, no translation
-or accessibility overlays, nothing that executes in a visitor's browser
-beyond what's in [the repository](https://github.com/msgwing/ZeroSMTP).
-A remote script is something that has to be trusted indefinitely rather
-than reviewed once, which doesn't fit the same handling of visitor data
-described elsewhere on this page. That holds regardless of price or how
-simple the integration is — the concern is ongoing trust, not setup cost.
-
-If multilingual support is ever added, it will be static, self-hosted
-pages generated from this repository, not a live third-party widget.
+No — see the [Security Policy](https://github.com/msgwing/ZeroSMTP/blob/main/SECURITY.md#infrastructure-and-third-party-integration-inquiries)
+for the reasoning.
 
 ## Still have questions?
 

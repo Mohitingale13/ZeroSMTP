@@ -25,6 +25,30 @@ ZeroSMTP relay (`mx.msgwing.com`). Vulnerabilities in scope include:
 Vulnerabilities in the ZeroSMTP *service* itself (mx.msgwing.com,
 msgwing.com) should also be reported to abuse@msgwing.com.
 
+## Infrastructure and third-party integration inquiries
+
+We don't publish operational specifics about the relay — server setup, IP
+reputation management, abuse monitoring, or anything else about how
+`mx.msgwing.com` stays off blacklists — beyond what's already documented
+in the [FAQ](https://docs.msgwing.com/FAQ.html) (rate limits,
+SPF/DKIM/DMARC alignment, and the abuse policy). Sharing that level of
+detail would make it easier to abuse the shared domain's reputation,
+which those trade-offs exist to protect against for everyone using the
+service. If you're evaluating ZeroSMTP for a legitimate use case and have
+questions about *your own* integration rather than our internals, reach
+out at abuse@msgwing.com.
+
+We also don't accept third-party plugins, widgets, or scripts on the
+docs site (docs.msgwing.com). It intentionally ships with zero
+third-party JavaScript — no analytics, no trackers, no chat widgets, no
+translation or accessibility overlays, nothing that executes in a
+visitor's browser beyond what's in this repository. A remote script has
+to be trusted indefinitely rather than reviewed once, which doesn't fit
+the handling of visitor data described in the FAQ. That holds regardless
+of price or how simple the integration is. If multilingual support is
+ever added, it will be static, self-hosted pages generated from this
+repository, not a live third-party widget.
+
 ## Supported Versions
 
 This is an examples repository rather than a versioned library — only the
