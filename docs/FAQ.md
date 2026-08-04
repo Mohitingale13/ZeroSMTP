@@ -11,6 +11,7 @@ Answers to the questions we get asked most often about using ZeroSMTP.
 - [My printer/device shows a certificate error — do I need to disable certificate verification?](#my-printerdevice-shows-a-certificate-error--do-i-need-to-disable-certificate-verification)
 - [Why is ZeroSMTP free? What's the catch?](#why-is-zerosmtp-free-whats-the-catch)
 - [Can you share details about your infrastructure or how deliverability is maintained?](#can-you-share-details-about-your-infrastructure-or-how-deliverability-is-maintained)
+- [Do you accept third-party plugins, widgets, or scripts on the docs site?](#do-you-accept-third-party-plugins-widgets-or-scripts-on-the-docs-site)
 - [Still have questions?](#still-have-questions)
 
 ## Can I use ZeroSMTP with my own hosting and my own domain?
@@ -139,6 +140,20 @@ against for everyone using the service.
 If you're evaluating ZeroSMTP for a legitimate use case and have specific
 questions about *your own* integration rather than our internals, reach
 out at abuse@msgwing.com.
+
+## Do you accept third-party plugins, widgets, or scripts on the docs site?
+
+No. This documentation site intentionally ships with zero third-party
+JavaScript — no analytics, no trackers, no chat widgets, no translation
+or accessibility overlays, nothing that executes in a visitor's browser
+beyond what's in [the repository](https://github.com/msgwing/ZeroSMTP).
+A remote script is something that has to be trusted indefinitely rather
+than reviewed once, which doesn't fit the same handling of visitor data
+described elsewhere on this page. That holds regardless of price or how
+simple the integration is — the concern is ongoing trust, not setup cost.
+
+If multilingual support is ever added, it will be static, self-hosted
+pages generated from this repository, not a live third-party widget.
 
 ## Still have questions?
 
