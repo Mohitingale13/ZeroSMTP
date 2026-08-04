@@ -10,6 +10,7 @@ Answers to the questions we get asked most often about using ZeroSMTP.
 - [Can ZeroSMTP receive email too?](#can-zerosmtp-receive-email-too)
 - [My printer/device shows a certificate error — do I need to disable certificate verification?](#my-printerdevice-shows-a-certificate-error--do-i-need-to-disable-certificate-verification)
 - [Why is ZeroSMTP free? What's the catch?](#why-is-zerosmtp-free-whats-the-catch)
+- [Can you share details about your infrastructure or how deliverability is maintained?](#can-you-share-details-about-your-infrastructure-or-how-deliverability-is-maintained)
 - [Still have questions?](#still-have-questions)
 
 ## Can I use ZeroSMTP with my own hosting and my own domain?
@@ -124,6 +125,20 @@ marketing or resold, and abuse accounts are actively removed to protect
 deliverability for everyone else. If your use case needs more than what's
 documented here, ask at abuse@msgwing.com rather than assuming it isn't
 supported.
+
+## Can you share details about your infrastructure or how deliverability is maintained?
+
+No. We don't publish operational specifics — server setup, IP reputation
+management, abuse monitoring, or anything else about how the relay is kept
+off blacklists — beyond what's already documented on this page (rate
+limits, SPF/DKIM/DMARC alignment, and the abuse policy above). Sharing
+that level of detail would make it easier to abuse the shared domain's
+reputation, which is exactly what those trade-offs exist to protect
+against for everyone using the service.
+
+If you're evaluating ZeroSMTP for a legitimate use case and have specific
+questions about *your own* integration rather than our internals, reach
+out at abuse@msgwing.com.
 
 ## Still have questions?
 
