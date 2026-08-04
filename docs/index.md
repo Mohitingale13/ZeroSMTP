@@ -37,6 +37,7 @@ Microsoft 365 tenants at the end of December 2026.
 | Have it failing or timing out | [Troubleshooting](TROUBLESHOOTING.md) |
 | Have monitoring/alerting tools that need to send mail | [Monitoring alerts](MONITORING.md) |
 | Want to see confirmed fixes for specific hardware | [Device case studies](DEVICE-CASE-STUDIES.md) |
+| Are comparing free SMTP relays | [ZeroSMTP vs. other free relays](ALTERNATIVES.md) |
 | Just want the short answers | [FAQ](FAQ.md) |
 
 ## What is happening

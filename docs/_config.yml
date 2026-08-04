@@ -171,6 +171,13 @@ defaults:
       description: >-
         Drop-in email alert configuration for Zabbix, Nagios/Icinga, Uptime
         Kuma and PRTG using a free SMTP relay.
+  - scope:
+      path: "ALTERNATIVES.md"
+    values:
+      title: "ZeroSMTP vs. other free SMTP relays"
+      description: >-
+        How ZeroSMTP compares to SMTP2GO, Brevo and MailerSend: no DNS
+        setup vs. sending from your own verified domain.
 
 exclude:
   - assets/*.py
