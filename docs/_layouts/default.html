@@ -184,6 +184,13 @@
         color: #57606a;
       }
       .site-footer a { text-decoration: underline; }
+      .page-updated {
+        margin-top: 2.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #d0d7de;
+        font-size: .85rem;
+        color: #57606a;
+      }
 
       /* Body-content links: the theme underlines these on hover only,
          which Lighthouse flags as distinguishable by color alone. */
@@ -201,9 +208,42 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        .site-header, .site-footer { border-color: #30363d; }
+        .site-header, .site-footer, .page-updated { border-color: #30363d; }
         .site-header .wordmark { color: #e6edf3; }
-        .site-footer { color: #8b949e; }
+        .site-footer, .page-updated { color: #8b949e; }
+      }
+
+      /* Copy button on fenced code blocks, injected by the script at the
+         end of the page. Positioned over .highlight (Rouge's wrapper),
+         which directly contains the code block for every fenced snippet. */
+      .highlight { position: relative; }
+      .copy-code-btn {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        padding: .2rem .55rem;
+        font-size: .75rem;
+        line-height: 1.4;
+        color: #57606a;
+        background: #fff;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity .1s ease-in-out;
+      }
+      .highlight:hover .copy-code-btn,
+      .copy-code-btn:focus {
+        opacity: 1;
+      }
+      .copy-code-btn.copied {
+        opacity: 1;
+        color: #1a7f37;
+        border-color: #1a7f37;
+      }
+      @media (prefers-color-scheme: dark) {
+        .copy-code-btn { color: #8b949e; background: #21262d; border-color: #30363d; }
+        .copy-code-btn.copied { color: #3fb950; border-color: #3fb950; }
       }
     </style>
   </head>
@@ -223,6 +263,9 @@
 
       <main id="content">
         {{ content }}
+        {% if page.last_modified_at %}
+        <p class="page-updated">Updated {{ page.last_modified_at | date: "%-d %b %Y" }}</p>
+        {% endif %}
       </main>
 
       <footer class="site-footer">
@@ -473,5 +516,30 @@
     })();
     </script>
     {% endif %}
+
+    <script>
+    (function(){
+      if (!navigator.clipboard) return;
+      document.querySelectorAll('div.highlight').forEach(function(block){
+        var code = block.querySelector('pre.highlight, pre');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-code-btn';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function(){
+          navigator.clipboard.writeText(code.innerText).then(function(){
+            btn.textContent = 'Copied';
+            btn.classList.add('copied');
+            setTimeout(function(){
+              btn.textContent = 'Copy';
+              btn.classList.remove('copied');
+            }, 1500);
+          });
+        });
+        block.appendChild(btn);
+      });
+    })();
+    </script>
   </body>
 </html>
