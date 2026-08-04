@@ -70,6 +70,14 @@ address, **not your own domain**
 ([why](FAQ.md#will-emails-be-sent-from-my-own-domain-eg-youyourdomaincom)),
 and there is a [200 emails/day limit](TROUBLESHOOTING.md#sending-limits-rate-limiting).
 
+In exchange, there's no DNS work: most free relays require verifying your
+own domain (SPF/DKIM records, propagation, sender reputation to manage
+yourself) before they'll send normally. ZeroSMTP skips that entirely.
+
+<img src="assets/setup-comparison.svg" width="760" height="580" alt="Setup path: a typical free relay takes five steps including DNS configuration (SPF, DKIM, DMARC, propagation, verification); ZeroSMTP takes three steps with no DNS work">
+
+Full breakdown: [ZeroSMTP vs. other free SMTP relays](ALTERNATIVES.md).
+
 That makes it a good fit for scan-to-email, device and backup alerts,
 monitoring notifications, homelabs, schools and small offices — anywhere the
 message just needs to arrive. It is **not** the right answer for
