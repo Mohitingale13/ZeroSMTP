@@ -4,6 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {% comment %}
+      Yandex Webmaster site-ownership verification. Not doable via DNS TXT
+      here: docs.msgwing.com is a CNAME (required for GitHub Pages), and a
+      name with a CNAME can't carry any other record type (RFC 1034) - the
+      Yandex resolver enforces this and never even looks for the TXT record,
+      unlike Google/Cloudflare's public resolvers which serve it anyway.
+    {% endcomment %}
+    <meta name="yandex-verification" content="54561a99b7e3ae2b" />
+
     {% seo %}
 
     {% comment %}
