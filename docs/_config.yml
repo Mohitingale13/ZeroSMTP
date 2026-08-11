@@ -145,10 +145,10 @@ defaults:
   - scope:
       path: "CODE-EXAMPLES.md"
     values:
-      title: "SMTP send-email code examples, 17 languages"
+      title: "SMTP send-email code examples, 18 languages"
       description: >-
         Ready-to-run SMTP send-email examples for mx.msgwing.com in Python,
-        PHP, Node.js, TypeScript, Java, C#, C, Go, Ruby, Perl, Rust, Kotlin,
+        PHP, Node.js, TypeScript, Java, C#, C, Go, Ruby, Perl, Rust, Kotlin, Dart,
         Elixir, Lua, Swift, PowerShell and Bash.
   - scope:
       path: "RELIABILITY.md"

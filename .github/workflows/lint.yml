@@ -161,6 +161,18 @@ jobs:
       - name: Build C example
         run: cc -std=c99 -Wall -Wextra -Werror -o /tmp/c-zerosmtp c-zerosmtp.c -lcurl
 
+  dart:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+      - name: Install Dart dependencies
+        run: dart pub get
+      - name: Analyze Dart example
+        run: dart analyze dart-zerosmtp.dart
+
   php:
     needs: changes
     if: needs.changes.outputs.code == 'true'
