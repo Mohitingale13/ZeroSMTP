@@ -121,6 +121,16 @@ jobs:
       - name: Syntax-check Elixir example
         run: elixir -e 'Code.string_to_quoted!(File.read!("elixir-zerosmtp.exs"))'
 
+  lua:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: leafo/gh-actions-lua@v11
+      - name: Syntax-check Lua script
+        run: luac -p lua-zerosmtp.lua
+
   php:
     needs: changes
     if: needs.changes.outputs.code == 'true'
