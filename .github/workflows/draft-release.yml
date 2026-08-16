@@ -54,6 +54,8 @@ jobs:
           } > body.md
 
       - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
