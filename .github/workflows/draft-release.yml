@@ -43,35 +43,23 @@ jobs:
           # Trim leading/trailing blank lines and keep the rest verbatim,
           # so markdown inside the entry survives untouched.
           NOTES=$(printf '%s\n' "$NOTES" | sed '/^[[:space:]]*$/d')
-          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
-          printf '%s\n' "$NOTES" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          # Write the notes to a file, not to a step output variable.
+          # Apostrophes in the notes (e.g. "Microsoft's") would break the
+          # shell quoting when the output is interpolated into a later step,
+          # so the entire body is assembled here and passed via --notes-file.
+          {
+            printf '%s\n' "$NOTES"
+            printf '\n---\n\n## First time here?\n\n- [Docs](https://docs.msgwing.com/) - setup, troubleshooting, migration guide\n- [Getting started](https://github.com/${{ github.repository }}#quickstart) - the whole API in four lines\n- [Code examples](https://github.com/${{ github.repository }}#code-examples) - 21 ready-to-run files across 19 languages\n\n_Draft prepared automatically. Publish when ready._\n'
+          } > body.md
 
       - name: Create the draft release
         run: |
           set -euo pipefail
-          NOTES='${{ steps.notes.outputs.notes }}'
-
-          # A release body that points at the right places makes the
-          # difference between "we shipped" and "look what shipped".
-          BODY=$(cat <<MD
-          $NOTES
-
-          ---
-
-          ## First time here?
-
-          - [Docs](https://docs.msgwing.com/) — setup, troubleshooting, migration guide
-          - [Getting started](https://github.com/${{ github.repository }}#quickstart) — the whole API in four lines
-          - [Code examples](https://github.com/${{ github.repository }}#code-examples) — 21 ready-to-run files across 19 languages
-
-          _Draft prepared automatically. Publish when ready._
-          MD
-          )
 
           # --draft is the entire point: nothing goes public without a click.
           gh release create "$GITHUB_REF_NAME" \
             --draft \
             --title "$GITHUB_REF_NAME" \
-            --notes "$BODY" \
+            --notes-file body.md \
             --repo "$GITHUB_REPOSITORY"
