@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0] - 2026-08-16
+
+### Added
+- `.github/workflows/draft-release.yml`: automatic Draft release notes from the
+  CHANGELOG whenever a `v*` tag is pushed. Draft, never published without a
+  click — releases are the project's public face and stay owner-controlled.
+
 ## [1.3.0] - 2026-07-26
 
 All 12 CI jobs (one per language/script surface) are green as of this

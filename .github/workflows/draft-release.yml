@@ -75,4 +75,3 @@ jobs:
             --title "$GITHUB_REF_NAME" \
             --notes "$BODY" \
             --repo "$GITHUB_REPOSITORY"
-MD
