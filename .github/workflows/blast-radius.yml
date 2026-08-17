@@ -172,7 +172,12 @@ jobs:
           cp /tmp/blast-radius-samples.json blast-radius-samples.json
 
           if [ "$label" != "none" ]; then
-            formatted=$(printf "%'d" "$value" | tr ',' ' ')
+            # Grouped with sed rather than printf "%'d": the runner's locale
+            # is C, where that format simply does not group, which is why the
+            # first badge ever published read "24960 files". This is the
+            # headline number of the whole blast-radius argument - it has to
+            # read as a quantity, not as an identifier.
+            formatted=$(echo "$value" | sed -E ':a;s/([0-9])([0-9]{3})($|[^0-9])/ /;ta')
             cat > blast-radius.json <<JSON
           {"schemaVersion":1,"label":"$label in public code","message":"$formatted files","color":"critical"}
           JSON
