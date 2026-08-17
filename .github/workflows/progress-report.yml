@@ -23,15 +23,14 @@ on:
     - cron: '0 6 */3 * *'   # every three days, 06:00 UTC
   workflow_dispatch:
 
-# `administration: read` is what the traffic endpoints map to. Without it the
-# first run reported "Resource not accessible by integration" and the report
-# went out with its headline numbers missing - which is the one thing this
-# report cannot be, since GitHub keeps traffic for only 14 days and nobody
-# else is writing it down.
+# No `administration:` here, however much the traffic endpoints want it: it is
+# not a valid GITHUB_TOKEN permission, and adding it made GitHub reject the
+# whole workflow at startup - a failure with no job and no log. The traffic
+# API is simply out of reach for the Actions token; the report says so in
+# words rather than pretending the numbers are zero.
 permissions:
   contents: read
   issues: write
-  administration: read
 
 jobs:
   report:
@@ -108,7 +107,7 @@ jobs:
               L.push(`| Unikalni odwiedzający (14 dni) | **${num(views.uniques)}** |`);
               L.push(`| Odsłony (14 dni) | ${num(views.count)} |`);
             } else {
-              L.push('| Ruch | ⚠️ **niedostępny — API odmówiło dostępu** |');
+              L.push('| Ruch | — _wymaga tokena osobistego, patrz niżej_ |');
             }
             L.push(`| Gwiazdki | **${meta.stargazers_count}** |`);
             L.push(`| Forki | ${meta.forks_count} |`);
@@ -165,6 +164,18 @@ jobs:
             } else {
               L.push('**Nic nie czeka na Twoją decyzję.** Zmiany w tym repozytorium zatwierdza rada;');
               L.push('do Ciebie trafia wyłącznie publikacja u obcych i tworzenie poświadczeń.');
+            }
+            L.push('');
+            if (!views) {
+              L.push('');
+              L.push('> **Liczby odwiedzin są poza zasięgiem tego raportu.** Endpointy ruchu');
+              L.push('> wymagają tokena osobistego, a token Actions ich nie ma i mieć nie może.');
+              L.push('> Do odczytania ręcznie w dowolnej chwili:');
+              L.push('>');
+              L.push('> ```bash');
+              L.push('> gh api repos/' + owner + '/' + repo + '/traffic/views');
+              L.push('> gh api repos/' + owner + '/' + repo + '/traffic/popular/referrers');
+              L.push('> ```');
             }
             L.push('');
             L.push('_Raport generowany automatycznie co trzy dni. Nie wymaga odpowiedzi — zamknij go._');
