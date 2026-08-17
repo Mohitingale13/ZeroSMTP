@@ -1,0 +1,81 @@
+name: Do akceptacji
+
+# Turns a finished piece of work into an email in the owner's inbox, in
+# Polish, with the one action to take.
+#
+# Two problems this exists to solve, both found the hard way on 2026-08-17:
+#
+#   1. The discovery bots used to assign every raw candidate to the owner,
+#      so the inbox filled with things that were not ready. Reviewing that
+#      queue found eight leads and zero actionable ones - five threads
+#      closed and resolved, two dead since 2022, one already answered by
+#      the owner. Nothing should reach the inbox until it is finished.
+#
+#   2. GitHub suppresses notifications for the actor who performed the
+#      action. Assigning the owner using the owner's own token emails
+#      nobody, which is exactly what happened to those ten issues. This
+#      workflow runs as github-actions[bot], a different actor, so the
+#      assignment actually notifies.
+#
+# So: label an issue `do-akceptacji` once it is genuinely finished, and this
+# assigns the owner and posts the Polish instruction. The label is the
+# handover; the email is its side effect.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+
+jobs:
+  assign:
+    if: github.event.label.name == 'do-akceptacji'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const issue_number = context.issue.number;
+
+            // Assigning is what sends the mail. Skip it if the owner is
+            // already assigned, so re-labelling does not silently do nothing
+            // and look like a failure.
+            const current = (context.payload.issue.assignees || []).map(a => a.login);
+            if (!current.includes(owner)) {
+              await github.rest.issues.addAssignees({
+                owner, repo: context.repo.repo, issue_number,
+                assignees: [owner],
+              });
+              core.notice(`Przypisano ${owner} — mail powinien wyjść.`);
+            } else {
+              core.warning(
+                `${owner} był już przypisany, więc GitHub nie wyśle powiadomienia ` +
+                `o przypisaniu. Komentarz poniżej i tak trafi na maila.`);
+            }
+
+            // The comment carries the instruction. Polish, because the owner
+            // reads these; the draft or entry inside the issue stays in the
+            // language it will be posted in, which is English.
+            const body = [
+              '## Gotowe do akceptacji',
+              '',
+              'Ta sprawa jest skompletowana. Nic tu nie trzeba dopisywać ani poprawiać.',
+              '',
+              '**Co zrobić:** przeczytaj treść powyżej i wykonaj **jedną** czynność, którą opisuje —',
+              'wklej gotową odpowiedź, zgłoś wpis albo kliknij przycisk. Potem zamknij to zgłoszenie.',
+              '',
+              '**Jeśli coś jest nie tak** — nie poprawiaj tego ręcznie. Zdejmij etykietę',
+              '`do-akceptacji` i napisz w komentarzu, co nie gra. Poprawka trafi tam, gdzie',
+              'powstał błąd, żeby nie wrócił.',
+              '',
+              '---',
+              '',
+              '_Treść przeznaczona do publikacji jest po angielsku celowo — w takim języku zostanie',
+              'wklejona. Ta instrukcja jest po polsku, bo czytasz ją tylko Ty._',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner, repo: context.repo.repo, issue_number, body,
+            });

@@ -302,16 +302,18 @@ jobs:
                 'queued again.',
               ].join('\n');
 
-              // Assigned so GitHub emails a direct link. Same reasoning as in
-              // outreach-watch.yml: a queued draft that nobody is told about
-              // is a draft nobody submits.
+              // Deliberately not assigned. A raw candidate is not finished
+              // work, and the owner's inbox is for finished work only -
+              // reviewing the first assigned queue found eight leads and zero
+              // actionable ones. It is labelled `do-akceptacji` after
+              // qualification, and ready-for-approval.yml does the assigning
+              // then, which is also the only way the notification fires.
               const created = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `Listing: ${c.full_name}`.slice(0, 200),
                 body,
                 labels: [LABEL],
-                assignees: [context.repo.owner],
               });
               core.notice(`Queued #${created.data.number} — ${c.url}`);
             }
