@@ -1,5 +1,56 @@
 # Changelog
 
+## [1.6.0] - 2026-08-17
+
+The relay's status is now visible where readers actually are, and the
+automation around the project stopped lying about its own results.
+
+### Added
+- Live relay status in the header of every page on docs.msgwing.com, reading
+  the project's own `status.json`. Clicking it fetches the most recent check
+  at that moment - both ports, how long ago, a link to the run - and offers
+  `Test-NetConnection` and `openssl s_client` for testing from your own
+  network. Nothing third-party is loaded, and with JavaScript unavailable it
+  still names the host, both ports and the run history.
+- A connection card at the top of the docs homepage: server and both ports in
+  large monospace with a copy button each, the live status, and one link to
+  registration. The 200/day cap and the shared `@msgwing.com` from-address are
+  inside the card rather than in a footnote.
+- `.github/workflows/listings-radar.yml`: a weekly, draft-only scout for
+  curated directories the project could be listed in. It never opens a pull
+  request and never comments - it queues an issue with a draft entry and that
+  list's own submission rules.
+- Queued drafts and outage alerts are assigned to the repository owner, so
+  they arrive as an email with a direct link.
+
+### Changed
+- The healthcheck runs every 15 minutes instead of every 6 hours, and a run
+  that starts while an alert is open stays and re-probes every 30 seconds
+  until the relay returns. Recovery is published within about half a minute
+  rather than up to six hours. A first failure is confirmed twice before any
+  alert is raised.
+- `lint.yml` cancels superseded pull-request runs. Three pushes in a minute
+  used to start three full matrices while the first two held runners.
+- `blast-radius.yml` publishes its weekly sample to the `status` branch
+  instead of pushing to the protected `main` branch.
+
+### Fixed
+- The status badge could sit on "degraded" for hours after the relay came
+  back, and a single transient timeout was enough to put it there.
+- `blast-radius.yml` had failed on every run it ever had: it measured the
+  number correctly and then threw it away. Three separate faults - a push to a
+  protected branch, a checkout that could not switch branches, and a retry
+  budget too short to outlast the code-search rate limit. Its first successful
+  measurement published on 2026-08-17: 24,960 public files containing
+  `smtp.office365.com`.
+- The outreach queue was half noise. `basic authentication` alone is not a
+  mail signal, so an OpenStreetMap API change, an Azure FTP setting and an
+  F5OS plugin were all queued as leads. A candidate now has to name both a
+  mail problem and an authentication problem, and threads that are closed,
+  long dead, already answered by us, or belong to abuse tooling are skipped.
+- The status panel offered `npx zerosmtp-check`, a package that returns 404
+  because it has never been published.
+
 ## [1.5.0] - 2026-08-16
 
 ### Added
