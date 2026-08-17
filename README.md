@@ -70,13 +70,9 @@ with anything that already speaks SMTP.
 ## Quickstart
 
 1. **[Register your free account →](https://msgwing.com)** — 30 seconds, no credit card, no trial. You immediately get a random `@msgwing.com` login and password.
-
-> ⭐ **Did this save you hours of digging?** Give ZeroSMTP a star — one click,
-> and it directly decides how many people get to discover this project:
-> **[Star ZeroSMTP ★](https://github.com/msgwing/ZeroSMTP/stargazers)**
 2. Copy [`.env.example`](.env.example) to `.env` and fill in your credentials.
 3. Run the curl snippet above (`export $(grep -v '^#' .env | xargs)` first), or pick your language from the [Code Examples](#code-examples) table — every example reads the same `.env` variables.
-4. Having trouble? Run `npx zerosmtp-check` first — it tells you in two seconds whether your network lets SMTP out at all, which is what most first-run failures turn out to be. Then see [Error messages](docs/ERROR-MESSAGES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md).
+4. Having trouble? Check your network lets SMTP out at all — `Test-NetConnection mx.msgwing.com -Port 587` on Windows, or `openssl s_client -starttls smtp -connect mx.msgwing.com:587` elsewhere. That is what most first-run failures turn out to be. Then see [Error messages](docs/ERROR-MESSAGES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md).
 
 > Prefer not to install anything locally? Every runtime used below (Python, PHP,
 > Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) is preinstalled in the
@@ -136,10 +132,10 @@ Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](doc
 This project is **free, with no paid tier and no ads** — it exists because
 the people who found it useful decided to help the next person find it too.
 
-**One star on GitHub is the single most effective way to do that.** It costs
-nothing, takes one click, and pushes the project up in search results so the
-next sysadmin with a dead printer at 2am finds it instead of rebuilding what
-is already here.
+**One star on GitHub is the cheapest way to do that.** GitHub ranks and
+recommends repositories partly by stars, so it changes whether the next
+sysadmin with a dead printer at 2am finds this — or spends the night
+rebuilding what is already here.
 
 ▶️ **[Give ZeroSMTP a star on GitHub](https://github.com/msgwing/ZeroSMTP/stargazers)**
 
