@@ -17,6 +17,19 @@ on:
 permissions:
   contents: read
 
+# Three pushes to a pull request in a minute used to start three full
+# matrices, and the first two kept holding runners while answering a
+# question nobody was asking any more. With ~20 jobs each, plus CodeQL and
+# the dependency submissions competing for the same pool, that is what put
+# the later jobs in QUEUED and made a merge wait on nothing.
+#
+# Superseded pull-request runs are cancelled. Runs on main are not: main's
+# history should carry a completed result for every commit, and nothing is
+# waiting on them anyway.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Branch protection requires each of the jobs below by name, so the
   # workflow itself can't use a top-level paths-ignore: a skipped *workflow*
