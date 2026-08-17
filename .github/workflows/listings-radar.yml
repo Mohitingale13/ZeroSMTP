@@ -1,0 +1,247 @@
+name: Listings radar
+
+# Finds curated GitHub lists that ZeroSMTP genuinely belongs on, checks whether
+# it is already there, and opens one issue per candidate with a draft entry and
+# that list's own submission rules.
+#
+# This is the highest-yield channel on GitHub that is also entirely within the
+# rules: awesome-* lists and free-service directories exist to receive exactly
+# this pull request. A merged line in one of them is a permanent, opt-in
+# referral from a repo with an audience - the opposite of an unsolicited
+# comment, which is what gets accounts flagged.
+#
+# The same two rules as outreach-watch.yml, for the same reason:
+#
+#   1. It NEVER opens a pull request and never comments anywhere. It opens an
+#      issue containing a draft entry. A person reads the target repo's
+#      CONTRIBUTING, edits the entry, and submits it by hand.
+#   2. The draft states the limits - 200 messages/day, shared @msgwing.com
+#      from-address. List maintainers check, and an entry that oversells gets
+#      the project a rejection it cannot re-submit against.
+
+on:
+  schedule:
+    # Weekly. New lists worth being on do not appear daily, and each candidate
+    # costs a human a careful read of somebody else's contribution rules.
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const LABEL = 'listing';
+            const MAX_NEW = 2;          // a careful submission is an hour of reading
+            const MARKER = 'listing-id:';
+
+            // Lists we could plausibly belong on. Deliberately broad on the
+            // search side and strict on the filter side - it is cheaper to
+            // reject a repo here than to have a human read a dead list.
+            const QUERIES = [
+              'awesome smtp in:name,description',
+              'awesome email in:name,description',
+              'awesome selfhosted in:name,description',
+              'awesome sysadmin in:name,description',
+              'free for developers in:name,description',
+              'awesome free services in:name,description',
+            ];
+
+            // A list has to be alive and read. Both numbers are judgement
+            // calls, but the failure they prevent is real: a PR to a list
+            // whose last merge was two years ago is an hour spent for nothing.
+            const MIN_STARS = 300;
+            const MAX_IDLE_DAYS = 180;
+
+            // Our own name, in the forms a list would use it.
+            const OURS = ['zerosmtp', 'msgwing'];
+
+            const idle = Date.now() - MAX_IDLE_DAYS * 86400_000;
+
+            // --- what has already been queued -------------------------------------
+            const seen = new Set();
+            for await (const res of github.paginate.iterator(
+              github.rest.issues.listForRepo,
+              { owner: context.repo.owner, repo: context.repo.repo,
+                state: 'all', labels: LABEL, per_page: 100 })) {
+              for (const issue of res.data) {
+                const m = (issue.body || '').match(new RegExp(`${MARKER}\\s*(\\S+)`));
+                if (m) seen.add(m[1]);
+              }
+            }
+            core.info(`${seen.size} list(s) already queued.`);
+
+            // --- collect ----------------------------------------------------------
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
+            const repos = new Map();
+            let attempted = 0, failed = 0;
+
+            for (const q of QUERIES) {
+              attempted++;
+              try {
+                const res = await github.rest.search.repos({
+                  q, sort: 'stars', order: 'desc', per_page: 20,
+                });
+                for (const r of res.data.items) repos.set(r.full_name, r);
+              } catch (e) {
+                core.warning(`search "${q}": ${e.message}`);
+                failed++;
+              }
+              await sleep(3000);   // secondary rate limit on the search API
+            }
+
+            // A run where every search failed must not look like a quiet week.
+            if (attempted > 0 && failed === attempted) {
+              core.setFailed(
+                `All ${attempted} searches failed. Reporting nothing found ` +
+                `would be wrong - this is an outage, not an empty radar.`);
+              return;
+            }
+
+            // --- filter -----------------------------------------------------------
+            const candidates = [];
+            let rejected = 0;
+
+            for (const r of repos.values()) {
+              const id = `list:${r.full_name}`;
+              if (seen.has(id)) continue;
+              if (r.owner.login.toLowerCase() === context.repo.owner.toLowerCase()) continue;
+              if (r.archived || r.fork) { rejected++; continue; }
+              if (r.stargazers_count < MIN_STARS) { rejected++; continue; }
+              if (new Date(r.pushed_at).getTime() < idle) { rejected++; continue; }
+
+              // Already listed? Then there is nothing to do, and opening an
+              // issue about it would waste the same hour every week.
+              let readme = '';
+              try {
+                const res = await github.rest.repos.getReadme({
+                  owner: r.owner.login, repo: r.name,
+                });
+                readme = Buffer.from(res.data.content, 'base64').toString('utf8');
+              } catch (e) {
+                core.warning(`${r.full_name}: no readable README (${e.message})`);
+                rejected++;
+                continue;
+              }
+              const lower = readme.toLowerCase();
+              if (OURS.some(w => lower.includes(w))) {
+                core.info(`${r.full_name}: already lists us.`);
+                continue;
+              }
+
+              // The list has to have a section this belongs in. A general
+              // awesome-list with no mail, SMTP or email section is not a
+              // rejection of the project - it is simply the wrong list, and
+              // submitting anyway is how a maintainer learns to ignore you.
+              const section = ['smtp', 'email', 'e-mail', 'mail', 'transactional']
+                .find(w => lower.includes(w));
+              if (!section) { rejected++; continue; }
+
+              // Whether self-submission is even allowed is decided by their
+              // CONTRIBUTING, which a human must read. We only record whether
+              // there is one, so the draft can point at the right file.
+              let contributing = null;
+              for (const path of ['CONTRIBUTING.md', '.github/CONTRIBUTING.md', 'contributing.md']) {
+                try {
+                  await github.rest.repos.getContent({
+                    owner: r.owner.login, repo: r.name, path,
+                  });
+                  contributing = path;
+                  break;
+                } catch { /* next */ }
+              }
+
+              candidates.push({
+                id,
+                full_name: r.full_name,
+                url: r.html_url,
+                stars: r.stargazers_count,
+                pushed: r.pushed_at.slice(0, 10),
+                license: r.license ? r.license.spdx_id : 'none',
+                section,
+                contributing,
+              });
+              await sleep(500);
+            }
+
+            core.info(`${rejected} repo(s) rejected as dead, too small or off-topic.`);
+
+            // Biggest audience first, among lists that are actually maintained.
+            candidates.sort((a, b) => b.stars - a.stars);
+            const picked = candidates.slice(0, MAX_NEW);
+
+            if (picked.length === 0) {
+              core.notice(
+                `Nothing new. ${repos.size} repo(s) seen, ` +
+                `${failed}/${attempted} searches failed.`);
+              return;
+            }
+
+            // --- draft --------------------------------------------------------------
+            const ENTRY =
+              '- [ZeroSMTP](https://msgwing.com) — Free SMTP relay that still ' +
+              'accepts plain username-and-password SMTP AUTH, for printers, ' +
+              'scanners, NAS units and legacy apps that cannot do OAuth2. ' +
+              '200 messages/day; sends from a shared @msgwing.com address ' +
+              'rather than your own domain.';
+
+            for (const c of picked) {
+              const body = [
+                `<!-- ${MARKER} ${c.id} -->`,
+                `**[${c.full_name}](${c.url})** — ${c.stars} stars · last push ${c.pushed}`,
+                `· license \`${c.license}\` · matched on section keyword \`${c.section}\``,
+                '',
+                c.contributing
+                  ? `Contribution rules: [\`${c.contributing}\`](${c.url}/blob/HEAD/${c.contributing}) — **read it in full before writing anything.**`
+                  : '⚠️ No `CONTRIBUTING.md` found. Read the README\'s own submission section instead; do not guess the format.',
+                '',
+                'Nothing has been submitted. This is a draft.',
+                '',
+                '### Check before submitting',
+                '',
+                '- [ ] Self-submission is permitted. If it is forbidden, close this — slipping one in gets the project banned from the list permanently.',
+                '- [ ] If it is permitted but must be disclosed, the PR body discloses it.',
+                '- [ ] The entry sits in the right section, in the right alphabetical position.',
+                '- [ ] The format matches the neighbouring lines exactly — dash style, trailing period, link form.',
+                '- [ ] Any minimum age, star count or license requirement is met.',
+                '- [ ] Their linter (`awesome-lint`, `remark`) passes locally.',
+                '',
+                '---',
+                '',
+                '### Draft entry',
+                '',
+                '```markdown',
+                ENTRY,
+                '```',
+                '',
+                'The 200/day cap and the shared from-address stay in. They are ' +
+                'what make the entry survive review — a list maintainer checks, ' +
+                'and an entry that hides its limits is rejected once and ' +
+                'remembered afterwards.',
+                '',
+                '---',
+                '',
+                'Close this issue once the PR is open, or if the list turns out ' +
+                'not to fit. Closed issues are remembered, so it will not be ' +
+                'queued again.',
+              ].join('\n');
+
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Listing: ${c.full_name}`.slice(0, 200),
+                body,
+                labels: [LABEL],
+              });
+              core.notice(`Queued #${created.data.number} — ${c.url}`);
+            }
+
+            core.notice(
+              `${picked.length} queued of ${candidates.length} candidate(s) ` +
+              `(${repos.size} repos seen, ${failed}/${attempted} searches failed).`);
