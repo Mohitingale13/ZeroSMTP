@@ -279,12 +279,16 @@ jobs:
                 ].join('\n');
 
                 try {
+                  // Assigned, so GitHub emails a direct link. An outage the
+                  // owner finds out about by looking at the badge is an
+                  // outage that ran for hours.
                   await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title,
                     body,
                     labels: ['service-alert'],
+                    assignees: [context.repo.owner],
                   });
                 } catch (err) {
                   core.warning(`Label may not exist yet, retrying without labels: ${err.message}`);

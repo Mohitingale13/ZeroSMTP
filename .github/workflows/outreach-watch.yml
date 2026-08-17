@@ -338,12 +338,19 @@ jobs:
                 'again.',
               ].join('\n');
 
+              // Assigned, not just labelled. A draft that nobody is told
+              // about is a draft nobody posts, and the queue's whole value is
+              // speed - an answer four days late lands on a thread nobody is
+              // reading. GitHub emails the assignee with a direct link, which
+              // is the whole notification mechanism needed here: open the
+              // link, read the thread, post or close.
               const created = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `Outreach: ${c.title}`.slice(0, 200),
                 body,
                 labels: [LABEL],
+                assignees: [context.repo.owner],
               });
               core.notice(`Queued #${created.data.number} — ${c.url}`);
             }
