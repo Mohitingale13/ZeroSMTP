@@ -14,6 +14,7 @@ from a shared `@msgwing.com` address rather than your own
 [![Exchange Online Basic auth countdown](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/countdown.json)](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)
 [![Lint examples](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml/badge.svg)](https://github.com/msgwing/ZeroSMTP/actions/workflows/lint.yml)
 [![21 ready-to-run examples](https://img.shields.io/badge/examples-21%20ready--to--run-blue)](#code-examples)
+[![GitHub stars](https://img.shields.io/github/stars/msgwing/ZeroSMTP)](https://github.com/msgwing/ZeroSMTP/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 [![Exchange Online Basic auth (SMTP AUTH) countdown](https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/countdown-card.svg)](docs/EXCHANGE-ONLINE-SMTP-AUTH.md)
@@ -68,10 +69,10 @@ with anything that already speaks SMTP.
 
 ## Quickstart
 
-1. Register and activate a free account at [msgwing.com](https://msgwing.com), then copy your randomly generated `@msgwing.com` login and password.
+1. **[Register your free account →](https://msgwing.com)** — 30 seconds, no credit card, no trial. You immediately get a random `@msgwing.com` login and password.
 2. Copy [`.env.example`](.env.example) to `.env` and fill in your credentials.
 3. Run the curl snippet above (`export $(grep -v '^#' .env | xargs)` first), or pick your language from the [Code Examples](#code-examples) table — every example reads the same `.env` variables.
-4. Having trouble? Run `npx zerosmtp-check` first — it tells you in two seconds whether your network lets SMTP out at all, which is what most first-run failures turn out to be. Then see [Error messages](docs/ERROR-MESSAGES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md).
+4. Having trouble? Check your network lets SMTP out at all — `Test-NetConnection mx.msgwing.com -Port 587` on Windows, or `openssl s_client -starttls smtp -connect mx.msgwing.com:587` elsewhere. That is what most first-run failures turn out to be. Then see [Error messages](docs/ERROR-MESSAGES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md).
 
 > Prefer not to install anything locally? Every runtime used below (Python, PHP,
 > Node, Ruby, Go, Java, Kotlin/Gradle, .NET, Rust) is preinstalled in the
@@ -125,6 +126,23 @@ Setup guides: [Network printers](docs/PRINTERS.md) · [Popular applications](doc
 > [the compatibility list](docs/DEVICE-COMPATIBILITY.md) nobody else can copy.
 > Confirming a device that *works* is just as useful as reporting one that
 > doesn't.
+
+## ⭐ Support ZeroSMTP
+
+This project is **free, with no paid tier and no ads** — it exists because
+the people who found it useful decided to help the next person find it too.
+
+**One star on GitHub is the cheapest way to do that.** GitHub ranks and
+recommends repositories partly by stars, so it changes whether the next
+sysadmin with a dead printer at 2am finds this — or spends the night
+rebuilding what is already here.
+
+▶️ **[Give ZeroSMTP a star on GitHub](https://github.com/msgwing/ZeroSMTP/stargazers)**
+
+Already starred? **[Create your free account](https://msgwing.com)** is the
+second best thing you can do — it takes 30 seconds and it means the next
+person who lands here finds a healthy, active service rather than a
+side-project graveyard.
 
 ## How does this compare to other options?
 
