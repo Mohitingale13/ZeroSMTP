@@ -143,13 +143,32 @@ jobs:
                 continue;
               }
 
-              // The list has to have a section this belongs in. A general
-              // awesome-list with no mail, SMTP or email section is not a
-              // rejection of the project - it is simply the wrong list, and
-              // submitting anyway is how a maintainer learns to ignore you.
-              const section = ['smtp', 'email', 'e-mail', 'mail', 'transactional']
-                .find(w => lower.includes(w));
-              if (!section) { rejected++; continue; }
+              // Is it a curated list at all? This gate was missing entirely on
+              // the run of 2026-08-17, which queued a database client and a
+              // collection of n8n workflow templates - both of them repos whose
+              // README happens to contain the word "email", which is true of
+              // most repos and says nothing. A directory looks like a
+              // directory: dozens of entry-shaped lines.
+              const entries = (readme.match(/^[ 	]*[-*] \[[^\]]+\]\(https?:\/\//gm) || []).length;
+              if (entries < 40) {
+                core.info(`${r.full_name}: only ${entries} list entries - not a directory.`);
+                rejected++;
+                continue;
+              }
+
+              // And it has to have a section this belongs in - a *heading*,
+              // not the word somewhere in the prose. A general list with no
+              // mail section is not a rejection of the project, it is simply
+              // the wrong list, and submitting anyway is how a maintainer
+              // learns to ignore you.
+              const heading = readme.match(
+                /^#{1,4}[ 	]+.*(e-?mail|smtp|mail|transactional).*$/im);
+              if (!heading) {
+                core.info(`${r.full_name}: ${entries} entries but no mail section.`);
+                rejected++;
+                continue;
+              }
+              const section = heading[0].replace(/^#+\s*/, '').trim().slice(0, 60);
 
               // What kind of list is it? Having a mail section is not enough,
               // and this is where the first run went wrong: it queued
