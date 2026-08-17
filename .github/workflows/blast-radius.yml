@@ -142,7 +142,13 @@ jobs:
           cp data/blast-radius.json /tmp/blast-radius-samples.json
 
           git fetch -q origin status
-          git checkout -q -B status origin/status
+          # -f on purpose. The Measure and Render steps leave modified copies
+          # of data/blast-radius.json and docs/BLAST-RADIUS.md in the working
+          # tree, and those deliberately do not go anywhere now that this
+          # workflow no longer writes to main - the sample has just been
+          # copied to /tmp. Without -f, checkout refuses to overwrite them and
+          # the step dies before publishing anything.
+          git checkout -q -f -B status origin/status
 
           cp /tmp/blast-radius-samples.json blast-radius-samples.json
 
@@ -157,7 +163,12 @@ jobs:
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add blast-radius-samples.json blast-radius.json
+          git add blast-radius-samples.json
+          # The badge file may not exist yet on the status branch - the step
+          # that used to write it never once ran to completion.
+          if [ -f blast-radius.json ]; then
+            git add blast-radius.json
+          fi
           if git diff --cached --quiet; then
             echo "Sample and badge unchanged - nothing to publish."
             exit 0
