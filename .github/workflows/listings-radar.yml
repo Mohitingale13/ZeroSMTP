@@ -44,13 +44,21 @@ jobs:
             // Lists we could plausibly belong on. Deliberately broad on the
             // search side and strict on the filter side - it is cheaper to
             // reject a repo here than to have a human read a dead list.
+            // Aimed at directories of *services*, which is what ZeroSMTP is.
+            // `awesome selfhosted` and `awesome sysadmin` were here on the
+            // first run and produced the only two candidates it queued, both
+            // of them dead ends: those lists require Free and Open-Source
+            // self-hostable software, every entry carrying a license
+            // identifier and a link to its source. A hosted relay whose pitch
+            // is "no mail server to run" cannot qualify however the entry is
+            // worded, so searching for that whole category was wasted effort.
             const QUERIES = [
               'awesome smtp in:name,description',
               'awesome email in:name,description',
-              'awesome selfhosted in:name,description',
-              'awesome sysadmin in:name,description',
               'free for developers in:name,description',
-              'awesome free services in:name,description',
+              'free tier in:name,description',
+              'free services developers in:name,description',
+              'awesome saas in:name,description',
             ];
 
             // A list has to be alive and read. Both numbers are judgement
@@ -143,6 +151,44 @@ jobs:
                 .find(w => lower.includes(w));
               if (!section) { rejected++; continue; }
 
+              // What kind of list is it? Having a mail section is not enough,
+              // and this is where the first run went wrong: it queued
+              // awesome-selfhosted and awesome-sysadmin, both of which
+              // require Free and Open-Source self-hostable software with a
+              // license identifier and a source URL per entry. ZeroSMTP is a
+              // hosted service that explicitly cannot be self-hosted, so no
+              // wording of the entry could have passed. Two careful hours
+              // would have been spent finding that out by hand.
+              const scope = (r.description || '') + ' ' + readme.slice(0, 4000);
+              const scopeLower = scope.toLowerCase();
+              const disqualifier = [
+                'self-hosted', 'self hosted', 'selfhosted', 'self-hosting',
+                'open source software', 'open-source software',
+                'foss', 'libre software',
+              ].find(w => scopeLower.includes(w));
+              if (disqualifier) {
+                core.info(`${r.full_name}: scoped to ${disqualifier} software - we are a hosted service.`);
+                rejected++;
+                continue;
+              }
+
+              // Several large lists have moved contributions elsewhere and
+              // say so in the PR template. Queuing the reading repository
+              // sends a person to a pull request that will be closed
+              // unread, so carry the redirect through to the draft instead.
+              let prTarget = null;
+              try {
+                const tpl = await github.rest.repos.getContent({
+                  owner: r.owner.login, repo: r.name,
+                  path: '.github/PULL_REQUEST_TEMPLATE.md',
+                });
+                const text = Buffer.from(tpl.data.content, 'base64').toString('utf8');
+                const m = text.match(/https?:\/\/github\.com\/[\w.-]+\/[\w.-]+/);
+                if (/do not submit|don't submit|use .* instead|open .* in the/i.test(text) && m) {
+                  prTarget = m[0];
+                }
+              } catch { /* no template, which is the common case */ }
+
               // Whether self-submission is even allowed is decided by their
               // CONTRIBUTING, which a human must read. We only record whether
               // there is one, so the draft can point at the right file.
@@ -166,6 +212,7 @@ jobs:
                 license: r.license ? r.license.spdx_id : 'none',
                 section,
                 contributing,
+                prTarget,
               });
               await sleep(500);
             }
@@ -201,10 +248,14 @@ jobs:
                   ? `Contribution rules: [\`${c.contributing}\`](${c.url}/blob/HEAD/${c.contributing}) — **read it in full before writing anything.**`
                   : '⚠️ No `CONTRIBUTING.md` found. Read the README\'s own submission section instead; do not guess the format.',
                 '',
+                ...(c.prTarget
+                  ? [`⚠️ **This repository does not take pull requests.** Its PR template redirects to ${c.prTarget} — submit there, not here.`, '']
+                  : []),
                 'Nothing has been submitted. This is a draft.',
                 '',
                 '### Check before submitting',
                 '',
+                '- [ ] The list actually accepts hosted services. If every entry carries a license and a source link, it is a list of self-hostable software and ZeroSMTP cannot qualify however the entry is worded — close this.',
                 '- [ ] Self-submission is permitted. If it is forbidden, close this — slipping one in gets the project banned from the list permanently.',
                 '- [ ] If it is permitted but must be disclosed, the PR body discloses it.',
                 '- [ ] The entry sits in the right section, in the right alphabetical position.',
