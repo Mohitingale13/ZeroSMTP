@@ -249,9 +249,31 @@
       .relay-status.is-up .dot { background: #1a7f37; }
       .relay-status.is-down { border-color: #cf222e; }
       .relay-status.is-down .dot { background: #cf222e; }
+      .relay-status .caret { color: #57606a; font-size: .7rem; }
+
+      /* Panel opened by clicking the pill. */
+      #relay-detail {
+        margin: -1.25rem 0 2rem;
+        padding: .8rem 1rem;
+        font-size: .85rem;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+      }
+      #relay-detail p { margin: 0 0 .5rem; }
+      #relay-detail ul { margin: 0 0 .5rem; padding-left: 1.2rem; }
+      #relay-detail code {
+        padding: .1rem .35rem;
+        background: #eaeef2;
+        border-radius: 4px;
+      }
+      #relay-detail .muted { color: #57606a; }
       @media (prefers-color-scheme: dark) {
         .relay-status { color: #e6edf3; background: #161b22; border-color: #30363d; }
-        .relay-status .ports { color: #8b949e; }
+        .relay-status .ports, .relay-status .caret { color: #8b949e; }
+        #relay-detail { background: #161b22; border-color: #30363d; }
+        #relay-detail code { background: #21262d; }
+        #relay-detail .muted { color: #8b949e; }
         .relay-status.is-up { border-color: #3fb950; }
         .relay-status.is-up .dot { background: #3fb950; }
         .relay-status.is-down { border-color: #f85149; }
@@ -320,6 +342,13 @@
           <span class="ports">587 · 465</span>
         </a>
       </header>
+
+      {%- comment -%}
+        Filled in by the script at the end of the page when the pill is
+        clicked. Empty and hidden until then, so a reader with JavaScript off
+        follows the pill's href to the run history instead and loses nothing.
+      {%- endcomment -%}
+      <div id="relay-detail" hidden></div>
 
       <main id="content">
         {{ content }}
@@ -643,6 +672,91 @@
           // because the check could not be read would be the one failure mode
           // that matters.
         });
+
+      // Clicking the pill opens the detail of the most recent check, fetched
+      // at that moment rather than read from the cached badge.
+      //
+      // It is worth being precise about what this can and cannot be. A page
+      // in a browser cannot open a TCP socket to port 587 or 465 - SMTP is
+      // not HTTP and no amount of JavaScript changes that - so nothing here
+      // is a live handshake performed by the reader's browser. What it is:
+      // the freshest result of the check that does perform one, plus the
+      // one-liner that runs the real thing from the reader's own network,
+      // which is the number they actually care about. Claiming otherwise
+      // would be the same dishonesty as a badge that guesses.
+      var detail = document.getElementById('relay-detail');
+      if (!detail) return;
+
+      var caret = document.createElement('span');
+      caret.className = 'caret';
+      caret.setAttribute('aria-hidden', 'true');
+      caret.textContent = '▾';
+      el.appendChild(caret);
+      el.setAttribute('aria-expanded', 'false');
+      el.setAttribute('aria-controls', 'relay-detail');
+
+      function ago(iso) {
+        var mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+        if (mins < 1) return 'less than a minute ago';
+        if (mins === 1) return '1 minute ago';
+        if (mins < 60) return mins + ' minutes ago';
+        var hrs = Math.round(mins / 60);
+        return hrs === 1 ? '1 hour ago' : hrs + ' hours ago';
+      }
+
+      var RUNS = 'https://api.github.com/repos/msgwing/ZeroSMTP/actions/workflows/'
+               + 'service-healthcheck.yml/runs?per_page=1&status=completed';
+
+      function selfTest() {
+        return '<p class="muted">To test from your own network rather than ours &mdash; '
+             + 'which is the result that actually decides whether your device can '
+             + 'send &mdash; run <code>npx zerosmtp-check</code>. It opens both ports '
+             + 'and completes the TLS handshake, and sends nothing.</p>';
+      }
+
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        if (!detail.hidden) {
+          detail.hidden = true;
+          el.setAttribute('aria-expanded', 'false');
+          caret.textContent = '▾';
+          return;
+        }
+        detail.hidden = false;
+        el.setAttribute('aria-expanded', 'true');
+        caret.textContent = '▴';
+        detail.innerHTML = '<p>Checking&hellip;</p>';
+
+        fetch(RUNS, { cache: 'no-store', headers: { 'Accept': 'application/vnd.github+json' } })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(d){
+            var run = d && d.workflow_runs && d.workflow_runs[0];
+            if (!run) {
+              detail.innerHTML =
+                '<p>Could not read the check history just now.</p>' + selfTest() +
+                '<p><a href="https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml">Run history</a></p>';
+              return;
+            }
+            var ok = run.conclusion === 'success';
+            detail.innerHTML =
+              '<p><strong>' + (ok ? 'mx.msgwing.com answered on both ports.' : 'The last check did not pass.') + '</strong> '
+              + '<span class="muted">Checked ' + ago(run.updated_at) + '.</span></p>'
+              + '<ul>'
+              + '<li>Port <code>587</code> &mdash; TCP connect and STARTTLS handshake</li>'
+              + '<li>Port <code>465</code> &mdash; TCP connect and SSL/TLS handshake</li>'
+              + '</ul>'
+              + '<p class="muted">No credentials are used and no mail is sent, so this proves the '
+              + 'relay is reachable, not that a given account can send. Re-checked every 15 minutes, '
+              + 'and every 30 seconds while it is down.</p>'
+              + selfTest()
+              + '<p><a href="' + run.html_url + '">This run on GitHub</a> &middot; '
+              + '<a href="https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml">full history</a></p>';
+          })
+          .catch(function(){
+            detail.innerHTML =
+              '<p>Could not reach GitHub to read the check history.</p>' + selfTest();
+          });
+      });
     })();
     </script>
 
