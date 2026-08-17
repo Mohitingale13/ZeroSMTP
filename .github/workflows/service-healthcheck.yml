@@ -14,75 +14,161 @@ name: mx.msgwing.com healthcheck
 # It also publishes a status.json to an orphan "status" branch (not to
 # main, to avoid cluttering history) so README can show a live
 # shields.io endpoint badge of the current result.
+#
+# The schedule is deliberately asymmetric, because the two directions are
+# not equally urgent and are not equally cheap:
+#
+#   * While the relay is healthy, a run costs ~20 seconds and only has to
+#     notice a new outage. Every 15 minutes is plenty.
+#   * While the relay is already flagged down, the badge is showing a red
+#     "degraded" that is wrong the moment the relay comes back, and a wrong
+#     red badge on the front page of a project whose pitch is "verifiably
+#     up" costs more than the outage did. So a run that starts while an
+#     alert is open does not check once and leave - it stays and re-probes
+#     every 30 seconds until the relay returns or its window runs out.
+#     Chained by the 15-minute schedule, that covers the downtime almost
+#     continuously and recovery is published within about half a minute.
+#
+# The previous version ran once every six hours in both directions, so a
+# relay that came back one minute after a failed check stayed "degraded"
+# for the next six hours. Worse, a single transient timeout on the runner
+# was enough to trigger that, with no second opinion asked.
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # every 6 hours
+    - cron: '*/15 * * * *' # every 15 minutes; a healthy run is ~20 seconds
   workflow_dispatch:
 
 permissions:
   issues: write
   contents: write
 
+# A watching run holds the slot for up to 13 minutes. Queue anything that
+# lands on top of it rather than running two probes against the relay at
+# once; GitHub keeps at most one run pending per group, so these cannot
+# pile up.
+concurrency:
+  group: service-healthcheck
+  cancel-in-progress: false
+
 jobs:
   healthcheck:
     runs-on: ubuntu-latest
+    # The watch loop is bounded, but a hung openssl must not be able to hold
+    # a runner for the default six hours.
+    timeout-minutes: 20
     steps:
       - name: Check TCP + TLS connectivity
         id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           HOST="mx.msgwing.com"
-          overall_ok=true
-          lines=()
+          ALERT_TITLE="mx.msgwing.com connectivity check failing"
 
-          check_port() {
-            local port="$1"
-            local tcp_ok=false
-            local tls_ok=false
+          # Stay inside the 15-minute schedule so consecutive runs chain
+          # rather than queue behind each other.
+          WATCH_SECONDS=780
+          WATCH_INTERVAL=30
 
-            if timeout 10 bash -c "exec 3<>/dev/tcp/$HOST/$port" 2>/dev/null; then
-              tcp_ok=true
-            fi
+          # A single failed connect is usually a blip on the runner, not an
+          # outage. Asking twice more costs 30 seconds and prevents a red
+          # badge for a relay that never stopped.
+          CONFIRM_ATTEMPTS=3
+          CONFIRM_INTERVAL=15
 
-            if [ "$tcp_ok" = true ]; then
-              local tls_check
-              if [ "$port" = "465" ]; then
-                tls_check=$(timeout 15 openssl s_client -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+          probe() {
+            PROBE_OK=true
+            PROBE_LINES=()
+
+            local port tcp_ok tls_ok tls_check
+            for port in 587 465; do
+              tcp_ok=false
+              tls_ok=false
+
+              if timeout 10 bash -c "exec 3<>/dev/tcp/$HOST/$port" 2>/dev/null; then
+                tcp_ok=true
+              fi
+
+              if [ "$tcp_ok" = true ]; then
+                if [ "$port" = "465" ]; then
+                  tls_check=$(timeout 15 openssl s_client -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+                else
+                  tls_check=$(timeout 15 openssl s_client -starttls smtp -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+                fi
+                if echo "$tls_check" | grep -q "Verify return code: 0"; then
+                  tls_ok=true
+                fi
+              fi
+
+              if [ "$tcp_ok" = true ] && [ "$tls_ok" = true ]; then
+                PROBE_LINES+=("- Port ${port}: TCP connect OK, TLS handshake OK")
+              elif [ "$tcp_ok" = true ]; then
+                PROBE_LINES+=("- Port ${port}: TCP connect OK, TLS handshake FAILED")
+                PROBE_OK=false
               else
-                tls_check=$(timeout 15 openssl s_client -starttls smtp -connect "$HOST:$port" -servername "$HOST" </dev/null 2>/dev/null)
+                PROBE_LINES+=("- Port ${port}: TCP connect FAILED")
+                PROBE_OK=false
               fi
-              if echo "$tls_check" | grep -q "Verify return code: 0"; then
-                tls_ok=true
-              fi
-            fi
-
-            if [ "$tcp_ok" = true ] && [ "$tls_ok" = true ]; then
-              lines+=("- Port ${port}: TCP connect OK, TLS handshake OK")
-            elif [ "$tcp_ok" = true ]; then
-              lines+=("- Port ${port}: TCP connect OK, TLS handshake FAILED")
-              overall_ok=false
-            else
-              lines+=("- Port ${port}: TCP connect FAILED")
-              overall_ok=false
-            fi
+            done
           }
 
-          check_port 587
-          check_port 465
+          # Whether we are already flagged down is read from the open alert
+          # issue, not from the published badge: the badge is served through
+          # raw.githubusercontent and the shields CDN, so it can be minutes
+          # stale, and deciding how hard to look based on a stale value is
+          # exactly the bug being fixed here.
+          if [ "$(gh issue list --label service-alert --state open \
+                    --json title --jq "[.[] | select(.title == \"$ALERT_TITLE\")] | length")" != "0" ]; then
+            already_down=true
+          else
+            already_down=false
+          fi
 
-          printf '%s\n' "${lines[@]}"
+          probe
+
+          if [ "$PROBE_OK" = true ]; then
+            status=ok
+            echo "Relay is up."
+          elif [ "$already_down" = true ]; then
+            status=fail
+            echo "Relay is still down and already flagged. Watching for recovery for up to $((WATCH_SECONDS / 60)) minutes."
+            deadline=$(( SECONDS + WATCH_SECONDS ))
+            while [ "$SECONDS" -lt "$deadline" ]; do
+              sleep "$WATCH_INTERVAL"
+              probe
+              if [ "$PROBE_OK" = true ]; then
+                status=ok
+                echo "Recovered after ${SECONDS}s of watching - publishing immediately."
+                break
+              fi
+            done
+            if [ "$status" = "fail" ]; then
+              echo "Still down when the watch window closed. The next scheduled run picks it up."
+            fi
+          else
+            status=fail
+            for attempt in $(seq 2 "$CONFIRM_ATTEMPTS"); do
+              echo "Probe failed. Confirming (attempt ${attempt}/${CONFIRM_ATTEMPTS}) before reporting an outage."
+              sleep "$CONFIRM_INTERVAL"
+              probe
+              if [ "$PROBE_OK" = true ]; then
+                status=ok
+                echo "Passed on attempt ${attempt} - a blip, not an outage. Not raising an alert."
+                break
+              fi
+            done
+          fi
+
+          printf '%s\n' "${PROBE_LINES[@]}"
 
           {
             echo "summary<<EOF_SUMMARY"
-            printf '%s\n' "${lines[@]}"
+            printf '%s\n' "${PROBE_LINES[@]}"
             echo "EOF_SUMMARY"
           } >> "$GITHUB_OUTPUT"
 
-          if [ "$overall_ok" = true ]; then
-            echo "status=ok" >> "$GITHUB_OUTPUT"
-          else
-            echo "status=fail" >> "$GITHUB_OUTPUT"
-          fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
 
       - name: Publish status badge data
         if: always() && steps.check.outputs.status != ''
@@ -112,19 +198,44 @@ jobs:
             git rm -rf . -q 2>/dev/null || true
           fi
 
+          # cacheSeconds is the floor shields.io will honour for an endpoint
+          # badge (300 is its minimum; lower values are ignored). Stating it
+          # is documentation more than control: even with the check reacting
+          # in seconds, a reader's badge can lag by up to ~5 minutes here and
+          # again at raw.githubusercontent. That is the floor for how fast
+          # green can come back, and no amount of checking harder beats it.
           cat > status.json <<JSON
-          {"schemaVersion":1,"label":"mx.msgwing.com","message":"${MESSAGE}","color":"${COLOR}"}
+          {"schemaVersion":1,"label":"mx.msgwing.com","message":"${MESSAGE}","color":"${COLOR}","cacheSeconds":300}
           JSON
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add status.json
-          if ! git diff --cached --quiet; then
-            git commit -q -m "Update status: ${MESSAGE}"
-            git push -q origin status
-          else
+          if git diff --cached --quiet; then
             echo "Status unchanged (${MESSAGE}), nothing to push"
+            exit 0
           fi
+
+          git commit -q -m "Update status: ${MESSAGE}"
+
+          # countdown-badge.yml writes countdown.json to this same branch. At
+          # a 15-minute cadence the two will eventually collide, and a lost
+          # push here is not cosmetic: the step failing would skip the alert
+          # step below, leaving a recovery unpublished and the alert issue
+          # open. Rebase onto whatever landed and try again.
+          for attempt in 1 2 3; do
+            if git push -q origin status; then
+              echo "Published status: ${MESSAGE}"
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}/3) - rebasing onto origin/status."
+            git fetch -q origin status
+            git rebase -q origin/status || { git rebase --abort || true; }
+            sleep $((attempt * 3))
+          done
+
+          echo "::error::Could not publish status.json after 3 attempts."
+          exit 1
 
       - name: Manage alert issue
         uses: actions/github-script@v9
