@@ -1,8 +1,8 @@
 name: Blast radius
 
 # Measures how much public code still points at Microsoft 365 SMTP, once a
-# week, and commits the result so the series can be checked rather than
-# taken on trust.
+# week, and publishes the result to the `status` branch so the series can be
+# checked rather than taken on trust.
 #
 # Why bother: nobody has published this number. Every article about the
 # December 2026 Basic auth shutdown says "many systems will be affected",
@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write            # commits the sample and the rendered page
+  contents: write            # publishes the sample and the badge to `status`
 
 concurrency:
   group: blast-radius
@@ -103,47 +103,80 @@ jobs:
       - name: Render the page
         run: python tools/build-blast-radius.py
 
-      - name: Commit
+      - name: Publish the sample and the badge
         run: |
           set -euo pipefail
-          if git diff --quiet -- data/blast-radius.json docs/BLAST-RADIUS.md; then
-            echo "Counts unchanged - nothing to commit."
-            exit 0
-          fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/blast-radius.json docs/BLAST-RADIUS.md
-          git commit -m "data: blast radius measurement ${{ env.date }}"
-          git push
 
-      - name: Badge
-        run: |
-          set -euo pipefail
+          # This step used to `git push` the sample straight to main. main is
+          # protected with enforce_admins on, so every single run ended in
+          # `GH006: Protected branch update failed` - measuring the number
+          # correctly over two minutes and then throwing it away.
+          #
+          # A pull request is not a way out either: a PR opened with
+          # GITHUB_TOKEN does not trigger workflows, so the checks main
+          # requires would never report and it would sit unmergeable forever.
+          # Making that work needs a PAT in the repository secrets, and there
+          # are none.
+          #
+          # So the series lives on the unprotected `status` branch, which the
+          # badge already uses and which the bot can write to. Nothing here
+          # touches main. docs/BLAST-RADIUS.md on main is refreshed by a
+          # person running `tools/build-blast-radius.py` against this file -
+          # and `lint.yml` keeps the committed page honest against whatever
+          # data/blast-radius.json says at the time.
+
           # Largest single measured count. Deliberately not a sum: one file
           # can contain both hostnames, and a total would double-count.
-          read -r label value < <(
+          # Count first, label second: `read` splits on the first space, so a
+          # label that ever contains one would otherwise silently take part
+          # of the number with it. Today's labels are hostnames, but the
+          # queries are data and data changes.
+          read -r value label < <(
             jq -r '
               (.samples | last | .counts) as $c
               | [.queries[] | select($c[.id] != null) | {label, n: $c[.id]}]
-              | if length == 0 then "none 0"
-                else (max_by(.n) | "\(.label) \(.n)") end' \
+              | if length == 0 then "0 none"
+                else (max_by(.n) | "\(.n) \(.label)") end' \
               data/blast-radius.json)
 
-          [ "$label" = "none" ] && { echo "Nothing measured; badge unchanged."; exit 0; }
-
-          formatted=$(printf "%'d" "$value" | tr ',' ' ')
+          cp data/blast-radius.json /tmp/blast-radius-samples.json
 
           git fetch -q origin status
           git checkout -q -B status origin/status
-          cat > blast-radius.json <<JSON
+
+          cp /tmp/blast-radius-samples.json blast-radius-samples.json
+
+          if [ "$label" != "none" ]; then
+            formatted=$(printf "%'d" "$value" | tr ',' ' ')
+            cat > blast-radius.json <<JSON
           {"schemaVersion":1,"label":"$label in public code","message":"$formatted files","color":"critical"}
           JSON
+          else
+            echo "Nothing measured; badge left unchanged."
+          fi
+
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add blast-radius.json
+          git add blast-radius-samples.json blast-radius.json
           if git diff --cached --quiet; then
-            echo "Badge unchanged."
-          else
-            git commit -q -m "status: blast radius badge ${{ env.date }}"
-            git push -q origin status
+            echo "Sample and badge unchanged - nothing to publish."
+            exit 0
           fi
+
+          git commit -q -m "status: blast radius ${{ env.date }}"
+
+          # service-healthcheck.yml writes status.json to this same branch
+          # every 15 minutes, so a collision here is a matter of when, not if.
+          for attempt in 1 2 3; do
+            if git push -q origin status; then
+              echo "Published sample and badge for ${{ env.date }}."
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}/3) - rebasing onto origin/status."
+            git fetch -q origin status
+            git rebase -q origin/status || { git rebase --abort || true; }
+            sleep $((attempt * 3))
+          done
+
+          echo "::error::Could not publish the blast radius sample after 3 attempts."
+          exit 1
