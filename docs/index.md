@@ -24,6 +24,27 @@ Microsoft 365 tenants at the end of December 2026.
 
 ---
 
+## Connection settings
+
+Three values, straight into the SMTP fields your device or app already has.
+No SDK, no API key, no DNS records.
+
+<div id="zc-connect"></div>
+
+| Setting | Value |
+| --- | --- |
+| Server | `mx.msgwing.com` |
+| Port | `587` (STARTTLS) — try this first |
+| Port | `465` (SSL/TLS) — if the device insists |
+| Authentication | Plain username and password, from your account |
+
+[Get free credentials](https://msgwing.com) — free, no card. 200 messages a
+day, sent from a generated `@msgwing.com` address rather than your own
+domain. If the From address has to be your own domain, this is the wrong
+tool and [the alternatives page](ALTERNATIVES.md) says which one is right.
+
+---
+
 ## Start here
 
 | If you… | Go to |
