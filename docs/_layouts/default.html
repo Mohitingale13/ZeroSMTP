@@ -280,6 +280,143 @@
         .relay-status.is-down .dot { background: #f85149; }
       }
 
+      /* The connection card. This is the element the whole site exists to
+         deliver: somebody with a printer that stopped sending needs three
+         values, and every minute they spend hunting for them is a minute
+         they might spend on a competitor's page instead. So the values are
+         large, monospaced, and one tap from the clipboard - and the live
+         dot next to them answers the question they ask straight after,
+         which is whether the thing is even up right now.
+
+         The limits sit inside the card, not in a footnote. A reader who
+         discovers the 200/day cap after registering is a support ticket and
+         a bad review; one who reads it here and registers anyway is a user. */
+      .zc-connect {
+        margin: 1.5rem 0 2rem;
+        border: 1px solid #d0d7de;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+      }
+      .zc-connect__top {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .6rem 1.1rem;
+        font-size: .8rem;
+        background: #f6f8fa;
+        border-bottom: 1px solid #d0d7de;
+      }
+      .zc-connect__live {
+        width: .55rem; height: .55rem; border-radius: 50%;
+        background: #8c959f; flex: none;
+      }
+      .zc-connect.is-up .zc-connect__live { background: #1a7f37; }
+      .zc-connect.is-down .zc-connect__live { background: #cf222e; }
+      /* transform/opacity only. An animated box-shadow or filter is flagged
+         as non-composited, same reasoning as the countdown widget below. */
+      @keyframes zc-connect-ping {
+        0%   { transform: scale(1);   opacity: .55; }
+        70%  { transform: scale(2.6); opacity: 0; }
+        100% { transform: scale(2.6); opacity: 0; }
+      }
+      .zc-connect__pulse {
+        position: relative;
+        display: inline-flex;
+        flex: none;
+      }
+      .zc-connect__pulse::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: #1a7f37;
+        opacity: 0;
+      }
+      .zc-connect.is-up .zc-connect__pulse::after {
+        animation: zc-connect-ping 2.4s cubic-bezier(0, 0, .2, 1) infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .zc-connect.is-up .zc-connect__pulse::after { animation: none; }
+      }
+      .zc-connect__body { padding: 1.1rem; }
+      .zc-connect__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: .75rem;
+      }
+      .zc-connect__field {
+        border: 1px solid #d0d7de;
+        border-radius: 8px;
+        padding: .6rem .75rem;
+        background: #f6f8fa;
+      }
+      .zc-connect__label {
+        font-size: .65rem;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: #57606a;
+      }
+      .zc-connect__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        margin-top: .15rem;
+      }
+      .zc-connect__value {
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #24292f;
+        word-break: break-all;
+      }
+      .zc-connect__note { font-size: .72rem; color: #57606a; margin-top: .15rem; }
+      .zc-connect__copy {
+        flex: none;
+        padding: .2rem .5rem;
+        font-size: .7rem;
+        color: #57606a;
+        background: #fff;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .zc-connect__copy:hover { border-color: #8c959f; }
+      .zc-connect__copy.copied { color: #1a7f37; border-color: #1a7f37; }
+      .zc-connect__cta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .5rem .9rem;
+        margin-top: 1rem;
+      }
+      .zc-connect__btn {
+        display: inline-block;
+        padding: .55rem 1.1rem;
+        font-size: .95rem;
+        font-weight: 600;
+        color: #fff !important;
+        background: #1f883d;
+        border: 1px solid rgba(31,35,40,.15);
+        border-radius: 8px;
+        text-decoration: none !important;
+      }
+      .zc-connect__btn:hover { background: #1a7f37; }
+      .zc-connect__limits { font-size: .78rem; color: #57606a; }
+      @media (prefers-color-scheme: dark) {
+        .zc-connect { background: #0d1117; border-color: #30363d; }
+        .zc-connect__top { background: #161b22; border-color: #30363d; }
+        .zc-connect__field { background: #161b22; border-color: #30363d; }
+        .zc-connect__value { color: #e6edf3; }
+        .zc-connect__label, .zc-connect__note, .zc-connect__limits { color: #8b949e; }
+        .zc-connect__copy { color: #8b949e; background: #21262d; border-color: #30363d; }
+        .zc-connect__copy.copied { color: #3fb950; border-color: #3fb950; }
+        .zc-connect.is-up .zc-connect__live,
+        .zc-connect.is-up .zc-connect__pulse::after { background: #3fb950; }
+        .zc-connect.is-down .zc-connect__live { background: #f85149; }
+      }
+
       /* Copy button on fenced code blocks, injected by the script at the
          end of the page. Positioned over .highlight (Rouge's wrapper),
          which directly contains the code block for every fenced snippet. */
@@ -757,6 +894,96 @@
               '<p>Could not reach GitHub to read the check history.</p>' + selfTest();
           });
       });
+    })();
+    </script>
+
+    {%- comment -%}
+      The connection card. Not keyed off page.widget, unlike the widgets
+      above: any page can drop in <div id="zc-connect"></div> next to its own
+      plain-Markdown settings table, and this exits quietly where there is no
+      mount. The Markdown table is the fallback, so the page still gives the
+      three values on github.com and with JavaScript unavailable.
+    {%- endcomment -%}
+    <script>
+    (function(){
+      var mount = document.getElementById('zc-connect');
+      if (!mount) return;
+
+      var FIELDS = [
+        { label: 'Server',  value: 'mx.msgwing.com', note: 'SMTP host' },
+        { label: 'Port',    value: '587',            note: 'STARTTLS — try this one first' },
+        { label: 'Port',    value: '465',            note: 'SSL/TLS — if the device insists' }
+      ];
+
+      var html =
+        '<div class="zc-connect__top">' +
+          '<span class="zc-connect__pulse"><span class="zc-connect__live"></span></span>' +
+          '<span id="zc-connect-state">Checking mx.msgwing.com…</span>' +
+        '</div>' +
+        '<div class="zc-connect__body">' +
+          '<div class="zc-connect__grid">';
+
+      FIELDS.forEach(function(f, i){
+        html +=
+          '<div class="zc-connect__field">' +
+            '<div class="zc-connect__label">' + f.label + '</div>' +
+            '<div class="zc-connect__row">' +
+              '<span class="zc-connect__value" id="zc-connect-v' + i + '">' + f.value + '</span>' +
+              '<button type="button" class="zc-connect__copy" data-copy="' + f.value + '" ' +
+                'aria-label="Copy ' + f.label + ' ' + f.value + '">Copy</button>' +
+            '</div>' +
+            '<div class="zc-connect__note">' + f.note + '</div>' +
+          '</div>';
+      });
+
+      html +=
+          '</div>' +
+          '<div class="zc-connect__cta">' +
+            '<a class="zc-connect__btn" href="https://msgwing.com">Get free credentials →</a>' +
+            '<span class="zc-connect__limits">Free, no card. 200 messages a day, sent from a ' +
+            'generated <code>@msgwing.com</code> address rather than your own domain.</span>' +
+          '</div>' +
+        '</div>';
+
+      mount.className = 'zc-connect';
+      mount.innerHTML = html;
+
+      // Copy is the whole point of the card: these three values are going
+      // into a printer's web form, and retyping a hostname is where the
+      // typo happens.
+      Array.prototype.forEach.call(mount.querySelectorAll('.zc-connect__copy'), function(btn){
+        if (!navigator.clipboard) { btn.hidden = true; return; }
+        btn.addEventListener('click', function(){
+          navigator.clipboard.writeText(btn.getAttribute('data-copy')).then(function(){
+            btn.textContent = 'Copied';
+            btn.classList.add('copied');
+            setTimeout(function(){
+              btn.textContent = 'Copy';
+              btn.classList.remove('copied');
+            }, 1500);
+          });
+        });
+      });
+
+      // Same source and the same honesty rule as the header pill: if the
+      // check cannot be read, the card says so rather than implying a green
+      // light it has not seen.
+      var state = document.getElementById('zc-connect-state');
+      fetch('https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json', { cache: 'no-cache' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){
+          if (!d || !d.message) { state.textContent = 'Status unavailable — check the run history'; return; }
+          if (d.message === 'operational') {
+            mount.classList.add('is-up');
+            state.innerHTML = '<strong>Live now</strong> — answering on ports 587 and 465, checked every 15 minutes';
+          } else {
+            mount.classList.add('is-down');
+            state.innerHTML = '<strong>Degraded</strong> — the last automated check could not reach ports 587 and 465';
+          }
+        })
+        .catch(function(){
+          state.textContent = 'Status unavailable — check the run history';
+        });
     })();
     </script>
 
