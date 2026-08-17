@@ -177,7 +177,7 @@ jobs:
             # first badge ever published read "24960 files". This is the
             # headline number of the whole blast-radius argument - it has to
             # read as a quantity, not as an identifier.
-            formatted=$(echo "$value" | sed -E ':a;s/([0-9])([0-9]{3})($|[^0-9])/ /;ta')
+            formatted=$(echo "$value" | sed -E ':a;s/([0-9])([0-9]{3})($|[^0-9])/\1 \2\3/;ta')
             cat > blast-radius.json <<JSON
           {"schemaVersion":1,"label":"$label in public code","message":"$formatted files","color":"critical"}
           JSON
