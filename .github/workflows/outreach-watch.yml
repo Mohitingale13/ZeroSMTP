@@ -73,14 +73,40 @@ jobs:
               'smtp free relay in:title is:issue is:open',
             ];
 
-            // A candidate has to name the actual problem, not merely mention
-            // SMTP. Every false positive on the first run failed this gate.
-            const REQUIRED = [
-              '5.7.139', '5.7.30', 'smtpclientauth', 'basic auth',
-              'basic authentication', 'office 365', 'office365',
-              'microsoft 365', 'exchange online', 'oauth', 'm365',
-              'scan to email', 'smtp relay', 'relay',
+            // A candidate has to name a MAIL problem AND an AUTHENTICATION
+            // problem. The first version was one flat list where any single
+            // hit passed, and `basic authentication` on its own is not a mail
+            // signal at all: measured on the queue of 2026-08-17, six of the
+            // fourteen threads it had queued were an OpenStreetMap API change,
+            // an Azure App Service FTP setting, an F5OS httpapi plugin, an
+            // HTTP Force-HTTPS bug and two generic auth-error tickets. None
+            // involved sending mail. A queue that is half noise stops being
+            // read, which is worse than an empty one because it still looks
+            // like it is working.
+
+            // Strings that cannot mean anything except SMTP submission. One
+            // of these alone is enough.
+            const DECISIVE = [
+              '5.7.139', '5.7.30', 'smtpclientauth', 'smtp relay',
+              'smtp auth', 'smtp authentication', 'scan to email',
             ];
+
+            // Otherwise the title has to carry both halves of the problem.
+            const MAIL = [
+              'smtp', 'mail', 'email', 'e-mail', 'port 587', 'port 465',
+              'sendmail', 'postfix', 'mailer', 'smtplib', 'javax.mail',
+              'nodemailer', 'phpmailer', 'mailkit',
+            ];
+            const AUTH = [
+              'basic auth', 'basic authentication', 'oauth', 'modern auth',
+              'office 365', 'office365', 'microsoft 365', 'microsoft365',
+              'm365', 'exchange online', '535',
+              'authentication unsuccessful', 'authentication failed',
+            ];
+
+            const onTopic = (s) =>
+              DECISIVE.some(w => s.includes(w)) ||
+              (MAIL.some(w => s.includes(w)) && AUTH.some(w => s.includes(w)));
 
             // Titles containing these are asking a different question - bulk
             // marketing mail, or building a mail server rather than sending
@@ -194,7 +220,7 @@ jobs:
               if (seen.has(c.id) || byId.has(c.id)) continue;
               const lower = (c.title + ' ' + c.tags.join(' ')).toLowerCase();
               if (SKIP.some(w => lower.includes(w))) { rejected++; continue; }
-              if (!REQUIRED.some(w => lower.includes(w))) { rejected++; continue; }
+              if (!onTopic(lower)) { rejected++; continue; }
               byId.add(c.id);
               fresh.push(c);
             }
