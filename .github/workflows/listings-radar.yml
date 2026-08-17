@@ -149,7 +149,7 @@ jobs:
               // README happens to contain the word "email", which is true of
               // most repos and says nothing. A directory looks like a
               // directory: dozens of entry-shaped lines.
-              const entries = (readme.match(/^[ 	]*[-*] \[[^\]]+\]\(https?:\/\//gm) || []).length;
+              const entries = (readme.match(/^[ \t]*[-*] \[[^\]]+\]\(https?:\/\//gm) || []).length;
               if (entries < 40) {
                 core.info(`${r.full_name}: only ${entries} list entries - not a directory.`);
                 rejected++;
@@ -162,7 +162,7 @@ jobs:
               // the wrong list, and submitting anyway is how a maintainer
               // learns to ignore you.
               const heading = readme.match(
-                /^#{1,4}[ 	]+.*(e-?mail|smtp|mail|transactional).*$/im);
+                /^#{1,4}[ \t]+.*\b(e-?mail|smtp|mail|transactional)\b.*$/im);
               if (!heading) {
                 core.info(`${r.full_name}: ${entries} entries but no mail section.`);
                 rejected++;

@@ -71,6 +71,16 @@ jobs:
         run: python tools/build-error-pages.py --check
       - name: Blast radius page matches data/blast-radius.json
         run: python tools/build-blast-radius.py --check
+      # A workflow file GitHub cannot parse fails at startup with no job and
+      # no log, so it stays invisible until somebody notices a run named after
+      # a file path instead of a workflow. Two files sat like that for twelve
+      # runs each on 2026-08-17, carrying a 0x01 and a 0x08 that a scripted
+      # edit had written where a regex meant backslash-1 and backslash-b.
+      # Cheap to check, expensive to miss.
+      - name: Workflow files parse, and carry no control characters
+        run: |
+          pip install --quiet pyyaml
+          python .github/check-workflows.py
 
   bash:
     needs: changes
