@@ -214,6 +214,50 @@
         .site-footer, .page-updated { color: #8b949e; }
       }
 
+      /* Live relay status, in the header of every page. The data is this
+         project's own status.json, published to the repository's `status`
+         branch by .github/workflows/service-healthcheck.yml - nothing
+         third-party is loaded, which the FAQ promises and SECURITY.md
+         explains. Colour is never the only signal: the state is spelled out
+         in words, so it survives both a colour-blind reader and a
+         screen reader. */
+      .relay-status {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .25rem .65rem;
+        font-size: .8rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        text-decoration: none;
+        color: #24292f;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 999px;
+      }
+      .relay-status:hover { border-color: #8c959f; }
+      .relay-status .dot {
+        flex: none;
+        width: .5rem;
+        height: .5rem;
+        border-radius: 50%;
+        background: #8c959f;
+      }
+      .relay-status .ports { color: #57606a; }
+      .relay-status.is-up { border-color: #1a7f37; }
+      .relay-status.is-up .dot { background: #1a7f37; }
+      .relay-status.is-down { border-color: #cf222e; }
+      .relay-status.is-down .dot { background: #cf222e; }
+      @media (prefers-color-scheme: dark) {
+        .relay-status { color: #e6edf3; background: #161b22; border-color: #30363d; }
+        .relay-status .ports { color: #8b949e; }
+        .relay-status.is-up { border-color: #3fb950; }
+        .relay-status.is-up .dot { background: #3fb950; }
+        .relay-status.is-down { border-color: #f85149; }
+        .relay-status.is-down .dot { background: #f85149; }
+      }
+
       /* Copy button on fenced code blocks, injected by the script at the
          end of the page. Positioned over .highlight (Rouge's wrapper),
          which directly contains the code block for every fenced snippet. */
@@ -260,6 +304,21 @@
           <a href="{{ '/FAQ.html' | relative_url }}">FAQ</a>
           <a href="https://github.com/msgwing/ZeroSMTP">GitHub</a>
         </nav>
+
+        {%- comment -%}
+          The relay's current state, on every page. It says the host and both
+          ports before any script runs, so a reader with JavaScript off still
+          learns what is being reported and can follow the link to the run
+          history - which is the actual evidence either way. The script below
+          fills in "operational" or "degraded".
+        {%- endcomment -%}
+        <a class="relay-status" id="relay-status" role="status" aria-live="polite"
+           href="https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml"
+           title="Automated TCP connect and TLS handshake against ports 587 and 465, every 15 minutes">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="state">mx.msgwing.com</span>
+          <span class="ports">587 · 465</span>
+        </a>
       </header>
 
       <main id="content">
@@ -552,6 +611,40 @@
     })();
     </script>
     {% endif %}
+
+    <script>
+    (function(){
+      var el = document.getElementById('relay-status');
+      if (!el || !window.fetch) return;
+
+      // Read at page load rather than baked in at build time: GitHub Pages
+      // only rebuilds on a push, and a status badge that is a week stale is
+      // worse than no badge at all. The source is this repository's own
+      // status branch on GitHub, written by service-healthcheck.yml - not a
+      // third-party status service.
+      //
+      // Both raw.githubusercontent and its CDN cache for around five
+      // minutes, so this can trail reality by that much. That is the floor,
+      // and it is why the pill links to the run history instead of asking to
+      // be taken on trust.
+      fetch('https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json', { cache: 'no-cache' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(d){
+          if (!d || !d.message) return;
+          var up = d.message === 'operational';
+          el.classList.add(up ? 'is-up' : 'is-down');
+          el.querySelector('.state').textContent = 'mx.msgwing.com ' + d.message;
+          el.title = up
+            ? 'Last automated check: TCP connect and TLS handshake succeeded on ports 587 and 465'
+            : 'Last automated check could not complete TCP connect and TLS handshake on ports 587 and 465';
+        })
+        .catch(function(){
+          // Leave the neutral pill exactly as rendered. Guessing "operational"
+          // because the check could not be read would be the one failure mode
+          // that matters.
+        });
+    })();
+    </script>
 
     <script>
     (function(){
