@@ -1,0 +1,168 @@
+name: Raport postępów
+
+# Every three days, opens one issue in Polish with the numbers the owner asked
+# for: what moved, what shipped, what is stuck and what still needs them.
+#
+# It exists because the owner delegated approval of changes to the team and
+# asked, reasonably, to see whether any of it is producing anything. A
+# delegation without a report is not delegation, it is disappearance.
+#
+# Two rules it is built around:
+#
+#   1. It reports the numbers, including the ones that did not move. A report
+#      that only lists activity looks like progress even when nothing changed;
+#      GitHub keeps traffic for 14 days and nobody else is writing it down, so
+#      this is also the only trend the project has.
+#   2. It never asks for a decision. Decisions about this repository belong to
+#      the change board now. Anything genuinely needing the owner - a
+#      third-party submission, a credential - is labelled `do-akceptacji` and
+#      arrives separately.
+
+on:
+  schedule:
+    - cron: '0 6 */3 * *'   # every three days, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const since = new Date(Date.now() - 3 * 86400_000).toISOString();
+            const day = new Date().toISOString().slice(0, 10);
+
+            const num = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+            // --- traffic ---------------------------------------------------
+            let views = null, referrers = [], paths = [];
+            try {
+              views = (await github.rest.repos.getViews({ owner, repo })).data;
+              referrers = (await github.rest.repos.getTopReferrers({ owner, repo })).data;
+              paths = (await github.rest.repos.getTopPaths({ owner, repo })).data;
+            } catch (e) {
+              core.warning(`Ruch niedostępny: ${e.message}`);
+            }
+
+            const meta = (await github.rest.repos.get({ owner, repo })).data;
+
+            // --- what shipped ----------------------------------------------
+            const prs = (await github.rest.pulls.list({
+              owner, repo, state: 'closed', sort: 'updated',
+              direction: 'desc', per_page: 50,
+            })).data.filter(p => p.merged_at && p.merged_at >= since);
+
+            // --- queues ----------------------------------------------------
+            const count = async (labels, state = 'open') =>
+              (await github.rest.issues.listForRepo({
+                owner, repo, state, labels, per_page: 100,
+              })).data.filter(i => !i.pull_request).length;
+
+            const outreach = await count('outreach');
+            const listing = await count('listing');
+            const waiting = await count('do-akceptacji');
+            const alerts = await count('service-alert');
+
+            // --- automation health -----------------------------------------
+            const runs = (await github.rest.actions.listWorkflowRunsForRepo({
+              owner, repo, per_page: 100,
+            })).data.workflow_runs.filter(r => r.created_at >= since);
+            const failed = runs.filter(r => r.conclusion === 'failure');
+            const byWorkflow = {};
+            for (const r of failed) byWorkflow[r.name] = (byWorkflow[r.name] || 0) + 1;
+
+            // --- the relay --------------------------------------------------
+            let relay = 'nieznany';
+            try {
+              const res = await fetch(
+                `https://raw.githubusercontent.com/${owner}/${repo}/status/status.json`,
+                { headers: { 'User-Agent': 'zerosmtp-progress-report' } });
+              if (res.ok) relay = (await res.json()).message;
+            } catch (e) { core.warning(e.message); }
+
+            // --- write it ----------------------------------------------------
+            const L = [];
+            L.push(`Raport za ostatnie trzy dni, do **${day}**.`, '');
+
+            L.push('## Liczby', '');
+            L.push('| Miara | Wartość |', '|---|---|');
+            if (views) {
+              L.push(`| Unikalni odwiedzający (14 dni) | **${num(views.uniques)}** |`);
+              L.push(`| Odsłony (14 dni) | ${num(views.count)} |`);
+            } else {
+              L.push('| Ruch | **niedostępny — API nie odpowiedziało** |');
+            }
+            L.push(`| Gwiazdki | **${meta.stargazers_count}** |`);
+            L.push(`| Forki | ${meta.forks_count} |`);
+            L.push(`| Obserwujący | ${meta.subscribers_count} |`);
+            L.push(`| Przekaźnik | ${relay === 'operational' ? '✅ działa' : `⚠️ ${relay}`} |`);
+            L.push('');
+
+            if (referrers.length) {
+              L.push('### Skąd przyszli', '', '| Źródło | Unikalni |', '|---|---|');
+              for (const r of referrers.slice(0, 6)) {
+                L.push(`| \`${r.referrer}\` | ${num(r.uniques)} |`);
+              }
+              L.push('');
+            }
+
+            if (paths.length) {
+              L.push('### Co czytali', '');
+              for (const p of paths.slice(0, 5)) {
+                L.push(`- ${num(p.uniques)} — \`${p.path}\``);
+              }
+              L.push('');
+            }
+
+            L.push('## Co weszło', '');
+            if (prs.length) {
+              for (const p of prs) L.push(`- #${p.number} ${p.title}`);
+            } else {
+              L.push('**Nic.** Trzy dni bez zmergowanej zmiany to nie jest cisza — to jest zatrzymana praca.');
+            }
+            L.push('');
+
+            L.push('## Kolejki', '');
+            L.push('| Kolejka | Otwarte |', '|---|---|');
+            L.push(`| Kandydaci outreach | ${outreach} |`);
+            L.push(`| Kandydaci na listy | ${listing} |`);
+            L.push(`| **Czeka na Ciebie** (\`do-akceptacji\`) | **${waiting}** |`);
+            if (alerts) L.push(`| ⚠️ Awarie usługi | **${alerts}** |`);
+            L.push('');
+
+            L.push('## Automatyka', '');
+            if (failed.length === 0) {
+              L.push(`Wszystkie ${runs.length} biegów zakończonych bez porażki.`);
+            } else {
+              L.push(`**${failed.length} porażek** na ${runs.length} biegów:`, '');
+              for (const [name, n] of Object.entries(byWorkflow)) {
+                L.push(`- \`${name}\` — ${n}×`);
+              }
+            }
+            L.push('');
+
+            L.push('---', '');
+            if (waiting > 0) {
+              L.push(`**${waiting} spraw czeka na Twoje jedno kliknięcie** — etykieta \`do-akceptacji\`.`);
+            } else {
+              L.push('**Nic nie czeka na Twoją decyzję.** Zmiany w tym repozytorium zatwierdza rada;');
+              L.push('do Ciebie trafia wyłącznie publikacja u obcych i tworzenie poświadczeń.');
+            }
+            L.push('');
+            L.push('_Raport generowany automatycznie co trzy dni. Nie wymaga odpowiedzi — zamknij go._');
+
+            const issue = await github.rest.issues.create({
+              owner, repo,
+              title: `Raport postępów — ${day}`,
+              body: L.join('\n'),
+              assignees: [owner],
+            });
+            core.notice(`Raport: ${issue.data.html_url}`);
