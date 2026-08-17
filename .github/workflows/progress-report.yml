@@ -23,9 +23,15 @@ on:
     - cron: '0 6 */3 * *'   # every three days, 06:00 UTC
   workflow_dispatch:
 
+# `administration: read` is what the traffic endpoints map to. Without it the
+# first run reported "Resource not accessible by integration" and the report
+# went out with its headline numbers missing - which is the one thing this
+# report cannot be, since GitHub keeps traffic for only 14 days and nobody
+# else is writing it down.
 permissions:
   contents: read
   issues: write
+  administration: read
 
 jobs:
   report:
@@ -49,7 +55,11 @@ jobs:
               referrers = (await github.rest.repos.getTopReferrers({ owner, repo })).data;
               paths = (await github.rest.repos.getTopPaths({ owner, repo })).data;
             } catch (e) {
-              core.warning(`Ruch niedostępny: ${e.message}`);
+              // Loud, not quiet. A report that silently drops the numbers it
+              // exists to carry looks like a calm week.
+              core.error(
+                `Ruch niedostępny: ${e.message}. Raport pójdzie bez ` +
+                `najważniejszych liczb - sprawdź uprawnienie administration: read.`);
             }
 
             const meta = (await github.rest.repos.get({ owner, repo })).data;
@@ -98,7 +108,7 @@ jobs:
               L.push(`| Unikalni odwiedzający (14 dni) | **${num(views.uniques)}** |`);
               L.push(`| Odsłony (14 dni) | ${num(views.count)} |`);
             } else {
-              L.push('| Ruch | **niedostępny — API nie odpowiedziało** |');
+              L.push('| Ruch | ⚠️ **niedostępny — API odmówiło dostępu** |');
             }
             L.push(`| Gwiazdki | **${meta.stargazers_count}** |`);
             L.push(`| Forki | ${meta.forks_count} |`);
