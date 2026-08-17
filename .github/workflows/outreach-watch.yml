@@ -67,11 +67,22 @@ jobs:
             // provider feature request and an Angular boilerplate, neither of
             // which is anybody looking for a relay. Bare "smtp" plus "disabled"
             // is not a signal. What worked was the error code.
+            // `is:open` on every one of them. Two of these carried only
+            // `is:issue`, and the queue of 2026-08-17 was the result: five of
+            // the eight threads it had queued were closed and resolved, the
+            // oldest since August 2024. A comment on a finished issue reaches
+            // nobody and is exactly what gets an account flagged.
             const GH_QUERIES = [
-              '5.7.139 in:title is:issue',
-              '"basic authentication is disabled" in:title is:issue',
+              '5.7.139 in:title is:issue is:open',
+              '"basic authentication is disabled" in:title is:issue is:open',
               'smtp free relay in:title is:issue is:open',
             ];
+
+            // A GitHub thread nobody has touched in four months is dead, even
+            // when it is open. Two of the eight were untouched since 2022.
+            // Stack Exchange is deliberately exempt: an answer there keeps
+            // earning from search for years.
+            const GH_MAX_IDLE_DAYS = 120;
 
             // A candidate has to name a MAIL problem AND an AUTHENTICATION
             // problem. The first version was one flat list where any single
@@ -115,6 +126,12 @@ jobs:
               'bulk', 'newsletter', 'marketing', 'campaign', 'mailing list',
               'spam filter', 'receive mail', 'imap', 'pop3', 'dovecot',
               'mailbox migration', 'exchange 2013', 'exchange 2016 install',
+              // Abuse tooling. The queue of 2026-08-17 contained an email
+              // bomber and a phishing-simulation framework. Handing either a
+              // sending path puts the shared @msgwing.com domain behind their
+              // traffic, and every other user of that domain pays for it.
+              'bomber', 'phishing', 'spammer', 'mass mail', 'mail flood',
+              'email flood', 'brute force',
             ];
 
             const since = Math.floor(Date.now() / 1000) - SE_LOOKBACK_DAYS * 86400;
@@ -182,11 +199,18 @@ jobs:
             for (const q of GH_QUERIES) {
               attempted++;
               try {
+                // `-commenter:` excludes threads we have already replied to.
+                // Without it the bot re-queues its own finished work: the one
+                // genuinely live lead of 2026-08-17 had already been answered
+                // by the owner six days earlier, and was queued anyway.
                 const res = await github.rest.search.issuesAndPullRequests({
-                  q: `${q} -repo:${context.repo.owner}/${context.repo.repo}`,
+                  q: `${q} -repo:${context.repo.owner}/${context.repo.repo}`
+                     + ` -commenter:${context.repo.owner}`,
                   per_page: 10,
                 });
+                const ghIdle = Date.now() - GH_MAX_IDLE_DAYS * 86400_000;
                 for (const item of res.data.items) {
+                  if (new Date(item.updated_at).getTime() < ghIdle) continue;
                   candidates.push({
                     id: `gh:${item.id}`,
                     source: 'github',
