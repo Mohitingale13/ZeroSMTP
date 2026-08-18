@@ -517,95 +517,194 @@
       and correctly with JavaScript unavailable, i.e. on github.com.
     {% endcomment %}
     {% if page.widget == "countdown" %}
+    {%- comment -%}
+      Mission clock. The previous version of this panel was a neon gradient
+      with forty twinkling stars, which reads as decoration on a page whose
+      entire argument is that a measured, dated failure is coming. An
+      instrument reads as evidence.
+
+      Every value on it is fetched rather than typed: the deadline is fixed,
+      the exposure count comes from the weekly measurement on the `status`
+      branch, and the relay state from the same status.json the header pill
+      reads. A panel showing a hardcoded number would be a picture of an
+      instrument rather than one.
+    {%- endcomment -%}
     <style>
       #zc-fc {
-        position:relative;overflow:hidden;
-        background:radial-gradient(ellipse at 50% 120%, #2d1b4e 0%, #0d0620 55%, #050310 100%);
-        border:1px solid #ff2ec4;border-radius:12px;max-width:640px;
-        padding:28px 20px 22px;margin:20px auto;
-        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-        text-align:center;
-        box-shadow:0 0 30px rgba(255,46,196,.25), inset 0 0 60px rgba(60,20,120,.4);
+        --mc-bg: #08090b;
+        --mc-line: #23262b;
+        --mc-dim: #7d858f;
+        --mc-fg: #f2f4f7;
+        --mc-accent: #ff8a3d;
+        --mc-live: #35d07f;
+        background: var(--mc-bg);
+        border: 1px solid var(--mc-line);
+        border-radius: 4px;
+        margin: 24px 0 28px;
+        overflow: hidden;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        color: var(--mc-fg);
       }
-      /* transform + opacity, not text-shadow or animated filter: Lighthouse
-         flags both as non-composited (animated filter still forces a
-         paint-bounds recompute for the blur radius, even though it's not
-         main-thread like text-shadow). The glow itself is a static filter
-         (never animated, so it's free); only scale/opacity pulse. */
-      @keyframes zc-fc-pulse { 0%,100%{ transform:scale(1); opacity:.85; } 50%{ transform:scale(1.06); opacity:1; } }
-      @keyframes zc-fc-twinkle { 0%,100%{ opacity:.15; } 50%{ opacity:.9; } }
-      .zc-fc-unit { min-width:64px; }
-      .zc-fc-num {
-        font-family:'Courier New',monospace; font-weight:700; font-size:2.4rem; line-height:1;
-        color:#8be9fd;
-        filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor);
-        animation:zc-fc-pulse 2.2s ease-in-out infinite;
+      .mc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 16px;
+        border-bottom: 1px solid var(--mc-line);
+        font-size: 10px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--mc-dim);
       }
-      .zc-fc-label { font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#c792ea;margin-top:4px; }
-      .zc-fc-sep { font-size:2.4rem;font-weight:700;color:#ff2ec4;align-self:flex-start;text-shadow:0 0 10px #ff2ec4; }
+      .mc-head b { color: var(--mc-accent); font-weight: 600; }
+      .mc-clock {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: clamp(8px, 3vw, 26px);
+        padding: 26px 16px 20px;
+      }
+      .mc-unit { text-align: center; min-width: 58px; }
+      .mc-n {
+        font-size: clamp(2.3rem, 9vw, 4.1rem);
+        font-weight: 600;
+        line-height: .95;
+        letter-spacing: -.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .mc-u {
+        margin-top: 8px;
+        font-size: 9px;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+        color: var(--mc-dim);
+      }
+      .mc-sep {
+        font-size: clamp(1.6rem, 6vw, 2.6rem);
+        line-height: 1.2;
+        color: var(--mc-line);
+      }
+      .mc-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        border-top: 1px solid var(--mc-line);
+      }
+      .mc-stat { padding: 13px 16px; }
+      .mc-stat + .mc-stat { border-left: 1px solid var(--mc-line); }
+      .mc-k {
+        font-size: 9px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--mc-dim);
+      }
+      .mc-v {
+        margin-top: 5px;
+        font-size: 1.45rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .mc-sub { margin-top: 3px; font-size: 10px; color: var(--mc-dim); }
+      .mc-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 7px;
+        border-radius: 50%;
+        background: var(--mc-dim);
+      }
+      .mc-dot.up { background: var(--mc-live); }
+      .mc-dot.down { background: #ff5c5c; }
     </style>
     <script>
-    (function(){
+    (function () {
       var wrap = document.getElementById('zc-fc');
       if (!wrap) return;
 
       wrap.innerHTML =
-        '<div id="zc-fc-stars" style="position:absolute;inset:0;pointer-events:none;"></div>' +
-        '<div style="position:relative;font-size:11px;letter-spacing:.25em;text-transform:uppercase;' +
-        'color:#ff2ec4;text-shadow:0 0 8px #ff2ec4;margin-bottom:10px;font-weight:700;">' +
-        '🚀 It’s the final countdown <span style="opacity:.6;">&mdash; for Basic Auth on SMTP AUTH</span></div>' +
-        '<div id="zc-fc-digits" style="position:relative;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;"></div>' +
-        '<div style="position:relative;font-size:12px;color:#8be9fd;margin-top:12px;text-shadow:0 0 6px rgba(139,233,253,.6);">' +
-        'Microsoft disables it by default on existing tenants &mdash; end of December 2026</div>';
+        '<div class="mc-head">' +
+          '<span>SMTP AUTH &middot; basic authentication</span>' +
+          '<span><b>disabled by default</b> &middot; 31 dec 2026</span>' +
+        '</div>' +
+        '<div class="mc-clock" id="mc-clock"></div>' +
+        '<div class="mc-stats">' +
+          '<div class="mc-stat">' +
+            '<div class="mc-k">Public files still pointing at it</div>' +
+            '<div class="mc-v" id="mc-exposure">&mdash;</div>' +
+            '<div class="mc-sub" id="mc-exposure-sub">measured weekly</div>' +
+          '</div>' +
+          '<div class="mc-stat">' +
+            '<div class="mc-k">Relay mx.msgwing.com &middot; 587 / 465</div>' +
+            '<div class="mc-v"><span class="mc-dot" id="mc-dot"></span><span id="mc-relay">checking</span></div>' +
+            '<div class="mc-sub">TCP + TLS, re-checked every 15 min</div>' +
+          '</div>' +
+        '</div>';
 
-      var digitsEl = document.getElementById('zc-fc-digits');
-      var starsEl = document.getElementById('zc-fc-stars');
-
-      for (var i = 0; i < 40; i++) {
-        var s = document.createElement('div');
-        var size = Math.random() < 0.8 ? 1 : 2;
-        s.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;' +
-          'left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;' +
-          'background:#fff;border-radius:50%;' +
-          'animation:zc-fc-twinkle ' + (2 + Math.random()*3).toFixed(1) + 's ease-in-out infinite;' +
-          'animation-delay:' + (Math.random()*3).toFixed(1) + 's;';
-        starsEl.appendChild(s);
-      }
-
+      var clock = document.getElementById('mc-clock');
       var deadline = new Date('2026-12-31T23:59:59Z');
+      var pad = function (n) { return String(n).padStart(2, '0'); };
+      var unit = function (v, u) {
+        return '<div class="mc-unit"><div class="mc-n">' + v + '</div>' +
+               '<div class="mc-u">' + u + '</div></div>';
+      };
 
-      function pad(n){ return String(n).padStart(2, '0'); }
-
-      function unit(value, label){
-        return '<div class="zc-fc-unit"><div class="zc-fc-num">' + value + '</div>' +
-               '<div class="zc-fc-label">' + label + '</div></div>';
-      }
-
-      function render(){
+      function render() {
         var diff = deadline - new Date();
         if (diff <= 0) {
-          digitsEl.innerHTML = '<div class="zc-fc-num" style="font-size:1.4rem;">The default has flipped &mdash; Basic auth is off.</div>';
+          clock.innerHTML = '<div class="mc-unit" style="min-width:auto">' +
+            '<div class="mc-n" style="font-size:1.5rem">THE DEFAULT HAS FLIPPED</div>' +
+            '<div class="mc-u">basic auth is off</div></div>';
           return;
         }
         var d = Math.floor(diff / 86400000);
         var h = Math.floor((diff % 86400000) / 3600000);
         var m = Math.floor((diff % 3600000) / 60000);
         var s = Math.floor((diff % 60000) / 1000);
-
-        digitsEl.innerHTML =
-          unit(d, d === 1 ? 'day' : 'days') +
-          '<div class="zc-fc-sep">:</div>' +
-          unit(pad(h), 'hrs') +
-          '<div class="zc-fc-sep">:</div>' +
-          unit(pad(m), 'min') +
-          '<div class="zc-fc-sep">:</div>' +
+        clock.innerHTML =
+          unit(d, d === 1 ? 'day' : 'days') + '<div class="mc-sep">:</div>' +
+          unit(pad(h), 'hrs') + '<div class="mc-sep">:</div>' +
+          unit(pad(m), 'min') + '<div class="mc-sep">:</div>' +
           unit(pad(s), 'sec');
       }
-
       render();
       setInterval(render, 1000);
+
+      var group = function (n) {
+        return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      };
+
+      // The exposure figure comes from the weekly measurement, not from a
+      // number typed into this file.
+      fetch('https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/blast-radius-samples.json',
+            { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || !d.samples || !d.samples.length) return;
+          var last = d.samples[d.samples.length - 1];
+          var counts = Object.keys(last.counts || {})
+            .map(function (k) { return last.counts[k]; })
+            .filter(function (v) { return typeof v === 'number'; });
+          if (!counts.length) return;
+          document.getElementById('mc-exposure').textContent =
+            group(Math.max.apply(null, counts));
+          document.getElementById('mc-exposure-sub').textContent =
+            'GitHub code search · ' + last.date;
+        })
+        .catch(function () { /* the dash stays; it does not invent a number */ });
+
+      fetch('https://raw.githubusercontent.com/msgwing/ZeroSMTP/status/status.json',
+            { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || !d.message) return;
+          var up = d.message === 'operational';
+          document.getElementById('mc-dot').className = 'mc-dot ' + (up ? 'up' : 'down');
+          document.getElementById('mc-relay').textContent = up ? 'operational' : d.message;
+        })
+        .catch(function () { /* stays "checking" rather than claiming a state */ });
     })();
     </script>
+
     {% elsif page.widget == "quiz" %}
     <script>
     (function(){
