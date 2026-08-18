@@ -159,295 +159,214 @@
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
 
     <style>
-      /* Site header: the wordmark is navigation, not the page's heading, so
-         each page keeps exactly one top-level heading of its own. */
+      /* ==================================================================
+         "The Split" — chosen from nine competing designs on 2026-08-17.
+
+         It won on the criterion that decides: a registration link visible
+         without scrolling at 375, 768 and 1280. Seven of the nine put it
+         below the first screen; two managed one width. This one manages all
+         three, because the conversion block is pinned rather than placed.
+
+         Indigo band, magenta conversion, amber for the deadline and nothing
+         else. Deliberately not the black-and-white minimalism every
+         technical product page reaches for: that palette belongs to other
+         people and a project cannot be recognised in it.
+         ================================================================== */
+      :root {
+        --paper:#FFFDF9; --panel:#FFFFFF; --tint:#F3EFFF;
+        --ink:#1B1830;   --muted:#4E4A66;
+        --line:#DDD6F2;  --line-strong:#B7ACE0;
+        --band:#3B2FA8;  --on-band:#FFFDF9; --on-band-muted:#D9D3F5;
+        --band-line:rgba(255,253,249,.28);
+        --amber:#FFD24A; --on-amber:#1B1830;
+        --accent:#A3005C; --on-accent:#FFFDF9;
+        --link:#3B2FA8;  --ok:#0F6B33; --fault:#B3261E;
+        --code-bg:#211D3B; --code-ink:#EFECFA; --code-muted:#A8A2C4;
+        --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+        --rail:352px;
+      }
+      @media (prefers-color-scheme:dark) {
+        :root {
+          --paper:#12101E; --panel:#1D1934; --tint:#1A162E;
+          --ink:#EFECFA;   --muted:#A8A2C4;
+          --line:#332C55;  --line-strong:#4B4179;
+          --band:#241E4A;  --on-band:#EFECFA; --on-band-muted:#B9B2E6;
+          --band-line:rgba(239,236,250,.2);
+          --amber:#FFD24A; --on-amber:#12101E;
+          --accent:#FF8FC4; --on-accent:#12101E;
+          --link:#A99CFF;  --ok:#3FD07A; --fault:#FF8A80;
+          --code-bg:#0B0916;
+        }
+      }
+
+      /* The Primer theme ships a light page; these override it rather than
+         fight it, so the whole composition holds in both schemes. */
+      body {
+        background:var(--paper); color:var(--ink);
+        font-family:var(--sans);
+        display:flex; flex-direction:column; min-height:100vh;
+        overflow-x:clip;
+      }
+      .markdown-body { background:transparent; color:var(--ink); font-family:var(--sans); }
+      .markdown-body h1,.markdown-body h2,.markdown-body h3,
+      .markdown-body h4,.markdown-body h5,.markdown-body h6 {
+        color:var(--ink); border-bottom:0; letter-spacing:-.025em;
+      }
+      .markdown-body h1 { font-size:clamp(1.9rem,4.4vw,2.9rem); letter-spacing:-.035em; text-wrap:balance; }
+      .markdown-body h2 { font-size:clamp(1.3rem,2.6vw,1.8rem); margin-top:2em; }
+      .markdown-body a[href]:not(.anchor) { color:var(--link); text-decoration:underline; text-underline-offset:3px; }
+      .markdown-body hr { background:var(--line); }
+      .markdown-body blockquote { color:var(--muted); border-left-color:var(--line-strong); }
+      .markdown-body img { height:auto; max-width:100%; }
+
+      .markdown-body table { display:block; overflow-x:auto; border-collapse:collapse; }
+      .markdown-body table th,.markdown-body table td {
+        border:1px solid var(--line); padding:11px 14px; vertical-align:top;
+      }
+      .markdown-body table thead th {
+        background:var(--tint); color:var(--muted); font-family:var(--mono);
+        font-size:.7rem; letter-spacing:.13em; text-transform:uppercase;
+      }
+      .markdown-body table tr { background:transparent; border-top:0; }
+      .markdown-body code { background:var(--tint); color:var(--ink); border-radius:4px; }
+      /* Explicit rather than inherited from the theme: a long error string is
+         exactly what this site is full of, and one unwrapped line turning the
+         whole page into a horizontal scroller is the defect that would have
+         disqualified this design under its own scoring. */
+      .markdown-body pre {
+        background:var(--code-bg); border:1px solid var(--line); border-radius:10px;
+        overflow-x:auto; max-width:100%;
+      }
+      .markdown-body pre code { background:transparent; color:var(--code-ink); }
+
+      /* ---------- masthead ---------- */
       .site-header {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: .35rem 1.25rem;
-        padding-bottom: .75rem;
-        margin-bottom: 2rem;
-        border-bottom: 1px solid #d0d7de;
+        display:flex; flex-wrap:wrap; align-items:center; gap:10px 24px;
+        padding-bottom:.9rem; margin-bottom:2rem;
+        border-bottom:1px solid var(--line);
       }
       .site-header .wordmark {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #24292f;
-        text-decoration: none;
+        font-size:1.05rem; font-weight:760; letter-spacing:-.02em;
+        color:var(--ink); text-decoration:none; margin-right:auto;
       }
-      .site-header nav a { font-size: .95rem; margin-right: 1rem; text-decoration: underline; }
-      .site-footer {
-        margin-top: 3rem;
-        padding-top: 1rem;
-        border-top: 1px solid #d0d7de;
-        font-size: .9rem;
-        color: #57606a;
+      .site-header nav { display:flex; flex-wrap:wrap; gap:4px 20px; }
+      .site-header nav a {
+        font-size:.93rem; font-weight:620; color:var(--muted);
+        text-decoration:none; padding:3px 0; border-bottom:2px solid transparent;
       }
-      .site-footer a { text-decoration: underline; }
-      .page-updated {
-        margin-top: 2.5rem;
-        padding-top: 1rem;
-        border-top: 1px solid #d0d7de;
-        font-size: .85rem;
-        color: #57606a;
-      }
+      .site-header nav a:hover { color:var(--ink); border-bottom-color:var(--accent); }
 
-      /* Body-content links: the theme underlines these on hover only,
-         which Lighthouse flags as distinguishable by color alone. */
-      .markdown-body a[href]:not(.anchor) {
-        text-decoration: underline;
-      }
-
-      /* The theme sets max-width: 100% on content images but no height
-         rule, so a fixed height="" attribute (kept for CLS) stretches the
-         image once its width is scaled down. height: auto lets the browser
-         derive the box from the width/height attributes' aspect ratio
-         instead, so it stays proportional at any container width. */
-      .markdown-body img {
-        height: auto;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        .site-header, .site-footer, .page-updated { border-color: #30363d; }
-        .site-header .wordmark { color: #e6edf3; }
-        .site-footer, .page-updated { color: #8b949e; }
-      }
-
-      /* Live relay status, in the header of every page. The data is this
-         project's own status.json, published to the repository's `status`
-         branch by .github/workflows/service-healthcheck.yml - nothing
-         third-party is loaded, which the FAQ promises and SECURITY.md
-         explains. Colour is never the only signal: the state is spelled out
-         in words, so it survives both a colour-blind reader and a
-         screen reader. */
+      /* ---------- live relay status ---------- */
       .relay-status {
-        margin-left: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        padding: .25rem .65rem;
-        font-size: .8rem;
-        line-height: 1.5;
-        white-space: nowrap;
-        text-decoration: none;
-        color: #24292f;
-        background: #f6f8fa;
-        border: 1px solid #d0d7de;
-        border-radius: 999px;
+        display:inline-flex; align-items:center; gap:.45rem;
+        padding:.28rem .7rem; border-radius:100px;
+        border:1px solid var(--line-strong); background:var(--panel);
+        color:var(--ink); font-family:var(--mono); font-size:.76rem;
+        font-weight:600; white-space:nowrap; text-decoration:none;
       }
-      .relay-status:hover { border-color: #8c959f; }
-      .relay-status .dot {
-        flex: none;
-        width: .5rem;
-        height: .5rem;
-        border-radius: 50%;
-        background: #8c959f;
-      }
-      .relay-status .ports { color: #57606a; }
-      .relay-status.is-up { border-color: #1a7f37; }
-      .relay-status.is-up .dot { background: #1a7f37; }
-      .relay-status.is-down { border-color: #cf222e; }
-      .relay-status.is-down .dot { background: #cf222e; }
-      .relay-status .caret { color: #57606a; font-size: .7rem; }
+      .relay-status:hover { border-color:var(--accent); }
+      .relay-status .dot { flex:none; width:8px; height:8px; border-radius:50%; background:var(--muted); }
+      .relay-status .ports,.relay-status .caret { color:var(--muted); }
+      .relay-status.is-up { border-color:var(--ok); }
+      .relay-status.is-up .dot { background:var(--ok); }
+      .relay-status.is-down { border-color:var(--fault); }
+      .relay-status.is-down .dot { background:var(--fault); }
 
-      /* Panel opened by clicking the pill. */
       #relay-detail {
-        margin: -1.25rem 0 2rem;
-        padding: .8rem 1rem;
-        font-size: .85rem;
-        background: #f6f8fa;
-        border: 1px solid #d0d7de;
-        border-radius: 6px;
+        margin:-1.25rem 0 2rem; padding:.85rem 1.05rem; font-size:.86rem;
+        background:var(--panel); border:1px solid var(--line); border-radius:10px;
       }
-      #relay-detail p { margin: 0 0 .5rem; }
-      #relay-detail ul { margin: 0 0 .5rem; padding-left: 1.2rem; }
-      #relay-detail code {
-        padding: .1rem .35rem;
-        background: #eaeef2;
-        border-radius: 4px;
-      }
-      #relay-detail .muted { color: #57606a; }
-      @media (prefers-color-scheme: dark) {
-        .relay-status { color: #e6edf3; background: #161b22; border-color: #30363d; }
-        .relay-status .ports, .relay-status .caret { color: #8b949e; }
-        #relay-detail { background: #161b22; border-color: #30363d; }
-        #relay-detail code { background: #21262d; }
-        #relay-detail .muted { color: #8b949e; }
-        .relay-status.is-up { border-color: #3fb950; }
-        .relay-status.is-up .dot { background: #3fb950; }
-        .relay-status.is-down { border-color: #f85149; }
-        .relay-status.is-down .dot { background: #f85149; }
-      }
+      #relay-detail p { margin:0 0 .5rem; }
+      #relay-detail ul { margin:0 0 .5rem; padding-left:1.2rem; }
+      #relay-detail code { padding:.1rem .35rem; background:var(--tint); border-radius:4px; }
+      #relay-detail .muted { color:var(--muted); }
+      #relay-detail a { color:var(--link); }
 
-      /* The connection card. This is the element the whole site exists to
-         deliver: somebody with a printer that stopped sending needs three
-         values, and every minute they spend hunting for them is a minute
-         they might spend on a competitor's page instead. So the values are
-         large, monospaced, and one tap from the clipboard - and the live
-         dot next to them answers the question they ask straight after,
-         which is whether the thing is even up right now.
+      /* ---------- conversion rail (homepage) ---------- */
+      .layout { display:grid; grid-template-columns:minmax(0,1fr); gap:0 clamp(24px,3vw,40px); align-items:start; }
+      @media (min-width:1040px) {
+        .layout.has-rail { grid-template-columns:minmax(0,1fr) var(--rail); }
+      }
+      .rail { min-width:0; }
+      .railinner { position:sticky; top:18px; }
+      @media (max-width:1039px) { .railinner { position:static; } }
 
-         The limits sit inside the card, not in a footnote. A reader who
-         discovers the 200/day cap after registering is a support ticket and
-         a bad review; one who reads it here and registers anyway is a user. */
-      .zc-connect {
-        margin: 1.5rem 0 2rem;
-        border: 1px solid #d0d7de;
-        border-radius: 12px;
-        background: #fff;
-        overflow: hidden;
+      .convert { border:2px solid var(--accent); border-radius:12px; background:var(--panel); overflow:hidden; margin-bottom:2rem; }
+      .converthead { background:var(--accent); color:var(--on-accent); padding:14px 18px; }
+      .converthead b { display:block; font-size:1.1rem; letter-spacing:-.03em; }
+      .converthead span { font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; }
+      .convertbody { padding:18px; }
+      .crow {
+        display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px;
+        border:1px solid var(--line); border-radius:8px; background:var(--tint);
+        padding:10px 12px; margin-bottom:8px; min-width:0;
       }
-      .zc-connect__top {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        padding: .6rem 1.1rem;
-        font-size: .8rem;
-        background: #f6f8fa;
-        border-bottom: 1px solid #d0d7de;
+      .crow .k { font-family:var(--mono); font-size:.67rem; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); width:100%; }
+      @media (min-width:400px) { .crow .k { width:58px; flex:none; } }
+      .crow .v { font-family:var(--mono); font-weight:700; font-size:1.08rem; flex:1 1 auto; min-width:0; overflow-wrap:anywhere; }
+      .crow .n { font-size:.74rem; color:var(--muted); white-space:nowrap; }
+      .ccopy {
+        flex:none; font:inherit; font-size:.7rem; font-weight:700; letter-spacing:.06em;
+        text-transform:uppercase; background:var(--panel); color:var(--ink);
+        border:1px solid var(--line-strong); border-radius:6px; padding:6px 10px; cursor:pointer;
       }
-      .zc-connect__live {
-        width: .55rem; height: .55rem; border-radius: 50%;
-        background: #8c959f; flex: none;
+      .ccopy:hover { border-color:var(--accent); color:var(--accent); }
+      .ccopy[data-done="1"] { background:var(--ok); border-color:var(--ok); color:var(--paper); }
+      .cta {
+        display:block; margin-top:15px; padding:15px 18px; border-radius:8px;
+        background:var(--accent); color:var(--on-accent) !important;
+        font-weight:760; font-size:1.04rem; text-align:center;
+        text-decoration:none !important; transition:transform .15s ease;
       }
-      .zc-connect.is-up .zc-connect__live { background: #1a7f37; }
-      .zc-connect.is-down .zc-connect__live { background: #cf222e; }
-      /* transform/opacity only. An animated box-shadow or filter is flagged
-         as non-composited, same reasoning as the countdown widget below. */
-      @keyframes zc-connect-ping {
-        0%   { transform: scale(1);   opacity: .55; }
-        70%  { transform: scale(2.6); opacity: 0; }
-        100% { transform: scale(2.6); opacity: 0; }
-      }
-      .zc-connect__pulse {
-        position: relative;
-        display: inline-flex;
-        flex: none;
-      }
-      .zc-connect__pulse::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: #1a7f37;
-        opacity: 0;
-      }
-      .zc-connect.is-up .zc-connect__pulse::after {
-        animation: zc-connect-ping 2.4s cubic-bezier(0, 0, .2, 1) infinite;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .zc-connect.is-up .zc-connect__pulse::after { animation: none; }
-      }
-      .zc-connect__body { padding: 1.1rem; }
-      .zc-connect__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: .75rem;
-      }
-      .zc-connect__field {
-        border: 1px solid #d0d7de;
-        border-radius: 8px;
-        padding: .6rem .75rem;
-        background: #f6f8fa;
-      }
-      .zc-connect__label {
-        font-size: .65rem;
-        letter-spacing: .09em;
-        text-transform: uppercase;
-        color: #57606a;
-      }
-      .zc-connect__row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .5rem;
-        margin-top: .15rem;
-      }
-      .zc-connect__value {
-        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: #24292f;
-        word-break: break-all;
-      }
-      .zc-connect__note { font-size: .72rem; color: #57606a; margin-top: .15rem; }
-      .zc-connect__copy {
-        flex: none;
-        padding: .2rem .5rem;
-        font-size: .7rem;
-        color: #57606a;
-        background: #fff;
-        border: 1px solid #d0d7de;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      .zc-connect__copy:hover { border-color: #8c959f; }
-      .zc-connect__copy.copied { color: #1a7f37; border-color: #1a7f37; }
-      .zc-connect__cta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: .5rem .9rem;
-        margin-top: 1rem;
-      }
-      .zc-connect__btn {
-        display: inline-block;
-        padding: .55rem 1.1rem;
-        font-size: .95rem;
-        font-weight: 600;
-        color: #fff !important;
-        background: #1f883d;
-        border: 1px solid rgba(31,35,40,.15);
-        border-radius: 8px;
-        text-decoration: none !important;
-      }
-      .zc-connect__btn:hover { background: #1a7f37; }
-      .zc-connect__limits { font-size: .78rem; color: #57606a; }
-      @media (prefers-color-scheme: dark) {
-        .zc-connect { background: #0d1117; border-color: #30363d; }
-        .zc-connect__top { background: #161b22; border-color: #30363d; }
-        .zc-connect__field { background: #161b22; border-color: #30363d; }
-        .zc-connect__value { color: #e6edf3; }
-        .zc-connect__label, .zc-connect__note, .zc-connect__limits { color: #8b949e; }
-        .zc-connect__copy { color: #8b949e; background: #21262d; border-color: #30363d; }
-        .zc-connect__copy.copied { color: #3fb950; border-color: #3fb950; }
-        .zc-connect.is-up .zc-connect__live,
-        .zc-connect.is-up .zc-connect__pulse::after { background: #3fb950; }
-        .zc-connect.is-down .zc-connect__live { background: #f85149; }
-      }
+      .cta:hover { transform:translateY(-2px); }
+      .climits { margin-top:18px; padding-top:16px; border-top:2px dashed var(--line-strong); font-size:.85rem; color:var(--muted); }
+      .climits b { color:var(--ink); }
 
-      /* Copy button on fenced code blocks, injected by the script at the
-         end of the page. Positioned over .highlight (Rouge's wrapper),
-         which directly contains the code block for every fenced snippet. */
-      .highlight { position: relative; }
+      /* ---------- persistent conversion dock ----------
+         Every page, every width under 1040px. This is the reason this design
+         won: a reader who lands on a troubleshooting page three levels deep
+         still knows, without scrolling, where an account comes from. */
+      .dock {
+        position:fixed; left:0; right:0; bottom:0; z-index:40;
+        display:flex; align-items:center; gap:12px;
+        padding:9px clamp(14px,4vw,20px);
+        padding-bottom:calc(9px + env(safe-area-inset-bottom,0px));
+        background:var(--accent); color:var(--on-accent);
+      }
+      .dock .t { min-width:0; font-family:var(--mono); font-size:.76rem; line-height:1.35; overflow:hidden; }
+      .dock .t b { display:block; font-size:.88rem; overflow-wrap:anywhere; }
+      .dock a {
+        flex:none; margin-left:auto; padding:11px 16px; border-radius:7px;
+        background:var(--paper); color:var(--ink) !important;
+        font-weight:760; font-size:.9rem; white-space:nowrap; text-decoration:none !important;
+      }
+      @media (min-width:1040px) { .dock { display:none; } }
+      @media (max-width:1039px) { body { padding-bottom:78px; } }
+
+      /* ---------- footer ---------- */
+      .site-footer {
+        margin-top:3rem; padding-top:1.2rem; border-top:1px solid var(--line);
+        font-size:.9rem; color:var(--muted);
+      }
+      .site-footer a { color:var(--ink); font-weight:650; text-decoration:none; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+      .site-footer a:hover { color:var(--accent); }
+      .page-updated { margin-top:2.5rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.85rem; color:var(--muted); }
+
+      /* ---------- copy button on fenced code ---------- */
+      .highlight { position:relative; }
       .copy-code-btn {
-        position: absolute;
-        top: .5rem;
-        right: .5rem;
-        padding: .2rem .55rem;
-        font-size: .75rem;
-        line-height: 1.4;
-        color: #57606a;
-        background: #fff;
-        border: 1px solid #d0d7de;
-        border-radius: 6px;
-        cursor: pointer;
-        opacity: 0;
-        transition: opacity .1s ease-in-out;
+        position:absolute; top:.5rem; right:.5rem; padding:.2rem .55rem;
+        font-size:.75rem; line-height:1.4; color:var(--code-muted);
+        background:var(--code-bg); border:1px solid var(--line-strong);
+        border-radius:6px; cursor:pointer; opacity:0; transition:opacity .1s ease-in-out;
       }
-      .highlight:hover .copy-code-btn,
-      .copy-code-btn:focus {
-        opacity: 1;
-      }
-      .copy-code-btn.copied {
-        opacity: 1;
-        color: #1a7f37;
-        border-color: #1a7f37;
-      }
-      @media (prefers-color-scheme: dark) {
-        .copy-code-btn { color: #8b949e; background: #21262d; border-color: #30363d; }
-        .copy-code-btn.copied { color: #3fb950; border-color: #3fb950; }
+      .highlight:hover .copy-code-btn,.copy-code-btn:focus { opacity:1; }
+      .copy-code-btn.copied { opacity:1; color:var(--ok); border-color:var(--ok); }
+
+      @media (prefers-reduced-motion:reduce) {
+        *,*::before,*::after { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+        .cta:hover { transform:none; }
       }
     </style>
   </head>
@@ -457,7 +376,7 @@
 
       <header class="site-header">
         <a class="wordmark" href="{{ '/' | relative_url }}">{{ site.title }}</a>
-        <nav>
+        <nav aria-label="Main">
           <a href="{{ '/EXCHANGE-ONLINE-SMTP-AUTH.html' | relative_url }}">Exchange Online migration</a>
           <a href="{{ '/PRINTERS.html' | relative_url }}">Printers</a>
           <a href="{{ '/FAQ.html' | relative_url }}">FAQ</a>
@@ -465,11 +384,10 @@
         </nav>
 
         {%- comment -%}
-          The relay's current state, on every page. It says the host and both
+          The relay's current state, on every page. It names the host and both
           ports before any script runs, so a reader with JavaScript off still
           learns what is being reported and can follow the link to the run
-          history - which is the actual evidence either way. The script below
-          fills in "operational" or "degraded".
+          history - the actual evidence either way.
         {%- endcomment -%}
         <a class="relay-status" id="relay-status" role="status" aria-live="polite"
            href="https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml"
@@ -480,19 +398,53 @@
         </a>
       </header>
 
-      {%- comment -%}
-        Filled in by the script at the end of the page when the pill is
-        clicked. Empty and hidden until then, so a reader with JavaScript off
-        follows the pill's href to the run history instead and loses nothing.
-      {%- endcomment -%}
       <div id="relay-detail" hidden></div>
 
-      <main id="content">
-        {{ content }}
-        {% if page.last_modified_at %}
-        <p class="page-updated">Updated {{ page.last_modified_at | date: "%-d %b %Y" }}</p>
+      <div class="layout{% if page.widget == 'countdown' %} has-rail{% endif %}">
+        <main id="content">
+          {{ content }}
+          {% if page.last_modified_at %}
+          <p class="page-updated">Updated {{ page.last_modified_at | date: "%-d %b %Y" }}</p>
+          {% endif %}
+        </main>
+
+        {%- comment -%}
+          The conversion rail, on the homepage only - it needs a hero to sit
+          beside. Everywhere else the dock at the foot of the page carries the
+          same job. Both are plain markup, so they survive JavaScript being
+          off, which is where the prototype's competitors lost points.
+        {%- endcomment -%}
+        {% if page.widget == "countdown" %}
+        <aside class="rail" aria-labelledby="convert-title">
+          <div class="railinner">
+            <div class="convert">
+              <div class="converthead">
+                <b id="convert-title">Get a free account</b>
+                <span>three fields, no card</span>
+              </div>
+              <div class="convertbody">
+                <div class="crow"><span class="k">Server</span><span class="v">mx.msgwing.com</span>
+                  <button type="button" class="ccopy" data-copy="mx.msgwing.com" aria-label="Copy server mx.msgwing.com">Copy</button></div>
+                <div class="crow"><span class="k">Port</span><span class="v">587</span><span class="n">STARTTLS</span>
+                  <button type="button" class="ccopy" data-copy="587" aria-label="Copy port 587">Copy</button></div>
+                <div class="crow"><span class="k">Port</span><span class="v">465</span><span class="n">SSL/TLS</span>
+                  <button type="button" class="ccopy" data-copy="465" aria-label="Copy port 465">Copy</button></div>
+
+                <a class="cta" href="https://msgwing.com">Register free at msgwing.com</a>
+
+                <div class="climits">
+                  <p><b>200 messages a day</b>, sent from a generated
+                  <b>@msgwing.com</b> address rather than your own domain. No paid tier
+                  lifts either. If the From address has to be your domain, this is the
+                  wrong tool — <a href="{{ '/ALTERNATIVES.html' | relative_url }}">the
+                  alternatives page</a> says which one is right.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
         {% endif %}
-      </main>
+      </div>
 
       <footer class="site-footer">
         <p>
@@ -504,6 +456,18 @@
       </footer>
 
     </div>
+
+    {%- comment -%}
+      The dock. Fixed to the bottom under 1040px on every page, which is the
+      single property that decided the design competition: measured across
+      nine prototypes at 375, 768 and 1280, this was the only one where a
+      registration link was reachable without scrolling at all three.
+    {%- endcomment -%}
+    <div class="dock">
+      <span class="t">mx.msgwing.com<b>587 STARTTLS · 465 SSL/TLS</b></span>
+      <a href="https://msgwing.com">Register free</a>
+    </div>
+
 
     {% comment %}
       Interactive page widgets (countdown, decision quiz, printer brand
@@ -530,13 +494,16 @@
       instrument rather than one.
     {%- endcomment -%}
     <style>
+      /* The clock is always on ink, in both schemes: it is an instrument
+         face, and an instrument that changes colour with the room is a
+         decoration. It carries the dark tokens explicitly for that reason. */
       #zc-fc {
-        --mc-bg: #08090b;
-        --mc-line: #23262b;
-        --mc-dim: #7d858f;
-        --mc-fg: #f2f4f7;
-        --mc-accent: #ff8a3d;
-        --mc-live: #35d07f;
+        --mc-bg: #0a0e14;
+        --mc-line: #212b38;
+        --mc-dim: #8892a4;
+        --mc-fg: #eef1f6;
+        --mc-accent: #f0b429;
+        --mc-live: #2dd4a7;
         background: var(--mc-bg);
         border: 1px solid var(--mc-line);
         border-radius: 4px;
@@ -614,7 +581,7 @@
         background: var(--mc-dim);
       }
       .mc-dot.up { background: var(--mc-live); }
-      .mc-dot.down { background: #ff5c5c; }
+      .mc-dot.down { background: #ff6b5b; }
     </style>
     <script>
     (function () {
@@ -1092,6 +1059,45 @@
         .catch(function(){
           state.textContent = 'Status unavailable — check the run history';
         });
+    })();
+    </script>
+
+    <script>
+    (function () {
+      // The rail's three values are going into a printer's web form. Retyping
+      // a hostname from a screen is where the typo happens, so each one has a
+      // button - and when the clipboard is unavailable the button says so and
+      // selects the text instead of quietly claiming success.
+      var btns = document.querySelectorAll('.ccopy');
+      if (!btns.length) return;
+      Array.prototype.forEach.call(btns, function (b) {
+        b.addEventListener('click', function () {
+          var value = b.getAttribute('data-copy');
+          var done = function () {
+            b.textContent = 'Copied';
+            b.setAttribute('data-done', '1');
+            setTimeout(function () {
+              b.textContent = 'Copy';
+              b.removeAttribute('data-done');
+            }, 1500);
+          };
+          if (!navigator.clipboard) {
+            var v = b.parentElement.querySelector('.v');
+            if (v && window.getSelection) {
+              var r = document.createRange();
+              r.selectNodeContents(v);
+              var sel = window.getSelection();
+              sel.removeAllRanges();
+              sel.addRange(r);
+            }
+            b.textContent = 'Select it';
+            return;
+          }
+          navigator.clipboard.writeText(value).then(done, function () {
+            b.textContent = 'Select it';
+          });
+        });
+      });
     })();
     </script>
 

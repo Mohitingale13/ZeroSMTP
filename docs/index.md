@@ -29,8 +29,6 @@ Microsoft 365 tenants at the end of December 2026.
 Three values, straight into the SMTP fields your device or app already has.
 No SDK, no API key, no DNS records.
 
-<div id="zc-connect"></div>
-
 | Setting | Value |
 | --- | --- |
 | Server | `mx.msgwing.com` |
