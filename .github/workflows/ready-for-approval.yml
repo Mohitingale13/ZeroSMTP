@@ -33,7 +33,7 @@ jobs:
     if: github.event.label.name == 'do-akceptacji'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         with:
           script: |
             const owner = context.repo.owner;
