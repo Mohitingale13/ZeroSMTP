@@ -65,9 +65,14 @@ def buduj(dane):
         "authentication is switched off by default at the end of December "
         "2026.",
         "",
-        f"Measured {ostatnia['date']}. Re-measured every week — the series is "
-        "below, and it is the more interesting half: a single number says the "
-        "problem is large, a series says whether anyone is fixing it.",
+        # The count of samples, not a promise about cadence. The page said
+        # "re-measured every week" while the series held a single point,
+        # and the first reader to check that would have been right to stop
+        # believing the rest of it. The schedule is stated as a schedule.
+        f"Measured {ostatnia['date']}. The measurement runs every Monday, and "
+        f"{'the series below has ' + str(len(probki)) + ' sample' + ('' if len(probki) == 1 else 's') + ' so far' if len(probki) < 4 else 'the series below is the more interesting half'}: "
+        "a single number says the problem is large, a series says whether "
+        "anyone is fixing it.",
         "",
         "## Current count",
         "",
@@ -166,8 +171,14 @@ def buduj(dane):
         "with a link to every vendor statement",
         "- [Every migration option](EXCHANGE-ONLINE-SMTP-AUTH.md), including "
         "the ones that are not this project",
-        "- `npx zerosmtp-check` — check in two seconds whether your network "
-        "even lets SMTP out, before assuming it is the credentials",
+        # Deliberately not `npx zerosmtp-check`: that package returns 404
+        # from npm and has never been published, because the repository
+        # has no NPM_TOKEN. Corrected twice on the generated page before
+        # anybody noticed the page is generated and this script was
+        # putting it straight back.
+        "- `./check-connection.sh`, or `check-connection.ps1` on Windows — "
+        "check in two seconds whether your network even lets SMTP out, "
+        "before assuming it is the credentials",
         "",
     ]
 

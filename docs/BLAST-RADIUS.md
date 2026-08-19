@@ -10,7 +10,7 @@ description: "A weekly count of public files on GitHub that still point at Micro
 
 At least **24,960 public files on GitHub** still contain a Microsoft 365 SMTP hostname. Every one of them is a place where somebody wrote down a setting that stops working when Basic authentication is switched off by default at the end of December 2026.
 
-Measured 2026-08-16. Re-measured every week — the series is below, and it is the more interesting half: a single number says the problem is large, a series says whether anyone is fixing it.
+Measured 2026-08-16. The measurement runs every Monday, and the series below has 1 sample so far: a single number says the problem is large, a series says whether anyone is fixing it.
 
 ## Current count
 
@@ -62,4 +62,4 @@ The figure and the data are free to cite, quote and republish under the reposito
 - [What the error will look like](ERROR-MESSAGES.md) when it starts failing
 - [Whether your hardware has an OAuth path](DEVICE-COMPATIBILITY.md), with a link to every vendor statement
 - [Every migration option](EXCHANGE-ONLINE-SMTP-AUTH.md), including the ones that are not this project
-- `npx zerosmtp-check` — check in two seconds whether your network even lets SMTP out, before assuming it is the credentials
+- `./check-connection.sh`, or `check-connection.ps1` on Windows — check in two seconds whether your network even lets SMTP out, before assuming it is the credentials
