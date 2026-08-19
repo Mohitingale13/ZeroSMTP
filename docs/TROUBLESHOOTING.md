@@ -19,29 +19,8 @@ spam:
 **This is why every example in this repository defaults to port `465`
 (implicit SSL/TLS) or `587` (STARTTLS), never port `25`.** If a script hangs
 until it times out rather than failing immediately, this is the first thing
-to check. Run the connectivity-only healthcheck (no credentials needed, no
-email sent):
-
-```bash
-npx zerosmtp-check
-```
-
-Nothing to install and nothing to clone. It resolves the host, connects on
-587 and 465, does the STARTTLS or implicit-TLS handshake, checks whether
-*this machine's* trust store accepts the certificate, and lists the `AUTH`
-mechanisms the server offers. No credentials are sent and no mail is
-delivered — the conversation stops after `EHLO`.
-
-It works against any SMTP host, which is the point when you are trying to
-establish whether the problem is the server or your network:
-
-```bash
-npx zerosmtp-check smtp.office365.com
-npx zerosmtp-check mail.example.com --port 25
-npx zerosmtp-check --json          # exit 0 = fine, 1 = a problem, 2 = DNS
-```
-
-If Node is not available, the repository has the same checks as scripts:
+to check. Run the connectivity-only check — no credentials needed, no email
+sent, and the conversation stops after `EHLO`:
 
 ```bash
 ./check-connection.sh
@@ -51,7 +30,17 @@ If Node is not available, the repository has the same checks as scripts:
 ./check-connection.ps1
 ```
 
-Or check manually:
+Both live in the [repository](https://github.com/msgwing/ZeroSMTP). They
+resolve the host, connect on 587 and 465, do the STARTTLS or implicit-TLS
+handshake, check whether *this machine's* trust store accepts the
+certificate, and list the `AUTH` mechanisms the server offers.
+
+They work against any SMTP host, which is the point when you are trying to
+establish whether the problem is the server or your network — pass the
+hostname as an argument.
+
+If you would rather not clone anything, the two one-liners below need nothing
+installed at all:
 
 ```bash
 # Bash/Linux/macOS — quick manual connectivity check

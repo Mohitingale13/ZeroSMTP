@@ -121,7 +121,7 @@ Full quickstart, 15 language examples and setup guides are in the
 ---
 
 <p><small>
-Service status is checked automatically every 6 hours —
+Service status is checked automatically every 15 minutes —
 <a href="https://github.com/msgwing/ZeroSMTP/actions/workflows/service-healthcheck.yml">see the live check</a>.
 Questions or corrections: <a href="https://github.com/msgwing/ZeroSMTP/issues/new/choose">open an issue</a>.
 </small></p>

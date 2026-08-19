@@ -62,4 +62,4 @@ The figure and the data are free to cite, quote and republish under the reposito
 - [What the error will look like](ERROR-MESSAGES.md) when it starts failing
 - [Whether your hardware has an OAuth path](DEVICE-COMPATIBILITY.md), with a link to every vendor statement
 - [Every migration option](EXCHANGE-ONLINE-SMTP-AUTH.md), including the ones that are not this project
-- `npx zerosmtp-check` — check in two seconds whether your network even lets SMTP out, before assuming it is the credentials
+- `./check-connection.sh` (or `check-connection.ps1`) — check in two seconds whether your network even lets SMTP out, before assuming it is the credentials
