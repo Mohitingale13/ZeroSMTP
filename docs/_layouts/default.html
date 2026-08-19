@@ -234,10 +234,39 @@
          exactly what this site is full of, and one unwrapped line turning the
          whole page into a horizontal scroller is the defect that would have
          disqualified this design under its own scoring. */
-      .markdown-body pre {
-        background:var(--code-bg); border:1px solid var(--line); border-radius:10px;
+      /* The theme wraps fenced code in div.highlight and paints that light,
+         which outranked the rule below and left light text on a light ground
+         at 1.09:1 - measured on the live site, not guessed. Both surfaces are
+         claimed here, and Rouge's token colours are re-pointed for a dark
+         ground: its defaults are navy and black, designed for the light one. */
+      .markdown-body pre,
+      .markdown-body div.highlight,
+      .markdown-body .highlight pre {
+        background:var(--code-bg); border-radius:10px;
         overflow-x:auto; max-width:100%;
       }
+      .markdown-body div.highlight { border:1px solid var(--line); }
+      .markdown-body .highlight pre { border:0; margin:0; }
+      .markdown-body pre code,
+      .markdown-body .highlight pre code { color:var(--code-ink); background:transparent; }
+
+      .markdown-body .highlight .c,  .markdown-body .highlight .c1,
+      .markdown-body .highlight .cm, .markdown-body .highlight .cp,
+      .markdown-body .highlight .cs { color:#A8B2C7; font-style:italic; }
+      .markdown-body .highlight .n,  .markdown-body .highlight .nx,
+      .markdown-body .highlight .o,  .markdown-body .highlight .p,
+      .markdown-body .highlight .w  { color:var(--code-ink); }
+      .markdown-body .highlight .nt, .markdown-body .highlight .nc,
+      .markdown-body .highlight .nf { color:#9BC4FF; }
+      .markdown-body .highlight .s,  .markdown-body .highlight .s1,
+      .markdown-body .highlight .s2, .markdown-body .highlight .sb,
+      .markdown-body .highlight .se { color:#FFD27D; }
+      .markdown-body .highlight .k,  .markdown-body .highlight .kd,
+      .markdown-body .highlight .kn, .markdown-body .highlight .kr { color:#FFA8D4; }
+      .markdown-body .highlight .m,  .markdown-body .highlight .mi,
+      .markdown-body .highlight .mf { color:#8FE9C4; }
+      .markdown-body .highlight .na, .markdown-body .highlight .nv { color:#FFD24A; }
+      .markdown-body .highlight .err { color:#FF9E96; background:transparent; }
       .markdown-body pre code { background:transparent; color:var(--code-ink); }
 
       /* ---------- masthead ---------- */

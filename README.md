@@ -95,7 +95,7 @@ with anything that already speaks SMTP.
   environment variables, plus Ansible and Docker Compose recipes and setup
   guides for Windows Server, Linux, and printers by brand.
 - **Verifiably up** — the status badge above is a real check that runs against
-  `mx.msgwing.com` every 6 hours, not a static image.
+  `mx.msgwing.com` every 15 minutes, not a static image.
 
 Good for: contact forms · password resets · CI/CD and monitoring alerts ·
 scan-to-email · IoT and device notifications · homelabs.
