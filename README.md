@@ -1,6 +1,6 @@
 <div align="center">
 
-![ZeroSMTP](docs/assets/banner.png)
+![ZeroSMTP — a free SMTP relay that still accepts basic auth. mx.msgwing.com, port 587 STARTTLS or 465 SSL/TLS.](docs/assets/banner.png)
 
 **Everything you need for the Microsoft 365 SMTP AUTH shutdown.**<br>
 Find out what breaks in your tenant, check whether your hardware has a way

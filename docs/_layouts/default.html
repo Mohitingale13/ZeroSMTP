@@ -527,12 +527,19 @@
          face, and an instrument that changes colour with the room is a
          decoration. It carries the dark tokens explicitly for that reason. */
       #zc-fc {
-        --mc-bg: #0a0e14;
-        --mc-line: #212b38;
-        --mc-dim: #8892a4;
-        --mc-fg: #eef1f6;
-        --mc-accent: #f0b429;
-        --mc-live: #2dd4a7;
+        /* The clock used to carry its own near-black palette from before the
+           redesign. On a paper-white page beside an indigo hero that read as a
+           foreign object cut out and dropped in - three different dark blocks
+           from three different systems on one page. It now borrows the hero's
+           own tokens, so it belongs to the composition instead of interrupting
+           it, and the step from page to panel is the one the page already
+           makes rather than a second, harder one. */
+        --mc-bg: var(--band);
+        --mc-line: var(--band-line);
+        --mc-dim: var(--on-band-muted);
+        --mc-fg: var(--on-band);
+        --mc-accent: var(--amber);
+        --mc-live: #8FE9C4;
         background: var(--mc-bg);
         border: 1px solid var(--mc-line);
         border-radius: 4px;
@@ -610,7 +617,7 @@
         background: var(--mc-dim);
       }
       .mc-dot.up { background: var(--mc-live); }
-      .mc-dot.down { background: #ff6b5b; }
+      .mc-dot.down { background: #FF9E96; }
     </style>
     <script>
     (function () {
