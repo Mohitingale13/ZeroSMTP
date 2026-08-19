@@ -178,12 +178,35 @@ jobs:
               L.push('> ```');
             }
             L.push('');
-            L.push('_Raport generowany automatycznie co trzy dni. Nie wymaga odpowiedzi — zamknij go._');
+            L.push('_Raport generowany automatycznie co trzy dni. Nie wymaga odpowiedzi — poprzedni zamyka się sam._');
 
             const issue = await github.rest.issues.create({
               owner, repo,
               title: `Raport postępów — ${day}`,
               body: L.join('\n'),
               assignees: [owner],
+              labels: ['raport'],
             });
             core.notice(`Raport: ${issue.data.html_url}`);
+
+            // A report is a snapshot and the next one supersedes it. Left for a
+            // person to close, three accumulated in six days and the owner had
+            // to ask why fourteen issues were open. Nobody should have to
+            // notice that: a bot that opens an issue on a schedule and never
+            // closes one fills the queue until the queue stops being read -
+            // which is the same lesson the outreach queue already taught.
+            const older = (await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'raport', per_page: 100,
+            })).data.filter(i => !i.pull_request && i.number !== issue.data.number);
+
+            for (const o of older) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: o.number,
+                body: `Zastąpiony przez #${issue.data.number}.`,
+              });
+              await github.rest.issues.update({
+                owner, repo, issue_number: o.number,
+                state: 'closed', state_reason: 'completed',
+              });
+              core.info(`Zamknięto poprzedni raport #${o.number}.`);
+            }
