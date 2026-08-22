@@ -97,8 +97,82 @@ jobs:
               if (res.ok) relay = (await res.json()).message;
             } catch (e) { core.warning(e.message); }
 
+            // --- did anything actually grow? ---------------------------------
+            //
+            // The owner's rule, 2026-08-22: they hear from this report when
+            // reach went up, and when it did not, the company improves itself
+            // instead of writing to them. A report that arrives on a timer
+            // regardless of whether anything happened trains its reader to
+            // stop opening it, and then the one that matters is missed too.
+            //
+            // Measured here is only what a workflow token can actually read.
+            // Traffic endpoints need a personal token and are out of reach, so
+            // they are not part of the test - a number that cannot be taken
+            // must never be recorded as a zero.
+            let npmWeek = null;
+            try {
+              const r = await fetch(
+                'https://api.npmjs.org/downloads/point/last-week/zerosmtp-check',
+                { headers: { 'User-Agent': 'zerosmtp-progress-report' } });
+              // 404 means npm has no data for the window yet, which is not the
+              // same as nobody downloading it. Stays null and is excluded.
+              if (r.ok) {
+                const j = await r.json();
+                if (typeof j.downloads === 'number') npmWeek = j.downloads;
+              }
+            } catch (e) { core.warning(`npm downloads unreadable: ${e.message}`); }
+
+            const now = {
+              stars: meta.stargazers_count,
+              forks: meta.forks_count,
+              watchers: meta.subscribers_count,
+              npmWeek,
+            };
+
+            // Previous snapshot travels inside the previous report rather than
+            // in a file, so this workflow needs no write access to anything.
+            let before = null;
+            try {
+              const past = (await github.rest.issues.listForRepo({
+                owner, repo, state: 'all', labels: 'raport',
+                sort: 'created', direction: 'desc', per_page: 5,
+              })).data.filter(i => !i.pull_request);
+              for (const i of past) {
+                const m = (i.body || '').match(/<!-- reach: (\{.*?\}) -->/);
+                if (m) { before = JSON.parse(m[1]); break; }
+              }
+            } catch (e) { core.warning(`no previous snapshot: ${e.message}`); }
+
+            // Growth means strictly more than last time on a number both runs
+            // could read. The first ever run has nothing to compare against and
+            // is not treated as growth - it is treated as a baseline.
+            const moved = [];
+            if (before) {
+              for (const k of ['stars', 'forks', 'watchers', 'npmWeek']) {
+                if (typeof now[k] === 'number' && typeof before[k] === 'number'
+                    && now[k] > before[k]) {
+                  moved.push(`${k}: ${before[k]} -> ${now[k]}`);
+                }
+              }
+            }
+            const grew = moved.length > 0;
+            core.notice(before
+              ? (grew ? `Wzrost: ${moved.join(', ')}` : 'Bez wzrostu - raport zostaje w firmie')
+              : 'Pierwszy pomiar - punkt odniesienia, bez powiadomienia');
+
             // --- write it ----------------------------------------------------
             const L = [];
+            if (grew) {
+              L.push(`**Zasięgi wzrosły.** ${moved.join(' · ')}`, '');
+            } else if (!before) {
+              L.push('**Pierwszy pomiar.** Nie ma z czym porównać, więc to jest '
+                + 'punkt odniesienia dla kolejnych cykli, a nie wynik.', '');
+            } else {
+              L.push('**Bez wzrostu w tym cyklu.** Ten raport nie został nikomu '
+                + 'przypisany i nie wysłał powiadomienia — zgodnie z zasadą, że '
+                + 'właściciel dostaje wynik wtedy, gdy jest wynik. Poniżej to, '
+                + 'czego firma nie ruszyła, i to jest lista pracy na następny cykl.', '');
+            }
             L.push(`Raport za ostatnie trzy dni, do **${day}**.`, '');
 
             L.push('## Liczby', '');
@@ -112,6 +186,9 @@ jobs:
             L.push(`| Gwiazdki | **${meta.stargazers_count}** |`);
             L.push(`| Forki | ${meta.forks_count} |`);
             L.push(`| Obserwujący | ${meta.subscribers_count} |`);
+            L.push('| Pobrania npm (7 dni) | '
+              + (npmWeek === null ? '— _npm nie ma jeszcze danych_' : `**${num(npmWeek)}**`)
+              + ' |');
             L.push(`| Przekaźnik | ${relay === 'operational' ? '✅ działa' : `⚠️ ${relay}`} |`);
             L.push('');
 
@@ -180,12 +257,24 @@ jobs:
             L.push('');
             L.push('_Raport generowany automatycznie co trzy dni. Nie wymaga odpowiedzi — poprzedni zamyka się sam._');
 
+            // The next run reads this to decide whether anything moved. It
+            // lives in the body so this workflow needs no write access to a
+            // branch, and so the numbers cannot drift from the report that
+            // published them.
+            L.push('');
+            L.push(`<!-- reach: ${JSON.stringify(now)} -->`);
+
             const issue = await github.rest.issues.create({
               owner, repo,
-              title: `Raport postępów — ${day}`,
+              title: grew
+                ? `Raport postępów — ${day}`
+                : `Cykl bez wzrostu — ${day}`,
               body: L.join('\n'),
-              assignees: [owner],
-              labels: ['raport'],
+              // No assignee when nothing grew: GitHub only mails the assignee,
+              // so this is the whole mechanism. The report still exists and is
+              // still readable - it simply does not interrupt anybody.
+              assignees: grew ? [owner] : [],
+              labels: grew ? ['raport'] : ['raport', 'bez-wzrostu'],
             });
             core.notice(`Raport: ${issue.data.html_url}`);
 
