@@ -36,6 +36,15 @@ Before the end of December 2026 the first three are the likely answer, and the f
 It exists because the one-liner everybody reaches for —
 `Get-CASMailbox | Where SmtpClientAuthenticationDisabled -eq $false` — **misses every mailbox that inherits the tenant setting** rather than carrying its own, and can therefore report zero on a tenant that is fully exposed. The script counts all three states separately.
 
+## The same error in other clothes
+
+Libraries and device firmware rarely pass the server's message through unchanged. These are the same refusal:
+
+- Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.
+- `curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.
+
+Kyocera MFPs report it as **send error 1102** / `0x1102`, which looks like a hardware fault and is not one.
+
 ## If it cannot be turned back on
 
 Three options remain, and they differ more than they look:
