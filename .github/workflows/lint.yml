@@ -71,6 +71,8 @@ jobs:
         run: python tools/build-error-pages.py --check
       - name: Blast radius page matches data/blast-radius.json
         run: python tools/build-blast-radius.py --check
+      - name: CLI error data matches data/errors.json
+        run: python tools/build-cli-errors.py --check
       # A workflow file GitHub cannot parse fails at startup with no job and
       # no log, so it stays invisible until somebody notices a run named after
       # a file path instead of a workflow. Two files sat like that for twelve
@@ -361,8 +363,43 @@ jobs:
           [ "$code" = "0" ] || [ "$code" = "1" ] \
             || { echo "::error::unexpected exit $code"; exit 1; }
           echo "$out" | jq -e '.host and (.addresses | length > 0) and (.ports | length == 2) and has("ok")' > /dev/null
-      - name: Package metadata is publishable
-        run: npm pack --dry-run
+      # --explain is the half of this tool that gives an answer rather than a
+      # measurement, so it is the half that can be confidently wrong. Each
+      # case below is one of the three people it exists for.
+      - name: Explain - a server error, matched to its cause
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain             "535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant")
+          echo "$out"
+          echo "$out" | grep -q "tenant level"             || { echo "::error::did not identify the tenant case"; exit 1; }
+          echo "$out" | grep -qi "December 2026"             || { echo "::error::did not say whether it is still reversible"; exit 1; }
+      - name: Explain - a printer panel code, not a hardware fault
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain 1102)
+          echo "$out"
+          echo "$out" | grep -qi "kyocera"             || { echo "::error::device code lookup is broken"; exit 1; }
+      - name: Explain - a client that hides the error
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain "curl: (67) Login denied")
+          echo "$out"
+          echo "$out" | grep -q -- "-v"             || { echo "::error::did not say how to reveal the real error"; exit 1; }
+      - name: Explain - reads a log from a pipe
+        run: |
+          log="SASL authentication failed; server said: 535 5.7.3 Authentication unsuccessful"
+          out=$(echo "$log" | node packages/zerosmtp-check/index.js --explain)
+          echo "$out"
+          echo "$out" | grep -q "5.7.3" || { echo "::error::stdin path broken"; exit 1; }
+      - name: Explain - an unknown string exits 1 rather than inventing one
+        run: |
+          set +e
+          out=$(node packages/zerosmtp-check/index.js --explain "421 4.3.2 nonsense not in the corpus")
+          code=$?
+          set -e
+          echo "$out"
+          [ "$code" = "1" ] || { echo "::error::expected exit 1, got $code"; exit 1; }
+      - name: Package metadata is publishable, and ships errors.js
+        run: |
+          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
+          grep -q "errors.js" /tmp/pack.txt             || { echo "::error::errors.js missing from the tarball - --explain would crash for every user"; exit 1; }
         working-directory: packages/zerosmtp-check
 
   csharp:

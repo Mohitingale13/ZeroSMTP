@@ -1,7 +1,7 @@
 {
   "name": "zerosmtp-check",
-  "version": "1.0.0",
-  "description": "Check whether outbound SMTP actually works from this machine: TCP, STARTTLS/implicit TLS, certificate validation and AUTH mechanisms, against any host. No credentials, no mail sent, no dependencies.",
+  "version": "1.1.0",
+  "description": "Check whether outbound SMTP works from this machine, and say what an SMTP error actually means. TCP, STARTTLS/implicit TLS, certificates and AUTH against any host, plus --explain for the refusal your log, library or printer panel printed. No credentials, no mail sent, no dependencies.",
   "type": "module",
   "bin": {
     "zerosmtp-check": "./index.js"
@@ -9,6 +9,7 @@
   "main": "./index.js",
   "files": [
     "index.js",
+    "errors.js",
     "README.md"
   ],
   "keywords": [
@@ -28,7 +29,12 @@
     "connectivity",
     "diagnostics",
     "cli",
-    "sysadmin"
+    "sysadmin",
+    "smtp-error",
+    "535-5-7-139",
+    "printer",
+    "troubleshooting",
+    "oauth2"
   ],
   "homepage": "https://docs.msgwing.com/TROUBLESHOOTING.html",
   "repository": {
