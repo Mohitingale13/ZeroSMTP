@@ -46,6 +46,16 @@ rather than trust it.
 > That's Microsoft switching off Basic auth for SMTP AUTH — [start
 > here](docs/ERROR-MESSAGES.md). Three of the four causes are still reversible
 > until the end of December 2026.
+>
+> ```bash
+> npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+> ```
+>
+> Paste whatever *your* client printed — a Postfix SASL line, a Python
+> traceback, `1102` off a Kyocera panel, or the `curl: (67) Login denied` that
+> hides the server's answer entirely. They are the same refusal wearing
+> different clothes, and it says which case you are in and whether it can still
+> be switched back on. No install, nothing sent.
 
 ---
 

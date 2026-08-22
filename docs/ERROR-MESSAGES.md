@@ -7,6 +7,18 @@ authentication for SMTP is refused.
 **None of them mean your password is wrong.** They mean the authentication
 *method* is switched off, which is a different problem with a different fix.
 
+Or skip the reading and paste it:
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+Whatever your own client printed works — a Postfix SASL line, a Python
+traceback, `1102` off a Kyocera panel, or `curl: (67) Login denied`, which
+shows none of the server's answer at all. It says which of the four cases you
+are in and whether it can still be switched back on. Nothing installed,
+nothing sent.
+
 ## Why the same error has four different causes
 
 Basic auth for SMTP AUTH gets refused in four situations, and the client-side

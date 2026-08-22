@@ -14,6 +14,16 @@ description: "What 550 5.7.60 SMTP; Client does not have permissions to send as 
 
 Authentication succeeded. This is not the Basic auth shutdown. The `From` address in the message does not belong to the mailbox that authenticated, and Microsoft 365 will not let one send as the other without an explicit Send As permission. Common after pointing a device at a shared or service mailbox while leaving the old From address in its settings.
 
+## Check it from the machine that is failing
+
+```bash
+npx zerosmtp-check --explain "550 5.7.60 SMTP; Client does not have permissions to send as this sender"
+```
+
+No install and nothing sent. It reads the refusal your own client printed - which is rarely what the server said, because libraries and device panels rewrite it - and says which of these cases you are in.
+
+If the send is hanging rather than being refused, the cause is usually the network and not the credentials. `npx zerosmtp-check` with no arguments checks ports 25, 587 and 465 from where you are standing.
+
 ## This is not the Basic auth shutdown
 
 Authentication worked. Do not change the authentication settings — the problem is the `From` address.
