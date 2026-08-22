@@ -1,5 +1,5 @@
 name: 'ZeroSMTP Check'
-description: 'Check outbound SMTP from this runner - ports, TLS, AUTH and how soon the certificate expires - before a deploy finds out it cannot send mail.'
+description: 'Check outbound SMTP from a runner: ports, TLS, AUTH, and fail the job when the mail certificate is near expiry.'
 author: 'msgwing'
 
 branding:
