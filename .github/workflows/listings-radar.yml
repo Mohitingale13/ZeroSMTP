@@ -59,6 +59,13 @@ jobs:
               'free tier in:name,description',
               'free services developers in:name,description',
               'awesome saas in:name,description',
+              // free-for.dev shaped: catalogues of free hosted services, which
+              // is the only channel with evidence behind it - a single entry in
+              // ripienaar/free-for-dev sends 29% of this project's traffic.
+              'free for dev in:name,description',
+              'free developer resources in:name,description',
+              'awesome free in:name,description',
+              'free plan in:name,description',
             ];
 
             // A list has to be alive and read. Both numbers are judgement
@@ -123,6 +130,37 @@ jobs:
               if (r.archived || r.fork) { rejected++; continue; }
               if (r.stargazers_count < MIN_STARS) { rejected++; continue; }
               if (new Date(r.pushed_at).getTime() < idle) { rejected++; continue; }
+
+              // pushed_at says the repository is alive. It does not say the
+              // maintainer still merges other people's work, and those came
+              // apart badly on 2026-08-22: awesome-sysadmin had been pushed
+              // three days earlier and had merged nothing from anyone since
+              // June. Of four directories named in a work order, three were
+              // dead by this measure and passed every other gate.
+              //
+              // So ask the only question that matters to us: did an outside
+              // contribution land here recently? One extra call per candidate.
+              let merges90 = 0;
+              try {
+                const prs = await github.rest.pulls.list({
+                  owner: r.owner.login, repo: r.name,
+                  state: 'closed', sort: 'updated', direction: 'desc', per_page: 100,
+                });
+                const since = Date.now() - 90 * 86400_000;
+                merges90 = prs.data.filter(
+                  p => p.merged_at && new Date(p.merged_at).getTime() >= since).length;
+              } catch (e) {
+                // Unreadable is not the same as dead. Say so and move on rather
+                // than recording a zero we never measured.
+                core.warning(`${r.full_name}: could not read pull requests (${e.message})`);
+                rejected++;
+                continue;
+              }
+              if (merges90 === 0) {
+                core.info(`${r.full_name}: rejected - no merged pull request in 90 days`);
+                rejected++;
+                continue;
+              }
 
               // Already listed? Then there is nothing to do, and opening an
               // issue about it would waste the same hour every week.
@@ -227,6 +265,7 @@ jobs:
                 full_name: r.full_name,
                 url: r.html_url,
                 stars: r.stargazers_count,
+                merges90,
                 pushed: r.pushed_at.slice(0, 10),
                 license: r.license ? r.license.spdx_id : 'none',
                 section,
@@ -260,7 +299,7 @@ jobs:
             for (const c of picked) {
               const body = [
                 `<!-- ${MARKER} ${c.id} -->`,
-                `**[${c.full_name}](${c.url})** — ${c.stars} stars · last push ${c.pushed}`,
+                `**[${c.full_name}](${c.url})** — ${c.stars} stars · last push ${c.pushed} · **${c.merges90} outside pull requests merged in the last 90 days**`,
                 `· license \`${c.license}\` · matched on section keyword \`${c.section}\``,
                 '',
                 c.contributing
