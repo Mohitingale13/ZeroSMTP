@@ -122,6 +122,19 @@ jobs:
               }
             } catch (e) { core.warning(`npm downloads unreadable: ${e.message}`); }
 
+            // The Marketplace listing needs a one-time signature nobody can
+            // give on the owner's behalf - checked against the API, there is
+            // no mutation that creates a listing. What can be automated is
+            // noticing when it exists, so the company stops asking. 200 means
+            // listed; anything else means not yet, and a network failure is
+            // treated as unknown rather than as absent.
+            let listed = null;
+            try {
+              const r = await fetch('https://github.com/marketplace/actions/zerosmtp-check',
+                { method: 'HEAD', headers: { 'User-Agent': 'zerosmtp-progress-report' } });
+              listed = r.status === 200;
+            } catch (e) { core.warning(`marketplace unreadable: ${e.message}`); }
+
             const now = {
               stars: meta.stargazers_count,
               forks: meta.forks_count,
@@ -175,6 +188,13 @@ jobs:
             }
             L.push(`Raport za ostatnie trzy dni, do **${day}**.`, '');
 
+            if (listed === false) {
+              L.push('> **Marketplace czeka na jeden podpis.** Akcja działa i jest',
+                '> używalna przez `uses: msgwing/ZeroSMTP@v1.7.0` — brakuje tylko',
+                '> wystawki w katalogu, a tej nie tworzy żadne API: to jednorazowa',
+                '> akceptacja umowy dewelopera przy wydaniu. Ta linijka zniknie sama,',
+                '> gdy wystawka będzie widoczna.', '');
+            }
             L.push('## Liczby', '');
             L.push('| Miara | Wartość |', '|---|---|');
             if (views) {
