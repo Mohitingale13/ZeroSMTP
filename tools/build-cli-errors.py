@@ -18,7 +18,14 @@ which has already happened here once.
 import argparse
 import json
 import pathlib
+import re
 import sys
+
+# Microsoft documents most of these codes without the SMTP reply code in
+# front - they publish "5.7.134", not "550 5.7.134". Splitting on a space
+# assumed a reply code was always there and would raise on the first entry
+# that had none, so the enhanced part is matched rather than positioned.
+ENHANCED = re.compile(r"\d\.\d\.\d{1,3}")
 
 KORZEN = pathlib.Path(__file__).resolve().parent.parent
 DANE = KORZEN / "data" / "errors.json"
@@ -44,7 +51,7 @@ def zbuduj() -> str:
     wpisy = [
         {
             "code": w["code"],
-            "enhanced": w["code"].split(" ", 1)[1],
+            "enhanced": ENHANCED.search(w["code"]).group(0),
             "message": w["message"],
             "kind": w["kind"],
             "scope": w["scope"],

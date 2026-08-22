@@ -231,6 +231,12 @@ def zbuduj(wpis, aktualizacja):
         "certificate. Common on firmware predating current root CAs — see [the "
         "Canon Maxify MB2755 case](../DEVICE-CASE-STUDIES.md). |",
         "",
+        *(["", f"**Source:** [Microsoft's own list of Exchange Online error "
+           f"codes]({wpis['source']}). This entry was written from that "
+           "documentation rather than from watching a machine fail, which is "
+           "worth knowing when you compare it against what your hardware "
+           "actually printed."] if wpis.get("source") else []),
+        "",
         "## Related",
         "",
         "- [All SMTP AUTH error messages](../ERROR-MESSAGES.md)",
