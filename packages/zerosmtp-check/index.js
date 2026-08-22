@@ -336,8 +336,11 @@ const REVERSIBLE = {
     + 'this is a setting on the device or in the code rather than anything '
     + 'Microsoft is turning off.',
   'wrong-sender':
-    'Yes, and it has no deadline. Authentication succeeded - the From address '
-    + 'is the part being refused, which is a permissions or mailbox question.',
+    'Yes, and it has no deadline. The credentials are not what is being '
+    + 'refused - either the From address is not one this account may send as, '
+    + 'or the message could not be matched to a route permitted to relay it. '
+    + 'Both are permissions questions rather than anything Microsoft is '
+    + 'switching off.',
 };
 
 function explainMatch(e) {

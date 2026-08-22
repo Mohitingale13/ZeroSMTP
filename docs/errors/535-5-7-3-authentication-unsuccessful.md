@@ -74,6 +74,7 @@ Three options remain, and they differ more than they look:
 | Connection times out; no authentication error ever appears | The network is blocking outbound SMTP. Cloud providers block port 25 and often 587 by default — see [troubleshooting](../TROUBLESHOOTING.md). |
 | `Certificate verify failed` / `unable to get local issuer certificate` | The device's trust store cannot validate the server certificate. Common on firmware predating current root CAs — see [the Canon Maxify MB2755 case](../DEVICE-CASE-STUDIES.md). |
 
+
 ## Related
 
 - [All SMTP AUTH error messages](../ERROR-MESSAGES.md)
