@@ -8,6 +8,36 @@ npx zerosmtp-check smtp.office365.com
 
 No install, no credentials, no mail sent, **no dependencies**.
 
+## Or: what does this error mean?
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+The string you are looking at is almost never the one the server sent. Your
+client rewrote it first, and each one mangles it differently:
+
+| You are | You see | The cause |
+|---|---|---|
+| a developer | `SMTPAuthenticationError: (535, b'5.7.139 ...')` | the same |
+| a sysadmin | `SASL authentication failed; server said: 535 ...` | the same |
+| a printer technician | `1102` on the panel | the same |
+| using curl | `curl: (67) Login denied` | **discarded — curl prints none of it** |
+
+Paste any of them. It tells you what the refusal actually is, **whether it can
+still be turned back on before the end of December 2026**, and what to do if it
+cannot.
+
+```bash
+npx zerosmtp-check --explain 1102                       # a code off a panel
+grep -i sasl /var/log/mail.log | npx zerosmtp-check --explain
+npx zerosmtp-check --explain "5.7.57" --json            # for a script
+```
+
+It does not guess. An error it has no record of exits 1 and says so, rather
+than offering a plausible answer — a diagnostic that invents a cause costs more
+than one that admits it does not know.
+
 ## Why this exists
 
 When a send fails, the symptom is almost always the same: it hangs, then it
