@@ -41,6 +41,18 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
+      # npm's trusted publishing (OIDC) needs npm >= 11.5.1, and Node 22 ships
+      # npm 10.x. Without this the workflow would ask for a token even after
+      # a trusted publisher is configured, and the failure reads as "bad
+      # credentials" rather than "wrong npm version" - which is the expensive
+      # kind of error message. Harmless if we end up publishing with a token
+      # instead: a newer npm publishes the same package either way.
+      - name: npm new enough for trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+          node --version
+
       # Publishing something that does not work is worse than not publishing.
       # These are the same checks the lint workflow runs, repeated here so
       # that a manual dispatch cannot skip them.
