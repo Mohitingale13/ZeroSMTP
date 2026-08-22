@@ -43,3 +43,11 @@ Packages/
 .gradle/
 build/
 free-for-dev/
+
+# Local-only: the working agent guidelines. Root CLAUDE.md carries the four
+# Karpathy principles (upstream, MIT) plus a section reconciling them with this
+# company's standing orders - and that section names the private team roles and
+# a production detail. HANDBOOK.md's red line says neither goes in a public
+# file. The upstream copies it is built from are versioned in the private team
+# repo at .claude/agents/karpathy/.
+/CLAUDE.md
