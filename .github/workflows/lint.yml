@@ -349,6 +349,13 @@ jobs:
           code=$?
           set -e
           [ "$code" = "2" ] || { echo "::error::expected exit 2, got $code"; exit 1; }
+      - name: Port 25 is checked but never offered as a way to send
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --port 25 --json) || true
+          echo "$out"
+          # If 25 ever starts advertising AUTH the wording below stops being
+          # true, and this is the step that will say so.
+          echo "$out" | jq -e '.ports[0].auth | length == 0' > /dev/null             || { echo "::error::port 25 now offers AUTH - the report text needs rewriting"; exit 1; }
       - name: Real check against mx.msgwing.com produces valid JSON
         # Exit 0 (all good) and exit 1 (a port unreachable) are both correct
         # behaviour and depend on the relay, so the assertion is on the
@@ -362,7 +369,7 @@ jobs:
           echo "$out"
           [ "$code" = "0" ] || [ "$code" = "1" ] \
             || { echo "::error::unexpected exit $code"; exit 1; }
-          echo "$out" | jq -e '.host and (.addresses | length > 0) and (.ports | length == 2) and has("ok")' > /dev/null
+          echo "$out" | jq -e '.host and (.addresses | length > 0) and (.ports | length == 3) and has("ok")' > /dev/null
       # --explain is the half of this tool that gives an answer rather than a
       # measurement, so it is the half that can be confidently wrong. Each
       # case below is one of the three people it exists for.

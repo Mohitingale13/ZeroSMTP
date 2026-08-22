@@ -1,6 +1,6 @@
 {
   "name": "zerosmtp-check",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Check whether outbound SMTP works from this machine, and say what an SMTP error actually means. TCP, STARTTLS/implicit TLS, certificates and AUTH against any host, plus --explain for the refusal your log, library or printer panel printed. No credentials, no mail sent, no dependencies.",
   "type": "module",
   "bin": {
@@ -34,7 +34,8 @@
     "535-5-7-139",
     "printer",
     "troubleshooting",
-    "oauth2"
+    "oauth2",
+    "port-25"
   ],
   "homepage": "https://docs.msgwing.com/TROUBLESHOOTING.html",
   "repository": {

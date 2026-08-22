@@ -53,7 +53,7 @@ This tells the cases apart in about two seconds.
 
 ## What it checks
 
-For each port (587 and 465 by default):
+For each port (25, 587 and 465 by default):
 
 - DNS resolution
 - TCP connect, with a real timeout rather than hanging
@@ -68,6 +68,17 @@ The conversation stops after `EHLO`. Nothing is authenticated and nothing is
 delivered.
 
 ## Usage
+### Why port 25 is in there
+
+25 is checked first because it is the one your provider is most likely to
+block, so it answers "is this the network or is it me" before anything else
+does.
+
+It is checked for reachability, **not** as a way to send. On this relay - and
+on most - port 25 offers no AUTH at all, so a device pointed at it will
+connect, look perfectly healthy, and then fail to log in. The report says so on
+the line where it would otherwise just say ok.
+
 
 ```
 npx zerosmtp-check [host] [options]
