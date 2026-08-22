@@ -30,10 +30,8 @@
       "scope": "tenant or mailbox",
       "meaning": "Microsoft 365 refused username-and-password authentication. The credentials are almost certainly fine — the authentication *method* is switched off. Retyping the password, generating a new one, or recreating the mailbox will not change anything.",
       "wrappers": [
-        "Python `smtplib` reports it as `SMTPAuthenticationError (535, ...)`",
-        "Java / JavaMail reports it as `javax.mail.AuthenticationFailedException`",
-        "MailKit and .NET report it as `AuthenticationInvalidCredentials`",
-        "Most printer and scanner panels shorten it to `Authentication failed` or `Login failed`"
+        "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
       ]
     },
     {
@@ -43,7 +41,10 @@
       "kind": "auth-refused",
       "scope": "tenant",
       "meaning": "The same refusal, reported at tenant level: the block applies to every mailbox that inherits the tenant setting, not just the one you are testing. Switching to a different mailbox will produce the same error, which is the fastest way to confirm you are in this case rather than the per-mailbox one.",
-      "wrappers": []
+      "wrappers": [
+        "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+      ]
     },
     {
       "slug": "535-5-7-139-smtpclientauthentication-is-disabled-for-the-mailbox",
@@ -52,7 +53,10 @@
       "kind": "auth-refused",
       "scope": "mailbox",
       "meaning": "The same refusal, reported for this one mailbox. Either an admin disabled it explicitly here, or it inherits a tenant-wide block and Microsoft is naming the mailbox rather than the tenant. Common on personal Outlook.com accounts and on single mailboxes that have been locked down deliberately — worth asking why before undoing it.",
-      "wrappers": []
+      "wrappers": [
+        "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+      ]
     },
     {
       "slug": "535-5-7-3-authentication-unsuccessful",
@@ -61,7 +65,10 @@
       "kind": "auth-refused",
       "scope": "tenant or mailbox",
       "meaning": "A generic refusal with the same set of causes as 5.7.139, but without the sub-code that tells you which. Because it names nothing, it is the one most often mistaken for a wrong password. Check the four causes before touching the credentials.",
-      "wrappers": []
+      "wrappers": [
+        "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.3 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+      ]
     },
     {
       "slug": "535-5-7-57-client-was-not-authenticated-to-send-anonymous-mail",
