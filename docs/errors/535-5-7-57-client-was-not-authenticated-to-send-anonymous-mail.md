@@ -14,6 +14,16 @@ description: "What 535 5.7.57 SMTP; Client was not authenticated to send anonymo
 
 A different problem from the ones above: the client sent no credentials at all, or sent them after `MAIL FROM` instead of before. Usually a device or script configured for anonymous internal relay that is now pointed at an endpoint requiring authentication. Check whether the SMTP settings have an authentication checkbox that is switched off, before assuming Basic auth is the issue.
 
+## Check it from the machine that is failing
+
+```bash
+npx zerosmtp-check --explain "535 5.7.57 SMTP; Client was not authenticated to send anonymous mail"
+```
+
+No install and nothing sent. It reads the refusal your own client printed - which is rarely what the server said, because libraries and device panels rewrite it - and says which of these cases you are in.
+
+If the send is hanging rather than being refused, the cause is usually the network and not the credentials. `npx zerosmtp-check` with no arguments checks ports 25, 587 and 465 from where you are standing.
+
 ## Check this before assuming it is the Basic auth shutdown
 
 This one is worth ruling out cheaply, because the fix is usually local:

@@ -84,6 +84,14 @@ What the panel shows, and what it actually means:
 | What you see | What it means |
 | --- | --- |
 | Kyocera **send error 1102** / `0x1102` | Kyocera's code for an SMTP authentication failure — same root cause when pointing at Microsoft 365. |
+
+A panel code is the hardest version of this to act on, because it looks like the machine is failing and says nothing about a mail server. If you have a laptop on the same network:
+
+```bash
+npx zerosmtp-check --explain 1102
+```
+
+It names the cause, says whether an administrator can still switch it back on, and — the part that matters on a service call — says the device does not need replacing.
 | `Authentication failed` / `Login failed` on the panel | Vendor wording for a refused username/password. Your credentials are fine; the method is switched off. |
 | `535` with any wording | The server refused Basic auth for SMTP AUTH. |
 | Connection times out, no auth error at all | Not authentication — the network is blocking outbound SMTP. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md). |
