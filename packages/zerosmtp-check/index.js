@@ -14,14 +14,18 @@
 import net from 'node:net';
 import tls from 'node:tls';
 import dns from 'node:dns/promises';
+import { pathToFileURL } from 'node:url';
 import { ERRORS, DEVICE_CODES } from './errors.js';
 
 const DEFAULT_HOST = 'mx.msgwing.com';
 // 25 first, because it is the one most likely to be blocked and therefore
-// the fastest answer to "is it the network or is it me". It is checked
-// for reachability, not as a route to send by: on this relay - and on
-// most - 25 offers no AUTH at all, which the report says out loud so
-// that nobody reads "ok" and points a printer at it.
+// the fastest answer to "is it the network or is it me".
+//
+// Whether 25 can be sent by depends entirely on the server, and the first
+// wording here generalised without measuring: this relay offers no AUTH on
+// 25, but mx.hsomail.pl and poczta.interia.pl both do. So the report claims
+// nothing - it says "no AUTH offered" only when that is what the server
+// actually said, and only then points at 587 and 465 instead.
 const DEFAULT_PORTS = [25, 587, 465];
 const TIMEOUT_MS = 10_000;
 
@@ -193,10 +197,29 @@ function describeCert(secure) {
   };
 }
 
-function authMechanisms(ehlo) {
+export function authMechanisms(ehlo) {
+  // Only the `250-AUTH MECH MECH` form. The `250-AUTH=` line some servers also
+  // send is a workaround for very old Outlook clients and repeats the same
+  // mechanisms, so counting it would double everything.
   const line = ehlo.split(/\r?\n/).find(l => /^250[ -]AUTH /i.test(l));
   if (!line) return [];
-  return line.replace(/^250[ -]AUTH /i, '').trim().split(/\s+/);
+  const raw = line.replace(/^250[ -]AUTH /i, '').trim().split(/\s+/).filter(Boolean);
+
+  // Servers do repeat themselves here. poczta.interia.pl advertises
+  // `AUTH PLAIN LOGIN PLAIN LOGIN PLAIN LOGIN` - three copies of the same two
+  // mechanisms, which is a duplicated SASL configuration rather than three
+  // different ways in. Printed verbatim it reads like a finding. The set is
+  // what the reader needs; that it was repeated is worth a line to a mail
+  // admin and nothing to anybody else, so it travels separately.
+  const seen = new Set();
+  const unique = raw.filter(m => {
+    const k = m.toUpperCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  unique.duplicated = unique.length !== raw.length;
+  return unique;
 }
 
 // --- the check itself ---------------------------------------------------------
@@ -204,7 +227,7 @@ function authMechanisms(ehlo) {
 async function checkPort(host, port, opts) {
   const result = {
     port, tcp: false, tls: false, starttls: null,
-    cert: null, auth: [], error: null,
+    cert: null, auth: [], authDuplicated: false, error: null,
   };
 
   let socket;
@@ -252,6 +275,7 @@ async function checkPort(host, port, opts) {
     send(secure, 'EHLO zerosmtp-check');
     const ehlo = await readReply(secure, opts.timeout);
     result.auth = authMechanisms(ehlo);
+    result.authDuplicated = Boolean(result.auth.duplicated);
 
     send(secure, 'QUIT');
     secure.destroy();
@@ -451,6 +475,10 @@ function report(host, addresses, results) {
       if (r.auth.some(m => /^(LOGIN|PLAIN)$/i.test(m))) {
         out.push('           accepts a username and password');
       }
+      if (r.authDuplicated) {
+        out.push('           (the server listed these more than once - a '
+          + 'duplicated SASL config, harmless to you)');
+      }
     } else if (r.tls) {
       // Reachable and encrypted is not the same as usable. Port 25 commonly
       // gets here: it is the server-to-server port and offers no AUTH, so a
@@ -484,58 +512,68 @@ function report(host, addresses, results) {
 
 // --- main ------------------------------------------------------------------------
 
-const opts = parseArgs(process.argv.slice(2));
+// Everything below runs only when this file is the program. Without the
+// guard, `import { authMechanisms }` opens sockets to the relay as a side
+// effect of being imported - which is how the parser ended up untestable
+// without a network, and how a duplicated AUTH list shipped unnoticed.
+const isMain = process.argv[1]
+  && import.meta.url === pathToFileURL(process.argv[1]).href;
 
-if (opts.help) { console.log(HELP); process.exit(0); }
-if (opts.error) { console.error(`${opts.error}\n\n${HELP}`); process.exit(1); }
+if (isMain) {
+  const opts = parseArgs(process.argv.slice(2));
 
-if (opts.explain !== undefined) {
-  let text = opts.explain.replace(/\s*--json\s*/g, ' ').trim();
+  if (opts.help) { console.log(HELP); process.exit(0); }
+  if (opts.error) { console.error(`${opts.error}\n\n${HELP}`); process.exit(1); }
 
-  // No text after the flag and something is piped in: read the log. That is
-  // the shape the problem actually arrives in for anyone with shell access -
-  // the error is sitting in a file, not on their clipboard.
-  if (!text && !process.stdin.isTTY) {
-    const chunks = [];
-    for await (const chunk of process.stdin) chunks.push(chunk);
-    text = Buffer.concat(chunks).toString('utf8').trim();
+  if (opts.explain !== undefined) {
+    let text = opts.explain.replace(/\s*--json\s*/g, ' ').trim();
+
+    // No text after the flag and something is piped in: read the log. That is
+    // the shape the problem actually arrives in for anyone with shell access -
+    // the error is sitting in a file, not on their clipboard.
+    if (!text && !process.stdin.isTTY) {
+      const chunks = [];
+      for await (const chunk of process.stdin) chunks.push(chunk);
+      text = Buffer.concat(chunks).toString('utf8').trim();
+    }
+
+    if (opts.json) {
+      const payload = explainJson(text);
+      console.log(JSON.stringify(payload, null, 2));
+      process.exit(payload.matched ? 0 : 1);
+    }
+
+    const answer = explain(text);
+    console.log(answer);
+    // Exit 1 when nothing matched, so a script can tell the two apart.
+    process.exit(/^No match for that one\.|^Nothing to explain\./.test(answer) ? 1 : 0);
   }
+
+
+  let addresses = [];
+  try {
+    addresses = (await dns.lookup(opts.host, { all: true })).map(a => a.address);
+  } catch (err) {
+    const msg = `Could not resolve ${opts.host}: ${err.code || err.message}`;
+    if (opts.json) console.log(JSON.stringify({ host: opts.host, dns: false, error: msg }, null, 2));
+    else console.error(msg);
+    process.exit(2);
+  }
+
+  const results = [];
+  for (const port of opts.ports) {
+    results.push(await checkPort(opts.host, port, opts));
+  }
+
+  const ok = results.every(r => r.tcp && r.tls && (!r.cert || r.cert.authorized) && !r.error);
 
   if (opts.json) {
-    const payload = explainJson(text);
-    console.log(JSON.stringify(payload, null, 2));
-    process.exit(payload.matched ? 0 : 1);
+    console.log(JSON.stringify(
+      { host: opts.host, addresses, ports: results, ok }, null, 2));
+  } else {
+    console.log(report(opts.host, addresses, results));
   }
 
-  const answer = explain(text);
-  console.log(answer);
-  // Exit 1 when nothing matched, so a script can tell the two apart.
-  process.exit(/^No match for that one\.|^Nothing to explain\./.test(answer) ? 1 : 0);
+  process.exit(ok ? 0 : 1);
+
 }
-
-
-let addresses = [];
-try {
-  addresses = (await dns.lookup(opts.host, { all: true })).map(a => a.address);
-} catch (err) {
-  const msg = `Could not resolve ${opts.host}: ${err.code || err.message}`;
-  if (opts.json) console.log(JSON.stringify({ host: opts.host, dns: false, error: msg }, null, 2));
-  else console.error(msg);
-  process.exit(2);
-}
-
-const results = [];
-for (const port of opts.ports) {
-  results.push(await checkPort(opts.host, port, opts));
-}
-
-const ok = results.every(r => r.tcp && r.tls && (!r.cert || r.cert.authorized) && !r.error);
-
-if (opts.json) {
-  console.log(JSON.stringify(
-    { host: opts.host, addresses, ports: results, ok }, null, 2));
-} else {
-  console.log(report(opts.host, addresses, results));
-}
-
-process.exit(ok ? 0 : 1);

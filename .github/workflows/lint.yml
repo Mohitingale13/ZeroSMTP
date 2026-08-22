@@ -403,6 +403,24 @@ jobs:
           set -e
           echo "$out"
           [ "$code" = "1" ] || { echo "::error::expected exit 1, got $code"; exit 1; }
+      # Reported by the owner running this against two Polish mail hosts:
+      # poczta.interia.pl advertises AUTH PLAIN LOGIN three times over and the
+      # tool printed it back verbatim, which reads like a finding and is not
+      # one. Tested by import rather than over the network, so it stays offline
+      # and deterministic - and the import itself is the second assertion,
+      # because before the main flow was guarded this opened sockets.
+      - name: AUTH mechanisms are de-duplicated, and importing has no side effects
+        run: |
+          node --input-type=module -e "
+          import { authMechanisms } from './packages/zerosmtp-check/index.js';
+          const CRLF = String.fromCharCode(13, 10);
+          const dup = authMechanisms('250-AUTH PLAIN LOGIN PLAIN LOGIN' + CRLF + '250 OK');
+          if (dup.join(',') !== 'PLAIN,LOGIN') { console.error('not de-duplicated: ' + dup); process.exit(1); }
+          if (!dup.duplicated) { console.error('duplication was not flagged'); process.exit(1); }
+          const clean = authMechanisms('250-AUTH LOGIN PLAIN' + CRLF + '250 OK');
+          if (clean.duplicated) { console.error('false positive on a clean list'); process.exit(1); }
+          console.log('ok: ' + dup.join(' ') + ' / ' + clean.join(' '));
+          "
       - name: Package metadata is publishable, and ships errors.js
         run: |
           npm pack --dry-run 2>&1 | tee /tmp/pack.txt

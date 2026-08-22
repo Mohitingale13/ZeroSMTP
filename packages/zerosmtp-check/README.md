@@ -74,10 +74,14 @@ delivered.
 block, so it answers "is this the network or is it me" before anything else
 does.
 
-It is checked for reachability, **not** as a way to send. On this relay - and
-on most - port 25 offers no AUTH at all, so a device pointed at it will
-connect, look perfectly healthy, and then fail to log in. The report says so on
-the line where it would otherwise just say ok.
+Whether you can *send* over 25 depends on the server, and the check does not
+guess: it reports the AUTH mechanisms the server actually advertised. This
+relay offers none there, so the report says so and points at 587 and 465
+instead. Plenty of other servers do offer AUTH on 25 and the report will say
+that too.
+
+That distinction matters because a port that connects and looks perfectly
+healthy but offers no way to log in is exactly how an afternoon disappears.
 
 
 ```
