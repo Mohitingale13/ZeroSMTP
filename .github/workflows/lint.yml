@@ -421,6 +421,28 @@ jobs:
           if (clean.duplicated) { console.error('false positive on a clean list'); process.exit(1); }
           console.log('ok: ' + dup.join(' ') + ' / ' + clean.join(' '));
           "
+      # The action is the Marketplace listing. Publishing one that does not run
+      # is worse than not publishing: it is a public page that fails for
+      # whoever tries it. fail-on-error is false because the relay being down
+      # is not this test's business - what is being asserted is that the action
+      # runs, produces its outputs and parses its own output.
+      - name: The action itself runs
+        id: act
+        uses: ./
+        with:
+          host: mx.msgwing.com
+          ports: '25,587'
+          cert-expiry-days: '0'
+          fail-on-error: 'false'
+      - name: The action produced usable outputs
+        run: |
+          echo "ok=${{ steps.act.outputs.ok }}"
+          echo "soonest=${{ steps.act.outputs.soonest-expiry-days }} dni"
+          case "${{ steps.act.outputs.ok }}" in
+            true|false) ;;
+            *) echo "::error::ok output was not a boolean"; exit 1 ;;
+          esac
+          echo '${{ steps.act.outputs.result }}' | jq -e '.ports | length == 2' > /dev/null             || { echo "::error::result JSON did not carry both ports"; exit 1; }
       - name: Package metadata is publishable, and ships errors.js
         run: |
           npm pack --dry-run 2>&1 | tee /tmp/pack.txt
