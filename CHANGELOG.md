@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `zerosmtp-check` is on npm. `npx zerosmtp-check` runs the connection test
+  with no install and no clone, published from CI with provenance, so the
+  tarball can be traced back to the workflow run and commit that built it.
+
+### Fixed
+- The status panel on docs.msgwing.com and the generated `BLAST-RADIUS.md`
+  both offer `npx zerosmtp-check` again. Both had been carrying a comment
+  saying the package 404s, which stopped being true the moment it was
+  published; a stale reason in a source file is how a correct decision gets
+  reversed by somebody who reads it a month later.
+
 ## [1.6.0] - 2026-08-17
 
 The relay's status is now visible where readers actually are, and the

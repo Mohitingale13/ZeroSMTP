@@ -946,20 +946,21 @@
       var RUNS = 'https://api.github.com/repos/msgwing/ZeroSMTP/actions/workflows/'
                + 'service-healthcheck.yml/runs?per_page=1&status=completed';
 
-      // Deliberately not `npx zerosmtp-check`: that package is not published
-      // to npm - publish-npm.yml needs an NPM_TOKEN secret the repository
-      // does not have, and has never run. Telling a reader to run a command
-      // that 404s is worse than telling them nothing. These two need no
-      // install and are already in the troubleshooting guide.
+      // `npx zerosmtp-check` is published as of 2026-08-22 and the registry
+      // returns 200, so it leads here now: it is the one line a reader can
+      // paste and pass on, which the two below are not. They stay because
+      // they need no Node at all, and a printer technician on a locked-down
+      // Windows box has neither npm nor the rights to get it.
       function selfTest() {
         return '<p class="muted">To test from your own network rather than ours &mdash; '
              + 'which is the result that actually decides whether your device can send '
              + '&mdash; open a terminal:</p>'
              + '<ul>'
+             + '<li>Anywhere with Node: <code>npx zerosmtp-check</code></li>'
              + '<li>Windows: <code>Test-NetConnection mx.msgwing.com -Port 587</code></li>'
              + '<li>Linux or macOS: <code>openssl s_client -starttls smtp -connect mx.msgwing.com:587</code></li>'
              + '</ul>'
-             + '<p class="muted">Both open the connection and send no mail.</p>';
+             + '<p class="muted">All three open the connection and send no mail.</p>';
       }
 
       el.addEventListener('click', function(e){
