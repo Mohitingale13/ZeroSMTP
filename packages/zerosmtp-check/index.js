@@ -17,7 +17,12 @@ import dns from 'node:dns/promises';
 import { ERRORS, DEVICE_CODES } from './errors.js';
 
 const DEFAULT_HOST = 'mx.msgwing.com';
-const DEFAULT_PORTS = [587, 465];
+// 25 first, because it is the one most likely to be blocked and therefore
+// the fastest answer to "is it the network or is it me". It is checked
+// for reachability, not as a route to send by: on this relay - and on
+// most - 25 offers no AUTH at all, which the report says out loud so
+// that nobody reads "ok" and points a printer at it.
+const DEFAULT_PORTS = [25, 587, 465];
 const TIMEOUT_MS = 10_000;
 
 const HELP = `
@@ -445,6 +450,16 @@ function report(host, addresses, results) {
       out.push(`           AUTH ${r.auth.join(' ')}`);
       if (r.auth.some(m => /^(LOGIN|PLAIN)$/i.test(m))) {
         out.push('           accepts a username and password');
+      }
+    } else if (r.tls) {
+      // Reachable and encrypted is not the same as usable. Port 25 commonly
+      // gets here: it is the server-to-server port and offers no AUTH, so a
+      // device configured to use it will connect, look healthy, and then fail
+      // to log in. Saying "ok" and stopping would cause that.
+      out.push('           no AUTH offered - this port will not take a '
+        + 'username and password');
+      if (r.port === 25) {
+        out.push('           use 587 (STARTTLS) or 465 (implicit TLS) to send');
       }
     }
     if (r.error) out.push(`  ->       ${r.error}`);
