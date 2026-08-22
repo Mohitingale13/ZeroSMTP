@@ -171,14 +171,16 @@ def buduj(dane):
         "with a link to every vendor statement",
         "- [Every migration option](EXCHANGE-ONLINE-SMTP-AUTH.md), including "
         "the ones that are not this project",
-        # Deliberately not `npx zerosmtp-check`: that package returns 404
-        # from npm and has never been published, because the repository
-        # has no NPM_TOKEN. Corrected twice on the generated page before
-        # anybody noticed the page is generated and this script was
-        # putting it straight back.
-        "- `./check-connection.sh`, or `check-connection.ps1` on Windows — "
-        "check in two seconds whether your network even lets SMTP out, "
-        "before assuming it is the credentials",
+        # `npx zerosmtp-check` is back as of 2026-08-22: the package is
+        # published (1.0.0, with provenance) and the registry returns 200.
+        # It was pulled from this list while the package 404'd, and the
+        # correction was made twice on the generated page before anybody
+        # noticed the page is generated and this script was putting it
+        # straight back. If it ever 404s again, fix it here, not there.
+        "- `npx zerosmtp-check` — no install; checks in two seconds whether "
+        "your network even lets SMTP out, before you assume it is the "
+        "credentials. `./check-connection.sh` and `check-connection.ps1` in "
+        "the repository do the same without Node.",
         "",
     ]
 
