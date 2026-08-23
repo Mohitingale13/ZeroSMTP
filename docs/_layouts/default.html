@@ -174,6 +174,37 @@
       ]
     }
     </script>
+    {% elsif page.schema == "dataset" %}
+    {%- comment -%}
+      The compatibility list and the error corpus are the only things here that
+      nobody else has, and until now they were a file in a git repository. A
+      Dataset declaration is what lets a crawler, a tool or an assistant tell
+      that this page is backed by structured data it can fetch and cite, rather
+      than prose it has to parse.
+
+      distribution points at the published copy under /data/, which
+      tools/build-data-endpoints.py mirrors from data/ and CI checks - so the
+      URL in this markup cannot start describing a file that is not there.
+    {%- endcomment -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": {{ page.title | jsonify }},
+      "description": {{ page.description | jsonify }},
+      "url": {{ page.url | absolute_url | jsonify }},
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "creator": { "@type": "Organization", "name": "ZeroSMTP" },
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": {{ page.dataset_url | absolute_url | jsonify }}
+      }],
+      "keywords": ["SMTP AUTH", "OAuth 2.0", "Exchange Online",
+                   "Basic authentication", "printers", "Microsoft 365"]
+    }
+    </script>
     {% elsif page.schema == "reference" %}
     {%- comment -%}
       The generated pages under errors/ and devices/. TechArticle rather than
