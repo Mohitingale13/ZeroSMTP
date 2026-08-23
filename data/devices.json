@@ -192,6 +192,14 @@
       "guide_title": "HP printer: \"SMTP server requires authentication\""
     },
     {
+      "vendor": "Sharp",
+      "product": "printers and MFPs",
+      "status": "partial",
+      "models": [],
+      "evidence": "https://global.sharp/restricted/products/copier/downloads/manuals/bp70m65/us/contents_09-07_003.html",
+      "notes": "Sharp documents OAuth 2.0 authentication for Microsoft 365 and Exchange Online SMTP on multiple newer printer and MFP models, including BP-series devices. Sharp does not appear to publish a centralized compatibility list or universal firmware floor for the full printer/MFP range. Verify the exact model's SMTP settings or current manual before assuming OAuth 2.0 support."
+    },
+    {
       "vendor": "Toshiba",
       "product": "printers and MFPs",
       "status": "check-advisory",
