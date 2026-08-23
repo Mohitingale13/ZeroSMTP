@@ -49,6 +49,7 @@ answer.
 | **[ManageEngine](devices/manageengine-opmanager.md)** OpManager | Check vendor advisory | — | [advisory](https://www.manageengine.com/network-monitoring/how-to/fix-smtpclientauth-disabled-error.html) |
 | **[Ricoh](devices/ricoh-multifunction-printers.md)** multifunction printers | Check vendor advisory | — | [advisory](https://www.ricoh.com/info/2025/0526_1) |
 | **[Synology](devices/synology-nas-notification-email.md)** NAS notification email | Check vendor advisory | — | [advisory](https://kb.synology.com/en-us/DSM/help/DSM/AdminCenter/system_notification_email?version=7) |
+| **[Toshiba](devices/toshiba-printers-and-mfps.md)** printers and MFPs | Check vendor advisory | — | [advisory](https://www.toshibatec.com/information/20260113_01.html) |
 | **[Microsoft](devices/microsoft-teams-rooms.md)** Teams Rooms | OAuth available | — | [advisory](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) |
 
 ### Notes per entry
@@ -107,10 +108,13 @@ Ricoh publishes affected products with per-product firmware status, revised on 2
 **Synology — NAS notification email**  
 Synology DSM 7 supports Outlook as an email notification service with an interactive Sign In flow rather than manual SMTP credentials. Synology documents OAuth-based authentication for this Outlook integration, but availability and behavior depend on the DSM version. Verify the exact DSM version and current Outlook notification configuration before assuming Microsoft 365 SMTP AUTH OAuth compatibility.
 
+**Toshiba — printers and MFPs**  
+Toshiba Tec publishes a model-by-model Exchange Online OAuth 2.0 compatibility table for its MFPs, including firmware release information, compatible models, pending firmware updates, and explicitly incompatible models. Verify the exact model and current firmware status against Toshiba's published advisory before assuming Microsoft 365 SMTP AUTH compatibility.
+
 **Microsoft — Teams Rooms**  
 Microsoft's own product. Enable modern auth on the resource account - no relay needed.
 
-*19 entries, last reviewed 2026-08-16.*
+*20 entries, last reviewed 2026-08-16.*
 
 <!-- END GENERATED TABLE -->
 
