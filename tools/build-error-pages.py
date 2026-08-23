@@ -28,7 +28,7 @@ KATALOG = KORZEN / "docs" / "errors"
 # characters for the part before it.
 LIMIT_TYTULU = 48
 
-RODZAJE = {"auth-refused", "no-credentials", "wrong-sender"}
+RODZAJE = {"auth-refused", "no-credentials", "wrong-sender", "throttled"}
 
 # Three of the four causes are still reversible before the end of December
 # 2026. Saying "you must migrate" to somebody a settings change would have
@@ -170,6 +170,29 @@ def zbuduj(wpis, aktualizacja):
             "are looking at "
             "[`535 5.7.139`](535-5-7-139-basic-authentication-is-disabled.md) "
             "instead.",
+            "",
+        ]
+
+    if wpis["kind"] == "throttled":
+        czesci += [
+            "## This is not the Basic auth shutdown, and not your credentials",
+            "",
+            "Authentication succeeded. The message was accepted and then "
+            "refused on volume: the tenant has sent more in the last 24 hours "
+            "than its limit allows. Changing SMTP settings does nothing here, "
+            "and re-enabling SMTP AUTH does nothing either.",
+            "",
+            "1. Find what is sending. A device stuck in a retry loop can spend "
+            "a tenant's daily allowance overnight without anybody noticing.",
+            "2. Check whether the send is a burst or a new steady rate. A "
+            "burst waits; a steady rate over the limit needs a different route.",
+            "3. Limits reset on a rolling 24-hour window, not at midnight, so "
+            "sending resumes gradually rather than all at once.",
+            "",
+            "Worth saying plainly because it is easy to sell against: this is "
+            "not a problem a relay fixes by itself. If the volume genuinely "
+            "exceeds what the tenant may send, it exceeds what this project "
+            "allows too - 200 messages a day, and no paid tier lifts it.",
             "",
         ]
 

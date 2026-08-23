@@ -335,6 +335,12 @@ const REVERSIBLE = {
     'Yes, and it has no deadline. The client never authenticated at all, so '
     + 'this is a setting on the device or in the code rather than anything '
     + 'Microsoft is turning off.',
+  'throttled':
+    'Yes, and it has nothing to do with December 2026. Authentication worked '
+    + 'and the message was refused on volume - the tenant has sent more in the '
+    + 'last 24 hours than its limit allows. Find what is sending before '
+    + 'changing any mail settings; a device in a retry loop can spend a '
+    + "tenant's daily allowance overnight.",
   'wrong-sender':
     'Yes, and it has no deadline. The credentials are not what is being '
     + 'refused - either the From address is not one this account may send as, '
