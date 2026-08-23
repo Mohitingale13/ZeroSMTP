@@ -112,6 +112,10 @@ telling you to migrate today may be wrong. Check which case you are in first.
 
 ## Certificate / TLS verification failed
 
+> On a printer or scanner this is usually the frozen root store rather than
+> anything wrong: [Printer cannot verify the mail server
+> certificate](PRINTER-CERTIFICATE-ERROR.md).
+
 - Do not disable certificate verification to "fix" this (no code example in
   this repo does, and none should) — a cert error almost always means an
   intercepting proxy, an outdated system CA bundle, or a wrong hostname, not

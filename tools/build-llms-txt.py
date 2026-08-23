@@ -58,6 +58,7 @@ GRUPY = [
     ("For printer and MFP technicians", [
         "PRINTERS.md",
         "HP-PRINTER-SMTP.md",
+        "PRINTER-CERTIFICATE-ERROR.md",
         "DEVICE-COMPATIBILITY.md",
         "NO-OAUTH-FIRMWARE.md",
         "DEVICE-CASE-STUDIES.md",
