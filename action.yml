@@ -2,6 +2,21 @@ name: 'ZeroSMTP Check'
 description: 'Check outbound SMTP from a runner: ports, TLS, AUTH, and fail the job when the mail certificate is near expiry.'
 author: 'msgwing'
 
+# Marketplace categories, set 2026-08-23: Monitoring (primary), Utilities.
+#
+# Recorded here because they are not part of this file - GitHub keeps them on
+# the release, so nothing in the repository would otherwise say what was
+# chosen or why, and the next release would be a guess.
+#
+# Monitoring rather than Testing, deliberately. What makes this worth putting
+# in a pipeline is not that it checks ports: it is that it fails the build when
+# the mail server's certificate is inside the window you set. Nobody watches a
+# mail certificate, it expires on a Sunday, and the first report is somebody
+# saying scanning stopped working. Testing would have attracted people looking
+# for a unit-test runner and disappointed them.
+#
+# To change them: repository -> Releases -> edit the release -> Release Action.
+
 branding:
   icon: 'mail'
   color: 'purple'
