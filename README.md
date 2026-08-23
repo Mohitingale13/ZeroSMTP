@@ -42,6 +42,29 @@ from a shared `@msgwing.com` address rather than your own
 
 <!-- END GENERATED CONTENTS -->
 
+> ### Arrived from the GitHub Marketplace?
+>
+> This page is the README of the whole project, which is a free SMTP relay — so
+> the action you came for is below the fold. Here it is:
+>
+> ```yaml
+> - uses: msgwing/ZeroSMTP@v1.7.0
+>   with:
+>     host: smtp.office365.com
+>     cert-expiry-days: '14'
+> ```
+>
+> It checks outbound SMTP from the runner — ports, TLS, certificate and the
+> AUTH mechanisms offered — and **fails the job when the mail server's
+> certificate is inside the window you set**. Nobody watches a mail
+> certificate; it expires on a Sunday and the first report is somebody saying
+> scanning stopped working.
+>
+> No install and no npm: the tool has no dependencies, so the action runs the
+> file shipped beside it. Every input, and the scheduled-canary setup that
+> reports without failing, is in [**GitHub Actions**](#github-actions) further
+> down.
+
 ## What's in here
 
 | | |
