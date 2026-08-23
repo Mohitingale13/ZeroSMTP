@@ -80,6 +80,8 @@ jobs:
         run: python tools/build-blast-radius.py --check
       - name: CLI error data matches data/errors.json
         run: python tools/build-cli-errors.py --check
+      - name: llms.txt matches the site
+        run: python tools/build-llms-txt.py --check
       - name: README Contents matches its headings
         run: python tools/build-readme-toc.py --check
       - name: action.yml is publishable to the Marketplace
@@ -443,6 +445,11 @@ jobs:
           ports: '25,587'
           cert-expiry-days: '0'
           fail-on-error: 'false'
+      - name: The action decodes an error without connecting
+        id: act_explain
+        uses: ./
+        with:
+          explain: "535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant"
       - name: The action produced usable outputs
         run: |
           echo "ok=${{ steps.act.outputs.ok }}"

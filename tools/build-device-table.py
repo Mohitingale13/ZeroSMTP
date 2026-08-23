@@ -255,6 +255,12 @@ def zbuduj_strone(wpis, aktualizacja):
     czesci += [
         "## Related",
         "",
+        # A vendor with a page of its own gets it first. Only where one exists:
+        # a "further reading" line pointing at a page that covers ten brands is
+        # not further reading, it is the same link the section already carries.
+        *([f"- **[{wpis['guide_title']}](../{wpis['guide']})** — the detailed "
+           f"guide for {wpis['vendor']}, including what the error on the panel "
+           f"actually means", ""] if wpis.get("guide") else []),
         f"- [What the error message means](../ERROR-MESSAGES.md) — if the "
         f"{wpis['vendor']} device is reporting a code rather than a sentence",
         "- [The full compatibility list](../DEVICE-COMPATIBILITY.md) — every "

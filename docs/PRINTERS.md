@@ -155,6 +155,10 @@ them in the printer's own credential store, not a shared document.
 
 ---
 
+> **Home printer, and not sure what any of this means?** [Scan to email from a home printer](SCAN-TO-EMAIL-HOME.md) explains what an
+> SMTP server is and why Gmail and Hotmail stopped working, without assuming
+> you administer a mail system.
+
 ## Where the settings live, by brand
 
 Menu wording shifts between firmware versions, but locations are stable
@@ -166,6 +170,10 @@ current documentation — check there if the wording has moved on your model.
 <div id="zc-brand-picker-mount"></div>
 
 ### HP
+> Its own page: **[HP printer: "SMTP server requires authentication"](HP-PRINTER-SMTP.md)**
+> — the three reasons that message appears, which HP models can do OAuth and
+> which HP has ruled out, and what to do about each.
+
 Embedded Web Server (browser → printer's IP) → `Networking` or `Scan` tab →
 `TCP/IP Settings` → `Outgoing Email` / `Scan to Email` →
 `Outgoing Email Profiles` → add a profile using the values above.

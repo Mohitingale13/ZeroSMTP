@@ -174,6 +174,37 @@
       ]
     }
     </script>
+    {% elsif page.schema == "reference" %}
+    {%- comment -%}
+      The generated pages under errors/ and devices/. TechArticle rather than
+      FAQPage on purpose: these are not written as questions and answers, and
+      claiming FAQ markup for prose that is not a Q&A is the kind of thing that
+      earns a manual action. What it buys is not a rich result - it is that a
+      crawler, and increasingly an assistant, can tell this is a technical
+      reference about one named thing rather than a marketing page.
+    {%- endcomment -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": {{ page.title | jsonify }},
+      "description": {{ page.description | jsonify }},
+      "url": {{ page.url | absolute_url | jsonify }},
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "proficiencyLevel": "Beginner",
+      "about": {
+        "@type": "Thing",
+        "name": "Microsoft 365 SMTP AUTH Basic authentication shutdown"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "ZeroSMTP",
+        "url": "https://docs.msgwing.com/"
+      }
+    }
+    </script>
+
     {% endif %}
 
     <link rel="icon" type="image/x-icon" href="{{ '/assets/favicon.ico' | relative_url }}">
@@ -181,7 +212,22 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/apple-touch-icon.png' | relative_url }}">
     <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
 
-    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    {% comment %}
+      No ?v= cache-buster here on purpose, removed 2026-08-23.
+
+      It appended site.github.build_revision, which is the commit SHA, so every
+      commit produced a different stylesheet URL. Thirty commits in two days
+      meant thirty URLs for one unchanged file, and Googlebot re-fetched it each
+      time: Search Console reported 25% of the crawl budget going to CSS while
+      only 10% of requests were discovery. Thirty-six pages sat unindexed while
+      the crawler re-read normalize.css.
+
+      It was buying nothing. Checked against the live response rather than
+      assumed: GitHub Pages already serves this with Cache-Control max-age=600
+      and an ETag, so the worst case without a buster is a ten-minute-old
+      stylesheet, and the ETag usually prevents even that.
+    {% endcomment %}
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
     <style>
       /* ==================================================================
