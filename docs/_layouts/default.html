@@ -8,11 +8,18 @@
       Search-engine site-ownership verification, driven from _config.yml so a
       token is pasted in one place rather than edited into this file.
 
-      None of these can use DNS TXT: docs.msgwing.com is a CNAME, required for
-      GitHub Pages, and a name carrying a CNAME can hold no other record type
-      (RFC 1034). Yandex's resolver enforces that and never looks for the TXT
-      at all, unlike Google's and Cloudflare's public resolvers, which serve it
-      anyway. So the HTML tag is the only route for all three.
+      On DNS, corrected 2026-08-23 after checking our own zone rather than
+      repeating what this comment used to say. It claimed a name carrying a
+      CNAME can hold no other record type (RFC 1034) and that DNS verification
+      was therefore impossible here. Our own zone disproves it: docs.msgwing.com
+      is a CNAME to msgwing.github.io *and* serves a TXT, which is how Yandex
+      was verified in the first place. What is true is narrower - Yandex's own
+      resolver enforced the rule and would not read the TXT, so their
+      verification had to move to a meta tag. Google reads it fine.
+
+      The tag stays regardless. It is the one method that works the same on
+      every engine and does not depend on a DNS provider's tolerance for a
+      record combination the RFC frowns on.
 
       Why it matters more than a checkbox: Search Console is the only honest
       answer to "what are people actually searching for". Search queries are
