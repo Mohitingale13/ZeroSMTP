@@ -14,9 +14,19 @@
 import net from 'node:net';
 import tls from 'node:tls';
 import dns from 'node:dns/promises';
+import { pathToFileURL } from 'node:url';
+import { ERRORS, DEVICE_CODES } from './errors.js';
 
 const DEFAULT_HOST = 'mx.msgwing.com';
-const DEFAULT_PORTS = [587, 465];
+// 25 first, because it is the one most likely to be blocked and therefore
+// the fastest answer to "is it the network or is it me".
+//
+// Whether 25 can be sent by depends entirely on the server, and the first
+// wording here generalised without measuring: this relay offers no AUTH on
+// 25, but mx.hsomail.pl and poczta.interia.pl both do. So the report claims
+// nothing - it says "no AUTH offered" only when that is what the server
+// actually said, and only then points at 587 and 465 instead.
+const DEFAULT_PORTS = [25, 587, 465];
 const TIMEOUT_MS = 10_000;
 
 const HELP = `
@@ -26,6 +36,9 @@ zerosmtp-check - check whether outbound SMTP works from this machine
 
   host              SMTP host to test (default: ${DEFAULT_HOST})
 
+  --explain [text]  say what an SMTP error actually means. Paste whatever
+                    your log, library or device panel printed - reading
+                    from a pipe if no text is given
   --port <n>        test one port only (default: ${DEFAULT_PORTS.join(', ')})
   --timeout <ms>    per-step timeout (default: ${TIMEOUT_MS})
   --insecure        continue past certificate errors and report them
@@ -37,6 +50,9 @@ Examples
   npx zerosmtp-check                          the ZeroSMTP relay
   npx zerosmtp-check smtp.office365.com       your own provider
   npx zerosmtp-check mail.example.com --port 25
+  npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+  npx zerosmtp-check --explain 1102          a code off a printer panel
+  grep -i sasl /var/log/mail.log | npx zerosmtp-check --explain
 
 No credentials are sent and no mail is delivered. The check stops after
 EHLO.
@@ -60,6 +76,13 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '-h' || a === '--help') return { help: true };
+    // --explain swallows the rest of the line on purpose. People paste error
+    // text straight off a terminal and it is full of quotes, colons and
+    // parentheses; demanding they quote it correctly while their mail is down
+    // is the wrong thing to insist on.
+    else if (a === '--explain') {
+      return { explain: argv.slice(i + 1).join(' ').trim(), json: argv.includes('--json') };
+    }
     else if (a === '--insecure') opts.insecure = true;
     else if (a === '--json') opts.json = true;
     else if (a === '--port') opts.ports = [Number(argv[++i])];
@@ -174,10 +197,29 @@ function describeCert(secure) {
   };
 }
 
-function authMechanisms(ehlo) {
+export function authMechanisms(ehlo) {
+  // Only the `250-AUTH MECH MECH` form. The `250-AUTH=` line some servers also
+  // send is a workaround for very old Outlook clients and repeats the same
+  // mechanisms, so counting it would double everything.
   const line = ehlo.split(/\r?\n/).find(l => /^250[ -]AUTH /i.test(l));
   if (!line) return [];
-  return line.replace(/^250[ -]AUTH /i, '').trim().split(/\s+/);
+  const raw = line.replace(/^250[ -]AUTH /i, '').trim().split(/\s+/).filter(Boolean);
+
+  // Servers do repeat themselves here. poczta.interia.pl advertises
+  // `AUTH PLAIN LOGIN PLAIN LOGIN PLAIN LOGIN` - three copies of the same two
+  // mechanisms, which is a duplicated SASL configuration rather than three
+  // different ways in. Printed verbatim it reads like a finding. The set is
+  // what the reader needs; that it was repeated is worth a line to a mail
+  // admin and nothing to anybody else, so it travels separately.
+  const seen = new Set();
+  const unique = raw.filter(m => {
+    const k = m.toUpperCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  unique.duplicated = unique.length !== raw.length;
+  return unique;
 }
 
 // --- the check itself ---------------------------------------------------------
@@ -185,7 +227,7 @@ function authMechanisms(ehlo) {
 async function checkPort(host, port, opts) {
   const result = {
     port, tcp: false, tls: false, starttls: null,
-    cert: null, auth: [], error: null,
+    cert: null, auth: [], authDuplicated: false, error: null,
   };
 
   let socket;
@@ -233,6 +275,7 @@ async function checkPort(host, port, opts) {
     send(secure, 'EHLO zerosmtp-check');
     const ehlo = await readReply(secure, opts.timeout);
     result.auth = authMechanisms(ehlo);
+    result.authDuplicated = Boolean(result.auth.duplicated);
 
     send(secure, 'QUIT');
     secure.destroy();
@@ -248,6 +291,157 @@ async function checkPort(host, port, opts) {
   }
 
   return result;
+}
+
+// --- explaining an error somebody pasted --------------------------------------
+//
+// The string a person is looking at is almost never the one the server sent.
+// Postfix wraps it in a SASL line, Python turns it into a bytes literal, a
+// Kyocera panel shows 1102, and curl throws the server's text away entirely
+// and prints `curl: (67) Login denied`. Three different people, three
+// different strings, one cause. Nothing else joins those up, which is the
+// only reason this mode is worth having.
+
+const DOCS = 'https://docs.msgwing.com/errors';
+
+/** The enhanced status code (5.7.139) is the reliable part: clients reword the
+ *  human text but pass this through untouched. Deliberately not matching the
+ *  reply code (535) - that one is shared by unrelated failures. */
+function enhancedCode(text) {
+  const m = text.match(/\b(\d\.\d\.\d{1,3})\b/);
+  return m ? m[1] : null;
+}
+
+/** Several entries share 5.7.139 and differ only in whether the block sits on
+ *  the tenant or the mailbox. If the pasted text says which, use it. */
+function narrowByScope(matches, lower) {
+  if (matches.length < 2) return matches;
+  const said = matches.filter(e => {
+    const s = e.scope.toLowerCase();
+    if (s === 'tenant') return /\btenant\b/.test(lower);
+    if (s === 'mailbox') return /\bmailbox\b/.test(lower);
+    return false;
+  });
+  return said.length ? said : matches;
+}
+
+const REVERSIBLE = {
+  'auth-refused':
+    'Yes, until the end of December 2026. The server is refusing the password '
+    + 'because SMTP AUTH is switched off for this tenant or mailbox, not '
+    + 'because the password is wrong. An administrator can switch it back on, '
+    + 'and after that date they cannot.',
+  'no-credentials':
+    'Yes, and it has no deadline. The client never authenticated at all, so '
+    + 'this is a setting on the device or in the code rather than anything '
+    + 'Microsoft is turning off.',
+  'wrong-sender':
+    'Yes, and it has no deadline. The credentials are not what is being '
+    + 'refused - either the From address is not one this account may send as, '
+    + 'or the message could not be matched to a route permitted to relay it. '
+    + 'Both are permissions questions rather than anything Microsoft is '
+    + 'switching off.',
+};
+
+function explainMatch(e) {
+  const out = [];
+  out.push(`${e.code} - ${e.message}`);
+  out.push('');
+  out.push(e.meaning);
+  out.push('');
+  out.push('Can it still be fixed?');
+  out.push(`  ${REVERSIBLE[e.kind] || 'Unknown - this entry has no recorded kind.'}`);
+  out.push('');
+  out.push(`  Full page: ${DOCS}/${e.slug}.html`);
+  return out.join('\n');
+}
+
+/** Clients that swallow the server's text. Nothing can be diagnosed from these
+ *  alone, and saying so beats guessing - but the way to reveal the real error
+ *  is worth more here than any guess would be. */
+const BLIND = [
+  {
+    test: /curl:\s*\(67\)|login denied/i,
+    name: 'curl',
+    advice:
+      'curl prints only `curl: (67) Login denied` and discards what the server '
+      + 'actually said, which is why this gets mistaken for a wrong password.\n'
+      + '  Run the same command again with -v and look for the line beginning '
+      + '535 or 550. Paste that here instead.',
+  },
+];
+
+function explain(text) {
+  const lower = text.toLowerCase();
+  const out = [];
+
+  if (!text) {
+    return 'Nothing to explain. Paste the error text, or pipe a log into it:\n'
+      + '  npx zerosmtp-check --explain "535 5.7.139 ..."\n'
+      + '  grep -i sasl /var/log/mail.log | npx zerosmtp-check --explain';
+  }
+
+  const code = enhancedCode(text);
+  if (code) {
+    const matches = narrowByScope(ERRORS.filter(e => e.enhanced === code), lower);
+    if (matches.length === 1) return explainMatch(matches[0]);
+    if (matches.length > 1) {
+      out.push(`${code} covers more than one case and the text you pasted does `
+        + `not say which. Both are below; the scope is the difference.`);
+      out.push('');
+      out.push(matches.map(m => `[${m.scope}]\n${explainMatch(m)}`).join('\n\n'));
+      return out.join('\n');
+    }
+  }
+
+  for (const [panel, d] of Object.entries(DEVICE_CODES)) {
+    // String.raw, because inside a plain template literal `\b` is the
+    // backspace character rather than a word boundary. The regex then
+    // matches nothing at all and says so politely, which is how a printer
+    // technician pasting 1102 got told there was no record of it.
+    if (new RegExp(String.raw`\b(0x)?${panel}\b`).test(lower)) {
+      out.push(`${panel} - ${d.vendor} device code`);
+      out.push('');
+      out.push(d.note);
+      out.push('');
+      out.push('Can it still be fixed?');
+      out.push(`  ${REVERSIBLE[d.kind]}`);
+      out.push('');
+      out.push('  The device is not broken and does not need replacing before '
+        + 'the deadline. Check the mail server setting first.');
+      return out.join('\n');
+    }
+  }
+
+  for (const b of BLIND) {
+    if (b.test.test(text)) {
+      return `This is ${b.name} hiding the error rather than reporting it.\n\n  `
+        + b.advice;
+    }
+  }
+
+  return 'No match for that one.\n\n'
+    + `  ${ERRORS.length} error strings are recorded here, all of them from the\n`
+    + '  Microsoft 365 SMTP AUTH shutdown. If yours belongs with them, adding it\n'
+    + '  gives it a page of its own - which is how somebody else finds it next\n'
+    + '  time:\n'
+    + '  https://github.com/msgwing/ZeroSMTP/issues/new?template=error-string.yml\n\n'
+    + '  If the send is timing out rather than being refused, the problem is\n'
+    + '  usually the network, not the credentials. Run the check with no\n'
+    + '  arguments: npx zerosmtp-check';
+}
+
+function explainJson(text) {
+  const code = enhancedCode(text);
+  const matches = code
+    ? narrowByScope(ERRORS.filter(e => e.enhanced === code), text.toLowerCase())
+    : [];
+  return {
+    input: text,
+    enhancedCode: code,
+    matched: matches.length > 0,
+    matches: matches.map(m => ({ ...m, reversible: REVERSIBLE[m.kind] || null })),
+  };
 }
 
 // --- output ---------------------------------------------------------------------
@@ -284,6 +478,20 @@ function report(host, addresses, results) {
       if (r.auth.some(m => /^(LOGIN|PLAIN)$/i.test(m))) {
         out.push('           accepts a username and password');
       }
+      if (r.authDuplicated) {
+        out.push('           (the server listed these more than once - a '
+          + 'duplicated SASL config, harmless to you)');
+      }
+    } else if (r.tls) {
+      // Reachable and encrypted is not the same as usable. Port 25 commonly
+      // gets here: it is the server-to-server port and offers no AUTH, so a
+      // device configured to use it will connect, look healthy, and then fail
+      // to log in. Saying "ok" and stopping would cause that.
+      out.push('           no AUTH offered - this port will not take a '
+        + 'username and password');
+      if (r.port === 25) {
+        out.push('           use 587 (STARTTLS) or 465 (implicit TLS) to send');
+      }
     }
     if (r.error) out.push(`  ->       ${r.error}`);
   }
@@ -307,33 +515,68 @@ function report(host, addresses, results) {
 
 // --- main ------------------------------------------------------------------------
 
-const opts = parseArgs(process.argv.slice(2));
+// Everything below runs only when this file is the program. Without the
+// guard, `import { authMechanisms }` opens sockets to the relay as a side
+// effect of being imported - which is how the parser ended up untestable
+// without a network, and how a duplicated AUTH list shipped unnoticed.
+const isMain = process.argv[1]
+  && import.meta.url === pathToFileURL(process.argv[1]).href;
 
-if (opts.help) { console.log(HELP); process.exit(0); }
-if (opts.error) { console.error(`${opts.error}\n\n${HELP}`); process.exit(1); }
+if (isMain) {
+  const opts = parseArgs(process.argv.slice(2));
 
-let addresses = [];
-try {
-  addresses = (await dns.lookup(opts.host, { all: true })).map(a => a.address);
-} catch (err) {
-  const msg = `Could not resolve ${opts.host}: ${err.code || err.message}`;
-  if (opts.json) console.log(JSON.stringify({ host: opts.host, dns: false, error: msg }, null, 2));
-  else console.error(msg);
-  process.exit(2);
+  if (opts.help) { console.log(HELP); process.exit(0); }
+  if (opts.error) { console.error(`${opts.error}\n\n${HELP}`); process.exit(1); }
+
+  if (opts.explain !== undefined) {
+    let text = opts.explain.replace(/\s*--json\s*/g, ' ').trim();
+
+    // No text after the flag and something is piped in: read the log. That is
+    // the shape the problem actually arrives in for anyone with shell access -
+    // the error is sitting in a file, not on their clipboard.
+    if (!text && !process.stdin.isTTY) {
+      const chunks = [];
+      for await (const chunk of process.stdin) chunks.push(chunk);
+      text = Buffer.concat(chunks).toString('utf8').trim();
+    }
+
+    if (opts.json) {
+      const payload = explainJson(text);
+      console.log(JSON.stringify(payload, null, 2));
+      process.exit(payload.matched ? 0 : 1);
+    }
+
+    const answer = explain(text);
+    console.log(answer);
+    // Exit 1 when nothing matched, so a script can tell the two apart.
+    process.exit(/^No match for that one\.|^Nothing to explain\./.test(answer) ? 1 : 0);
+  }
+
+
+  let addresses = [];
+  try {
+    addresses = (await dns.lookup(opts.host, { all: true })).map(a => a.address);
+  } catch (err) {
+    const msg = `Could not resolve ${opts.host}: ${err.code || err.message}`;
+    if (opts.json) console.log(JSON.stringify({ host: opts.host, dns: false, error: msg }, null, 2));
+    else console.error(msg);
+    process.exit(2);
+  }
+
+  const results = [];
+  for (const port of opts.ports) {
+    results.push(await checkPort(opts.host, port, opts));
+  }
+
+  const ok = results.every(r => r.tcp && r.tls && (!r.cert || r.cert.authorized) && !r.error);
+
+  if (opts.json) {
+    console.log(JSON.stringify(
+      { host: opts.host, addresses, ports: results, ok }, null, 2));
+  } else {
+    console.log(report(opts.host, addresses, results));
+  }
+
+  process.exit(ok ? 0 : 1);
+
 }
-
-const results = [];
-for (const port of opts.ports) {
-  results.push(await checkPort(opts.host, port, opts));
-}
-
-const ok = results.every(r => r.tcp && r.tls && (!r.cert || r.cert.authorized) && !r.error);
-
-if (opts.json) {
-  console.log(JSON.stringify(
-    { host: opts.host, addresses, ports: results, ok }, null, 2));
-} else {
-  console.log(report(opts.host, addresses, results));
-}
-
-process.exit(ok ? 0 : 1);

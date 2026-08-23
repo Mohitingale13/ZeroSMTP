@@ -46,6 +46,16 @@ rather than trust it.
 > That's Microsoft switching off Basic auth for SMTP AUTH — [start
 > here](docs/ERROR-MESSAGES.md). Three of the four causes are still reversible
 > until the end of December 2026.
+>
+> ```bash
+> npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+> ```
+>
+> Paste whatever *your* client printed — a Postfix SASL line, a Python
+> traceback, `1102` off a Kyocera panel, or the `curl: (67) Login denied` that
+> hides the server's answer entirely. They are the same refusal wearing
+> different clothes, and it says which case you are in and whether it can still
+> be switched back on. No install, nothing sent.
 
 ---
 
@@ -171,10 +181,25 @@ contact form, or side project, ZeroSMTP costs nothing to try first.
 
 ## GitHub Actions
 
-Using ZeroSMTP from a workflow (CI failure alerts, deploy notifications,
-scheduled reports)? [`msgwing/send-email-action`](https://github.com/msgwing/send-email-action)
-on the [GitHub Marketplace](https://github.com/marketplace/actions/zerosmtp-send-email)
-wraps the setup below into one step:
+Two actions, and they do opposite things.
+
+**[`msgwing/ZeroSMTP`](https://github.com/marketplace/actions/zerosmtp-check) — check that mail *can* be sent.**
+Runs the connectivity check from the runner and fails the job when the mail
+server's certificate is inside a window you choose. Nobody watches a mail
+certificate; it expires on a Sunday and the first report is a user saying
+scanning stopped working. No credentials and no mail sent.
+
+```yaml
+- uses: msgwing/ZeroSMTP@v1.7.0
+  with:
+    host: smtp.office365.com
+    cert-expiry-days: '14'
+```
+
+**[`msgwing/send-email-action`](https://github.com/msgwing/send-email-action) — actually send one.**
+For CI failure alerts, deploy notifications and scheduled reports.
+On the [GitHub Marketplace](https://github.com/marketplace/actions/zerosmtp-send-email),
+it wraps the setup below into one step:
 
 ```yaml
 - uses: msgwing/send-email-action@v1

@@ -65,12 +65,23 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
+      # Installed once, before anything that needs it. It used to live inside
+      # the last step in this job, which worked until a step that also imports
+      # yaml was added above it - and then the first person to hit
+      # ModuleNotFoundError was an outside contributor on their first pull
+      # request, on a change that had nothing to do with it.
+      - name: Python dependencies for the checks below
+        run: pip install --quiet pyyaml
       - name: Device table and pages match data/devices.json
         run: python tools/build-device-table.py --check
       - name: Error pages match data/errors.json
         run: python tools/build-error-pages.py --check
       - name: Blast radius page matches data/blast-radius.json
         run: python tools/build-blast-radius.py --check
+      - name: CLI error data matches data/errors.json
+        run: python tools/build-cli-errors.py --check
+      - name: action.yml is publishable to the Marketplace
+        run: python tools/check-action.py
       # A workflow file GitHub cannot parse fails at startup with no job and
       # no log, so it stays invisible until somebody notices a run named after
       # a file path instead of a workflow. Two files sat like that for twelve
@@ -78,9 +89,7 @@ jobs:
       # edit had written where a regex meant backslash-1 and backslash-b.
       # Cheap to check, expensive to miss.
       - name: Workflow files parse, and carry no control characters
-        run: |
-          pip install --quiet pyyaml
-          python .github/check-workflows.py
+        run: python .github/check-workflows.py
 
   bash:
     needs: changes
@@ -347,6 +356,13 @@ jobs:
           code=$?
           set -e
           [ "$code" = "2" ] || { echo "::error::expected exit 2, got $code"; exit 1; }
+      - name: Port 25 is checked but never offered as a way to send
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --port 25 --json) || true
+          echo "$out"
+          # If 25 ever starts advertising AUTH the wording below stops being
+          # true, and this is the step that will say so.
+          echo "$out" | jq -e '.ports[0].auth | length == 0' > /dev/null             || { echo "::error::port 25 now offers AUTH - the report text needs rewriting"; exit 1; }
       - name: Real check against mx.msgwing.com produces valid JSON
         # Exit 0 (all good) and exit 1 (a port unreachable) are both correct
         # behaviour and depend on the relay, so the assertion is on the
@@ -360,9 +376,84 @@ jobs:
           echo "$out"
           [ "$code" = "0" ] || [ "$code" = "1" ] \
             || { echo "::error::unexpected exit $code"; exit 1; }
-          echo "$out" | jq -e '.host and (.addresses | length > 0) and (.ports | length == 2) and has("ok")' > /dev/null
-      - name: Package metadata is publishable
-        run: npm pack --dry-run
+          echo "$out" | jq -e '.host and (.addresses | length > 0) and (.ports | length == 3) and has("ok")' > /dev/null
+      # --explain is the half of this tool that gives an answer rather than a
+      # measurement, so it is the half that can be confidently wrong. Each
+      # case below is one of the three people it exists for.
+      - name: Explain - a server error, matched to its cause
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain             "535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant")
+          echo "$out"
+          echo "$out" | grep -q "tenant level"             || { echo "::error::did not identify the tenant case"; exit 1; }
+          echo "$out" | grep -qi "December 2026"             || { echo "::error::did not say whether it is still reversible"; exit 1; }
+      - name: Explain - a printer panel code, not a hardware fault
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain 1102)
+          echo "$out"
+          echo "$out" | grep -qi "kyocera"             || { echo "::error::device code lookup is broken"; exit 1; }
+      - name: Explain - a client that hides the error
+        run: |
+          out=$(node packages/zerosmtp-check/index.js --explain "curl: (67) Login denied")
+          echo "$out"
+          echo "$out" | grep -q -- "-v"             || { echo "::error::did not say how to reveal the real error"; exit 1; }
+      - name: Explain - reads a log from a pipe
+        run: |
+          log="SASL authentication failed; server said: 535 5.7.3 Authentication unsuccessful"
+          out=$(echo "$log" | node packages/zerosmtp-check/index.js --explain)
+          echo "$out"
+          echo "$out" | grep -q "5.7.3" || { echo "::error::stdin path broken"; exit 1; }
+      - name: Explain - an unknown string exits 1 rather than inventing one
+        run: |
+          set +e
+          out=$(node packages/zerosmtp-check/index.js --explain "421 4.3.2 nonsense not in the corpus")
+          code=$?
+          set -e
+          echo "$out"
+          [ "$code" = "1" ] || { echo "::error::expected exit 1, got $code"; exit 1; }
+      # Reported by the owner running this against two Polish mail hosts:
+      # poczta.interia.pl advertises AUTH PLAIN LOGIN three times over and the
+      # tool printed it back verbatim, which reads like a finding and is not
+      # one. Tested by import rather than over the network, so it stays offline
+      # and deterministic - and the import itself is the second assertion,
+      # because before the main flow was guarded this opened sockets.
+      - name: AUTH mechanisms are de-duplicated, and importing has no side effects
+        run: |
+          node --input-type=module -e "
+          import { authMechanisms } from './packages/zerosmtp-check/index.js';
+          const CRLF = String.fromCharCode(13, 10);
+          const dup = authMechanisms('250-AUTH PLAIN LOGIN PLAIN LOGIN' + CRLF + '250 OK');
+          if (dup.join(',') !== 'PLAIN,LOGIN') { console.error('not de-duplicated: ' + dup); process.exit(1); }
+          if (!dup.duplicated) { console.error('duplication was not flagged'); process.exit(1); }
+          const clean = authMechanisms('250-AUTH LOGIN PLAIN' + CRLF + '250 OK');
+          if (clean.duplicated) { console.error('false positive on a clean list'); process.exit(1); }
+          console.log('ok: ' + dup.join(' ') + ' / ' + clean.join(' '));
+          "
+      # The action is the Marketplace listing. Publishing one that does not run
+      # is worse than not publishing: it is a public page that fails for
+      # whoever tries it. fail-on-error is false because the relay being down
+      # is not this test's business - what is being asserted is that the action
+      # runs, produces its outputs and parses its own output.
+      - name: The action itself runs
+        id: act
+        uses: ./
+        with:
+          host: mx.msgwing.com
+          ports: '25,587'
+          cert-expiry-days: '0'
+          fail-on-error: 'false'
+      - name: The action produced usable outputs
+        run: |
+          echo "ok=${{ steps.act.outputs.ok }}"
+          echo "soonest=${{ steps.act.outputs.soonest-expiry-days }} dni"
+          case "${{ steps.act.outputs.ok }}" in
+            true|false) ;;
+            *) echo "::error::ok output was not a boolean"; exit 1 ;;
+          esac
+          echo '${{ steps.act.outputs.result }}' | jq -e '.ports | length == 2' > /dev/null             || { echo "::error::result JSON did not carry both ports"; exit 1; }
+      - name: Package metadata is publishable, and ships errors.js
+        run: |
+          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
+          grep -q "errors.js" /tmp/pack.txt             || { echo "::error::errors.js missing from the tarball - --explain would crash for every user"; exit 1; }
         working-directory: packages/zerosmtp-check
 
   csharp:

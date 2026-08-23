@@ -23,15 +23,29 @@
       "product": "ineo and ineo+ MFPs",
       "status": "none-planned",
       "models": [
-        "ineo 306", "ineo 7228", "ineo 266",
-        "ineo+ 266", "ineo+ 256", "ineo+ 226",
-        "ineo 4752", "ineo 4052",
-        "ineo 4750", "ineo 4050",
-        "ineo+ 3110", "ineo+ 3100P",
-        "ineo+ 754e", "ineo+ 654e",
-        "ineo 246", "ineo 236", "ineo 226", "ineo 216",
-        "ineo 4700P", "ineo 3301P", "ineo 4000P",
-        "ineo 165 variants", "ineo 185 variants"
+        "ineo 306",
+        "ineo 7228",
+        "ineo 266",
+        "ineo+ 266",
+        "ineo+ 256",
+        "ineo+ 226",
+        "ineo 4752",
+        "ineo 4052",
+        "ineo 4750",
+        "ineo 4050",
+        "ineo+ 3110",
+        "ineo+ 3100P",
+        "ineo+ 754e",
+        "ineo+ 654e",
+        "ineo 246",
+        "ineo 236",
+        "ineo 226",
+        "ineo 216",
+        "ineo 4700P",
+        "ineo 3301P",
+        "ineo 4000P",
+        "ineo 165 variants",
+        "ineo 185 variants"
       ],
       "evidence": "https://www.develop.eu/en/support/discontinuation-of-basic-authentication-for-smtp.html",
       "notes": "Marked \"N/A\" in the vendor's own OAuth column. The advisory points these owners at a different mail service rather than at an update. Other ineo product groups in the same advisory do have OAuth firmware - check the exact model. A third category exists that is neither: several Product Group 10 models are listed as \"Under planning\" with no release date, so their owners have no answer yet in either direction."
@@ -41,10 +55,14 @@
       "product": "ConnectKey printers and MFPs",
       "status": "partial",
       "models": [
-        "VersaLink B415", "VersaLink C415",
-        "VersaLink B620", "VersaLink C620",
-        "VersaLink B625", "VersaLink C625",
-        "AltaLink", "PrimeLink"
+        "VersaLink B415",
+        "VersaLink C415",
+        "VersaLink B620",
+        "VersaLink C620",
+        "VersaLink B625",
+        "VersaLink C625",
+        "AltaLink",
+        "PrimeLink"
       ],
       "evidence": "https://www.xerox.com/en-us/office/insights/exchange-online-authentication",
       "notes": "Device Code Flow is supported broadly; Client Credentials Flow only on the ConnectKey models listed. Devices not on Xerox's supported-firmware list are the problem cases and are not promised an update. Affects Scan to Email, Internet Fax (Send), Fax Forward to Email and Auto Email Notifications."
@@ -69,7 +87,9 @@
       "vendor": "Canon",
       "product": "Maxify MB2755",
       "status": "unsupported",
-      "models": ["Maxify MB2755"],
+      "models": [
+        "Maxify MB2755"
+      ],
       "evidence": "https://github.com/msgwing/ZeroSMTP/blob/main/docs/DEVICE-CASE-STUDIES.md",
       "notes": "Separate failure mode from OAuth: the firmware ships a fixed root CA store predating current Let's Encrypt roots, so certificate validation fails regardless of authentication. Hardware-confirmed, unchanged after a firmware update. Verification has to be disabled on the device."
     },
@@ -151,7 +171,16 @@
       "status": "check-advisory",
       "models": [],
       "evidence": "https://faxination.com/microsoft-timeline-for-basic-authentication-deprecation-in-exchange-online-smtp-auth/",
-      "notes": "Vendor published a timeline notice. Apply their update if one exists for the version in use; otherwise the outbound SMTP account has to be repointed."    },
+      "notes": "Vendor published a timeline notice. Apply their update if one exists for the version in use; otherwise the outbound SMTP account has to be repointed."
+    },
+    {
+      "vendor": "Lexmark",
+      "product": "printers and MFPs",
+      "status": "check-advisory",
+      "models": [],
+      "evidence": "https://support.lexmark.com/content/support/guides/en/kb20211110020010549/setup-installation-and-configuration-issues/how-to-set-up-oauth-2-authentication.html",
+      "notes": "Lexmark documents OAuth 2.0 authentication for printers starting with the FW24 firmware release, including Outlook Live and Microsoft 365. The Email Server flow is configured through the printer's Embedded Web Server and requires OAuth 2.0 registration. Verify the specific device and firmware before assuming support."
+    },
     {
       "vendor": "HP",
       "product": "printers and MFPs",

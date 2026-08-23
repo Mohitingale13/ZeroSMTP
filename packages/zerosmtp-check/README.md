@@ -8,6 +8,36 @@ npx zerosmtp-check smtp.office365.com
 
 No install, no credentials, no mail sent, **no dependencies**.
 
+## Or: what does this error mean?
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+The string you are looking at is almost never the one the server sent. Your
+client rewrote it first, and each one mangles it differently:
+
+| You are | You see | The cause |
+|---|---|---|
+| a developer | `SMTPAuthenticationError: (535, b'5.7.139 ...')` | the same |
+| a sysadmin | `SASL authentication failed; server said: 535 ...` | the same |
+| a printer technician | `1102` on the panel | the same |
+| using curl | `curl: (67) Login denied` | **discarded — curl prints none of it** |
+
+Paste any of them. It tells you what the refusal actually is, **whether it can
+still be turned back on before the end of December 2026**, and what to do if it
+cannot.
+
+```bash
+npx zerosmtp-check --explain 1102                       # a code off a panel
+grep -i sasl /var/log/mail.log | npx zerosmtp-check --explain
+npx zerosmtp-check --explain "5.7.57" --json            # for a script
+```
+
+It does not guess. An error it has no record of exits 1 and says so, rather
+than offering a plausible answer — a diagnostic that invents a cause costs more
+than one that admits it does not know.
+
 ## Why this exists
 
 When a send fails, the symptom is almost always the same: it hangs, then it
@@ -23,7 +53,7 @@ This tells the cases apart in about two seconds.
 
 ## What it checks
 
-For each port (587 and 465 by default):
+For each port (25, 587 and 465 by default):
 
 - DNS resolution
 - TCP connect, with a real timeout rather than hanging
@@ -38,6 +68,21 @@ The conversation stops after `EHLO`. Nothing is authenticated and nothing is
 delivered.
 
 ## Usage
+### Why port 25 is in there
+
+25 is checked first because it is the one your provider is most likely to
+block, so it answers "is this the network or is it me" before anything else
+does.
+
+Whether you can *send* over 25 depends on the server, and the check does not
+guess: it reports the AUTH mechanisms the server actually advertised. This
+relay offers none there, so the report says so and points at 587 and 465
+instead. Plenty of other servers do offer AUTH on 25 and the report will say
+that too.
+
+That distinction matters because a port that connects and looks perfectly
+healthy but offers no way to log in is exactly how an afternoon disappears.
+
 
 ```
 npx zerosmtp-check [host] [options]
