@@ -110,6 +110,11 @@ ever handles the specific notification traffic it's meant for.
 
 ## Legacy: the classic IIS SMTP relay (not recommended for new setups)
 
+> Its own page now: **[IIS SMTP relay and Microsoft 365](IIS-SMTP-RELAY.md)**
+> — the queue and Badmail directories where this fails silently, the three
+> settings that matter, and the three options when the application cannot
+> be reconfigured. The short version is below.
+
 If you're maintaining an old application that only supports "deliver to
 local SMTP server" and can't be reconfigured to connect directly, the
 [Microsoft doc linked above](https://learn.microsoft.com/en-us/iis/application-frameworks/install-and-configure-php-on-iis/configure-smtp-e-mail-in-iis-7-and-above)
