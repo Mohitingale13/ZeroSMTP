@@ -31,7 +31,8 @@
       "meaning": "Microsoft 365 refused username-and-password authentication. The credentials are almost certainly fine — the authentication *method* is switched off. Retyping the password, generating a new one, or recreating the mailbox will not change anything.",
       "wrappers": [
         "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
-        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.",
+        ".NET - `System.Net.Mail.SmtpClient`, and therefore PowerShell's `Send-MailMessage` - throws `SmtpException` with the server's text discarded entirely and the message translated into the operating system's language. Measured on a Polish system it reads \"Uwierzytelnianie nie powiodlo sie\"; on an English one, \"Authentication failed\". Either way there is no 535, no 5.7.139 and nothing to search for, which is why this failure is usually reported as a wrong password."
       ]
     },
     {
@@ -43,7 +44,8 @@
       "meaning": "The same refusal, reported at tenant level: the block applies to every mailbox that inherits the tenant setting, not just the one you are testing. Switching to a different mailbox will produce the same error, which is the fastest way to confirm you are in this case rather than the per-mailbox one.",
       "wrappers": [
         "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
-        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.",
+        ".NET - `System.Net.Mail.SmtpClient`, and therefore PowerShell's `Send-MailMessage` - throws `SmtpException` with the server's text discarded entirely and the message translated into the operating system's language. Measured on a Polish system it reads \"Uwierzytelnianie nie powiodlo sie\"; on an English one, \"Authentication failed\". Either way there is no 535, no 5.7.139 and nothing to search for, which is why this failure is usually reported as a wrong password."
       ]
     },
     {
@@ -55,7 +57,8 @@
       "meaning": "The same refusal, reported for this one mailbox. Either an admin disabled it explicitly here, or it inherits a tenant-wide block and Microsoft is naming the mailbox rather than the tenant. Common on personal Outlook.com accounts and on single mailboxes that have been locked down deliberately — worth asking why before undoing it.",
       "wrappers": [
         "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
-        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.",
+        ".NET - `System.Net.Mail.SmtpClient`, and therefore PowerShell's `Send-MailMessage` - throws `SmtpException` with the server's text discarded entirely and the message translated into the operating system's language. Measured on a Polish system it reads \"Uwierzytelnianie nie powiodlo sie\"; on an English one, \"Authentication failed\". Either way there is no 535, no 5.7.139 and nothing to search for, which is why this failure is usually reported as a wrong password."
       ]
     },
     {
@@ -67,7 +70,8 @@
       "meaning": "A generic refusal with the same set of causes as 5.7.139, but without the sub-code that tells you which. Because it names nothing, it is the one most often mistaken for a wrong password. Check the four causes before touching the credentials.",
       "wrappers": [
         "Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.3 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.",
-        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said."
+        "`curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.",
+        ".NET - `System.Net.Mail.SmtpClient`, and therefore PowerShell's `Send-MailMessage` - throws `SmtpException` with the server's text discarded entirely and the message translated into the operating system's language. Measured on a Polish system it reads \"Uwierzytelnianie nie powiodlo sie\"; on an English one, \"Authentication failed\". Either way there is no 535, no 5.7.139 and nothing to search for, which is why this failure is usually reported as a wrong password."
       ]
     },
     {
