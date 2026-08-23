@@ -65,6 +65,13 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
+      # Installed once, before anything that needs it. It used to live inside
+      # the last step in this job, which worked until a step that also imports
+      # yaml was added above it - and then the first person to hit
+      # ModuleNotFoundError was an outside contributor on their first pull
+      # request, on a change that had nothing to do with it.
+      - name: Python dependencies for the checks below
+        run: pip install --quiet pyyaml
       - name: Device table and pages match data/devices.json
         run: python tools/build-device-table.py --check
       - name: Error pages match data/errors.json
@@ -82,9 +89,7 @@ jobs:
       # edit had written where a regex meant backslash-1 and backslash-b.
       # Cheap to check, expensive to miss.
       - name: Workflow files parse, and carry no control characters
-        run: |
-          pip install --quiet pyyaml
-          python .github/check-workflows.py
+        run: python .github/check-workflows.py
 
   bash:
     needs: changes
