@@ -22,11 +22,22 @@ name: Do akceptacji
 # handover; the email is its side effect.
 
 on:
+  # Every two hours. A pull request from a first-time contributor cannot run
+  # its required checks until somebody approves the workflow, and nothing was
+  # watching that queue: on 2026-08-22 two pull requests from the first outside
+  # contributor this project has ever had sat for fifteen hours, unable to
+  # merge no matter how good they were. The approval requirement stays - it is
+  # what stops a stranger's fork running code on our runners - but it stops
+  # being invisible.
+  schedule:
+    - cron: '17 */2 * * *'
+  workflow_dispatch:
   issues:
     types: [labeled]
 
 permissions:
   issues: write
+  actions: read
 
 jobs:
   assign:
@@ -79,3 +90,85 @@ jobs:
             await github.rest.issues.createComment({
               owner, repo: context.repo.repo, issue_number, body,
             });
+
+  waiting:
+    if: github.event_name != 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const NL = String.fromCharCode(10);
+            const TICK = String.fromCharCode(96);
+
+            const runs = (await github.rest.actions.listWorkflowRunsForRepo({
+              owner, repo, status: 'action_required', per_page: 100,
+            })).data.workflow_runs;
+
+            const TYTUL = 'Przebiegi CI czekaja na zatwierdzenie';
+            const open = (await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'do-akceptacji', per_page: 100,
+            })).data.filter(i => !i.pull_request && i.title === TYTUL);
+
+            if (!runs.length) {
+              // Nothing waiting. Close the reminder rather than leaving a stale
+              // one open: an alert that outlives its cause is how a queue stops
+              // being read, which is the lesson the outreach queue already cost.
+              for (const i of open) {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: i.number,
+                  body: 'Kolejka pusta - nic nie czeka na zatwierdzenie. Zamykam.',
+                });
+                await github.rest.issues.update({
+                  owner, repo, issue_number: i.number, state: 'closed',
+                });
+              }
+              core.info('Nic nie czeka.');
+              return;
+            }
+
+            const godziny = (r) =>
+              Math.round((Date.now() - new Date(r.created_at).getTime()) / 3600000);
+            const najstarszy = Math.max(...runs.map(godziny));
+
+            const wiersze = runs.slice(0, 15).map(
+              r => '| ' + godziny(r) + 'h | ' + TICK + r.head_branch + TICK +
+                   ' | ' + r.name + ' |');
+
+            const body = [
+              '**' + runs.length + ' przebieg(ow) CI czeka na zatwierdzenie.**' +
+                ' Najstarszy: **' + najstarszy + 'h**.',
+              '',
+              'Pull request od kogos, kto zglasza sie tu pierwszy raz, **nie moze',
+              'uruchomic wymaganych sprawdzen**, dopoki ktos nie zatwierdzi jego',
+              'workflow. Bez tego nie scali sie nigdy, niezaleznie od tego, jak',
+              'dobra jest zmiana.',
+              '',
+              '| Czeka | Galaz | Workflow |',
+              '|---|---|---|',
+              ...wiersze,
+              '',
+              '**Zanim zatwierdzisz:** otworz roznice i sprawdz, czy zmiana nie',
+              'rusza .github/, tools/ ani zadnego pliku wykonywalnego.',
+              'Zatwierdzenie uruchamia kod z cudzego forka na naszych runnerach -',
+              'dla zmiany w dokumentacji to nic, dla zmiany w workflow to wszystko.',
+              '',
+              'Kolejka: https://github.com/' + owner + '/' + repo +
+                '/actions?query=is%3Aaction_required',
+              '',
+              '_To zgloszenie zamknie sie samo, gdy kolejka bedzie pusta._',
+            ].join(NL);
+
+            if (open.length) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: open[0].number, body,
+              });
+              core.notice('Zaktualizowano #' + open[0].number);
+            } else {
+              const issue = await github.rest.issues.create({
+                owner, repo, title: TYTUL, body,
+                labels: ['do-akceptacji'], assignees: [owner],
+              });
+              core.notice('Utworzono ' + issue.data.html_url);
+            }
