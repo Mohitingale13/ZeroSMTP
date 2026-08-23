@@ -108,7 +108,7 @@ jobs:
 
             const TYTUL = 'Przebiegi CI czekaja na zatwierdzenie';
             const open = (await github.rest.issues.listForRepo({
-              owner, repo, state: 'open', labels: 'do-akceptacji', per_page: 100,
+              owner, repo, state: 'open', labels: 'stan:zalegle', per_page: 100,
             })).data.filter(i => !i.pull_request && i.title === TYTUL);
 
             if (!runs.length) {
@@ -140,6 +140,8 @@ jobs:
               '**' + runs.length + ' przebieg(ow) CI czeka na zatwierdzenie.**' +
                 ' Najstarszy: **' + najstarszy + 'h**.',
               '',
+              'Do wykonania przez firme, nie przez wlasciciela.',
+              '',
               'Pull request od kogos, kto zglasza sie tu pierwszy raz, **nie moze',
               'uruchomic wymaganych sprawdzen**, dopoki ktos nie zatwierdzi jego',
               'workflow. Bez tego nie scali sie nigdy, niezaleznie od tego, jak',
@@ -168,7 +170,11 @@ jobs:
             } else {
               const issue = await github.rest.issues.create({
                 owner, repo, title: TYTUL, body,
-                labels: ['do-akceptacji'], assignees: [owner],
+                // Deliberately unassigned. The owner's instruction on
+                // 2026-08-23: the company accepts and acts, and nothing routes
+                // to them for approval. Assigning them is what makes GitHub
+                // send mail, so leaving it off is the whole mechanism.
+                labels: ['stan:zalegle'],
               });
               core.notice('Utworzono ' + issue.data.html_url);
             }
