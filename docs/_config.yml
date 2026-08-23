@@ -230,3 +230,21 @@ defaults:
 
 exclude:
   - assets/*.py
+
+# Search-engine webmaster verification. Paste the token each console gives you;
+# an empty value emits no tag at all, so a half-configured entry cannot ship a
+# broken one.
+#
+# Google Search Console is the one that matters most and is the one missing:
+# it reports the actual queries that brought somebody to this site, which is
+# the only legitimate source for that - search queries are not public and there
+# is no list of them anywhere to be found. Without it the seventeen error pages
+# are aimed at a December traffic spike we have no way to watch.
+#
+#   Google: search.google.com/search-console -> add property docs.msgwing.com
+#           -> HTML tag -> copy the content="..." value here
+#   Bing:   bing.com/webmasters -> can import directly from Search Console
+verification:
+  google: ""
+  bing: ""
+  yandex: "54561a99b7e3ae2b"
