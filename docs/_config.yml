@@ -70,6 +70,18 @@ defaults:
     values:
       layout: default
       image: /assets/social-preview.png
+  # The generated reference pages. Scoped by directory so a page added by
+  # tools/build-error-pages.py or build-device-table.py inherits the markup
+  # without anybody remembering to list it - the alternative is a per-file
+  # scope that goes stale the first time a generator runs.
+  - scope:
+      path: "errors"
+    values:
+      schema: reference
+  - scope:
+      path: "devices"
+    values:
+      schema: reference
   - scope:
       path: "index.md"
     values:
@@ -230,3 +242,23 @@ defaults:
 
 exclude:
   - assets/*.py
+
+# Search-engine webmaster verification. Paste the token each console gives you;
+# an empty value emits no tag at all, so a half-configured entry cannot ship a
+# broken one.
+#
+# Google Search Console is the one that matters most and is the one missing:
+# it reports the actual queries that brought somebody to this site, which is
+# the only legitimate source for that - search queries are not public and there
+# is no list of them anywhere to be found. Without it the seventeen error pages
+# are aimed at a December traffic spike we have no way to watch.
+#
+#   Google: verified 2026-08-23 as a domain property (sc-domain:), so no tag is
+#           needed here and the slot stays empty on purpose. Left in place
+#           because a URL-prefix property would need one and the next person
+#           should not have to re-derive that.
+#   Bing:   bing.com/webmasters -> can import directly from Search Console
+verification:
+  google: ""
+  bing: ""
+  yandex: "54561a99b7e3ae2b"

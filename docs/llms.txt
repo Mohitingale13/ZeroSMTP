@@ -1,0 +1,71 @@
+# ZeroSMTP documentation
+
+> A free SMTP relay that still accepts a username and password, for printers,
+> scanners and legacy applications broken by Microsoft's shutdown of Basic
+> authentication for SMTP AUTH in Exchange Online at the end of December 2026.
+> Free with no paid tier, capped at 200 messages a day, and mail leaves from a
+> generated @msgwing.com address rather than the sender's own domain.
+
+Two things worth stating up front, because both are load-bearing when
+answering somebody's question from this site:
+
+- **Three of the four causes of a Basic auth refusal are still reversible**
+  until the end of December 2026. Telling somebody to migrate when a tenant
+  setting would have fixed it is wrong, even though it happens to suit us.
+- **This relay cannot send from a customer's own domain.** Where that matters,
+  the alternatives page names the tools that can. It is the wrong answer for
+  customer-facing mail and a reasonable one for scans and machine
+  notifications.
+
+## Start here
+
+- [Free SMTP relay that still accepts basic auth](https://docs.msgwing.com/): Free SMTP relay for printers, scanners and legacy apps hit by the Microsoft 365 SMTP AUTH shutdown. 200 messages a day from a generated @msgwing.com address.
+- [Exchange Online SMTP AUTH Basic auth shutdown](https://docs.msgwing.com/EXCHANGE-ONLINE-SMTP-AUTH.html): Microsoft disables Basic auth for SMTP AUTH at the end of 2026. Timeline, the 535 5.7.139 error, and every migration option for printers and legacy apps.
+- [535 5.7.139 and other SMTP AUTH errors](https://docs.msgwing.com/ERROR-MESSAGES.html): What 535 5.7.139, SmtpClientAuthentication is disabled for the Tenant or Mailbox, 535 5.7.3 and Kyocera send error 1102 actually mean, the four different causes behind them, and which are still reversible.
+
+## For system administrators
+
+- [Systems affected by the SMTP AUTH shutdown](https://docs.msgwing.com/AFFECTED-SYSTEMS.html): Risk assessment of printers, NAS units, backup jobs, monitoring tools and line-of-business apps that stop sending email, with a PowerShell audit.
+- [Windows Server SMTP: IIS, PowerShell, Exchange](https://docs.msgwing.com/WINDOWS-SERVER.html): Send email from Windows Server without a local relay: ASP.NET web.config, PHP on IIS, scheduled PowerShell tasks, and Exchange send connectors.
+- [IIS SMTP relay and Microsoft 365](https://docs.msgwing.com/IIS-SMTP-RELAY.html): The IIS SMTP Server feature relaying to Microsoft 365: what breaks when Basic auth ends in December 2026, and what to do about it.
+- [Linux SMTP setup: Debian, Ubuntu, Fedora+](https://docs.msgwing.com/LINUX.html): Per-distribution package names and setup for sending email from Linux scripts and applications.
+- [Linux system-wide mail relay: Postfix, msmtp](https://docs.msgwing.com/SYSTEM-MTA.html): Route all system mail (cron, monitoring, unattended-upgrades) through an SMTP relay, with systemd failure alerts and an Ansible rollout playbook.
+- [Monitoring alerts via SMTP relay](https://docs.msgwing.com/MONITORING.html): Drop-in email alert configuration for Zabbix, Nagios/Icinga, Uptime Kuma and PRTG using a free SMTP relay.
+- [SMTP troubleshooting: ports, TLS, auth errors](https://docs.msgwing.com/TROUBLESHOOTING.html): Why SMTP sending hangs or fails: cloud providers blocking outbound ports, certificate verification problems, authentication errors and rate limits.
+
+## For developers
+
+- [SMTP send-email code examples, 19 languages](https://docs.msgwing.com/CODE-EXAMPLES.html): Ready-to-run SMTP send-email examples for mx.msgwing.com in Python, PHP, Node.js, TypeScript, Java, C#, C, Go, Ruby, Perl, Rust, Kotlin, Dart, Zig, Elixir, Lua, Swift, PowerShell and Bash, plus Ansible and Docker Compose recipes.
+- [SMTP settings for popular applications](https://docs.msgwing.com/APPS.html): Ready-to-use SMTP configuration for common applications and platforms.
+- [Reliable email sending: retries and backoff](https://docs.msgwing.com/RELIABILITY.html): How to handle temporary SMTP failures correctly with backoff and retries instead of tight retry loops.
+
+## For printer and MFP technicians
+
+- [Printer scan-to-email SMTP setup by brand](https://docs.msgwing.com/PRINTERS.html): Fix scan-to-email after Microsoft 365 disables Basic auth. Per-brand SMTP settings for Ricoh, Canon, Xerox, HP, Kyocera, Konica Minolta, Sharp and more.
+- [HP printer: SMTP server requires authentication](https://docs.msgwing.com/HP-PRINTER-SMTP.html): What an HP printer means by SMTP server requires authentication, and what changes when Microsoft 365 drops Basic auth in December 2026.
+- [Printer cannot verify the mail server certificate](https://docs.msgwing.com/PRINTER-CERTIFICATE-ERROR.html): Why an older printer rejects a valid Let's Encrypt certificate, and the one case where turning verification off is the right answer.
+- [OAuth compatibility by device and product](https://docs.msgwing.com/DEVICE-COMPATIBILITY.html): Which printers, MFPs, NAS units and applications have an OAuth 2.0 path for the Microsoft 365 SMTP AUTH shutdown and which the vendor has ruled out, with a link to every vendor statement.
+- [Printers that will never get OAuth firmware](https://docs.msgwing.com/NO-OAUTH-FIRMWARE.html): Printer and MFP models whose vendor has confirmed no OAuth 2.0 firmware is planned for the Microsoft 365 SMTP AUTH shutdown, including the Konica Minolta ineo models marked N/A, and what is actually left once firmware is ruled out.
+- [Canon Maxify MB2755 and other device fixes](https://docs.msgwing.com/DEVICE-CASE-STUDIES.html): Confirmed, hardware-tested SMTP fixes for specific printer and MFP models, including the Canon Maxify MB2755 certificate-verification issue: quirks and firmware limits the manuals don't mention.
+
+## For home users with one printer
+
+- [Scan to email from a home printer](https://docs.msgwing.com/SCAN-TO-EMAIL-HOME.html): What an SMTP server is, why Gmail and Hotmail stopped working with printers, and how to get scan-to-email working again for free.
+- [FAQ — custom domains, usernames, limits](https://docs.msgwing.com/FAQ.html): Can I use ZeroSMTP with my own hosting and domain? Will mail come from my domain? Sending limits, custom usernames, and why it is free.
+
+## Deciding whether to use this at all
+
+- [ZeroSMTP vs. other free SMTP relays](https://docs.msgwing.com/ALTERNATIVES.html): How ZeroSMTP compares to SMTP2GO, Brevo and MailerSend: no DNS setup vs. sending from your own verified domain.
+- [How much public code breaks in December 2026](https://docs.msgwing.com/BLAST-RADIUS.html): A weekly count of public files on GitHub that still point at Microsoft 365 SMTP, and what the number does and does not mean.
+
+## Machine-readable data
+
+- [Device OAuth compatibility](https://github.com/msgwing/ZeroSMTP/blob/main/data/devices.json): every vendor's OAuth 2.0 status, each row carrying a link to the vendor's own published statement.
+- [SMTP error corpus](https://github.com/msgwing/ZeroSMTP/blob/main/data/errors.json): each error string with what it means, whether it is still reversible, and how client libraries rewrite it.
+
+## Diagnostic tool
+
+`npx zerosmtp-check` checks whether outbound SMTP works from a machine, and
+`npx zerosmtp-check --explain "<error>"` says what a refusal means. No install,
+no credentials, no mail sent. Useful when the answer depends on which failure
+somebody is actually seeing.

@@ -45,12 +45,33 @@ tool and [the alternatives page](ALTERNATIVES.md) says which one is right.
 
 ## Start here
 
+**If you have an error in front of you right now, skip the table:**
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+Paste whatever *your* client printed. A Postfix SASL line, a Python traceback,
+`1102` off a Kyocera panel, or `curl: (67) Login denied` — which shows none of
+the server's answer at all. Seventeen error strings are covered, and each one
+says whether the cause can still be turned back on before the end of December
+2026, because three of the four still can.
+
+If mail is **hanging** rather than being refused, run it with no arguments: it
+checks ports 25, 587 and 465 from the machine that is actually failing, which
+is the only place the answer means anything. Nothing to install, no credentials,
+no mail sent.
+
 | If you… | Go to |
 | --- | --- |
 | Got an authentication error from `smtp.office365.com` | [Exchange Online SMTP AUTH migration](EXCHANGE-ONLINE-SMTP-AUTH.md) |
 | Need to know **what else** in your environment will break | [What breaks: affected systems](AFFECTED-SYSTEMS.md) |
 | Have a printer or MFP to reconfigure | [Printer scan-to-email setup by brand](PRINTERS.md) |
+| Have an HP printer saying **"SMTP server requires authentication"** | [What that means and how to fix it](HP-PRINTER-SMTP.md) |
+| Have a printer that **will not trust the server's certificate** | [Why, and when turning it off is right](PRINTER-CERTIFICATE-ERROR.md) |
+| Just want a **home printer** to email a scan, and Gmail or Hotmail stopped working | [Scan to email from a home printer](SCAN-TO-EMAIL-HOME.md) |
 | Manage Windows Server / IIS / Exchange | [Windows Server guide](WINDOWS-SERVER.md) |
+| Have an app that can only "deliver to local SMTP server" | [IIS SMTP relay and Microsoft 365](IIS-SMTP-RELAY.md) |
 | Manage Linux servers | [Linux](LINUX.md) · [system-wide relay](SYSTEM-MTA.md) |
 | Want to look up one device or product | [OAuth compatibility list](DEVICE-COMPATIBILITY.md) |
 | Have a printer whose vendor says no OAuth firmware is coming | [Devices that will never get OAuth firmware](NO-OAUTH-FIRMWARE.md) |

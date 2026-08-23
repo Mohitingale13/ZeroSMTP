@@ -14,3 +14,13 @@ Allow: /
 # nothing to hide, so no Disallow rules.
 
 Sitemap: https://docs.msgwing.com/sitemap.xml
+
+# /llms.txt is a curated map of this site for language models, grouped by who
+# is asking - administrator, developer, printer technician, somebody at home.
+# There is no robots.txt directive for it and no crawler is required to read
+# it; it is listed here because this is the file people check when they want
+# to know what a site publishes about itself.
+#
+# Every crawler is allowed above, AI crawlers included. That is deliberate:
+# an assistant answering "why did my printer stop emailing scans" from this
+# documentation is this project reaching somebody it was written for.
