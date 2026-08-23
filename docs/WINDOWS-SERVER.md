@@ -127,9 +127,35 @@ notice, treat this as a last resort, not a starting point.
 
 ## Verifying it works
 
-The [`check-connection.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.ps1) script in this repo
-works identically on Windows Server — run it first to confirm the network
-path to `mx.msgwing.com` is open before debugging application config. See
-[TROUBLESHOOTING.md](TROUBLESHOOTING.md) if it isn't (Windows Server on
-some cloud providers is subject to the same outbound port blocking as
-Linux VMs).
+Check the network path before debugging any application config. On a Windows
+Server with Node available:
+
+```powershell
+npx zerosmtp-check
+```
+
+It tests ports 25, 587 and 465 from that machine, reports whether STARTTLS and
+the certificate check pass, and lists the AUTH mechanisms the server offers.
+Nothing is installed, no credentials are sent and no mail leaves the box — the
+conversation stops after `EHLO`.
+
+No Node on that server, which is normal on a locked-down box? The
+[`check-connection.ps1`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.ps1)
+script in this repository does the same with nothing but PowerShell.
+
+**If the send is refused rather than hanging**, the network is fine and the
+server is saying no for a reason. Paste what it said:
+
+```powershell
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+`Send-MailMessage` and `System.Net.Mail` rewrite the server's answer before you
+see it, which is why the string in your log is often not the one Exchange
+Online sent. [Every error message and what it
+means](ERROR-MESSAGES.md) covers seventeen of them, each with whether the cause
+can still be turned back on before the end of December 2026.
+
+If it **hangs** instead, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — Windows
+Server on some cloud providers is subject to the same outbound port blocking as
+Linux VMs, and that looks identical to a server being down.
