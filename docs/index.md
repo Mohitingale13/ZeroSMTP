@@ -68,6 +68,7 @@ no mail sent.
 | Need to know **what else** in your environment will break | [What breaks: affected systems](AFFECTED-SYSTEMS.md) |
 | Have a printer or MFP to reconfigure | [Printer scan-to-email setup by brand](PRINTERS.md) |
 | Have an HP printer saying **"SMTP server requires authentication"** | [What that means and how to fix it](HP-PRINTER-SMTP.md) |
+| Have a printer that **will not trust the server's certificate** | [Why, and when turning it off is right](PRINTER-CERTIFICATE-ERROR.md) |
 | Just want a **home printer** to email a scan, and Gmail or Hotmail stopped working | [Scan to email from a home printer](SCAN-TO-EMAIL-HOME.md) |
 | Manage Windows Server / IIS / Exchange | [Windows Server guide](WINDOWS-SERVER.md) |
 | Have an app that can only "deliver to local SMTP server" | [IIS SMTP relay and Microsoft 365](IIS-SMTP-RELAY.md) |
