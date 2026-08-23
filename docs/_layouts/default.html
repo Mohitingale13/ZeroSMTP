@@ -316,6 +316,15 @@
       .layout { display:grid; grid-template-columns:minmax(0,1fr); gap:0 clamp(24px,3vw,40px); align-items:start; }
       @media (min-width:1040px) {
         .layout.has-rail { grid-template-columns:minmax(0,1fr) var(--rail); }
+        /* `.layout` sets align-items:start so the main column does not stretch.
+           That also shrank this grid item to the height of the card inside it,
+           which left `position:sticky` with nowhere to travel: measured on the
+           live page, the rail was 545px tall around a 513px card - 32px of
+           movement on a 4,847px page. It stuck for 32 pixels and then scrolled
+           away, which reads as sticky being broken rather than absent.
+           Stretching only this item gives it the full row height back; measured
+           again afterwards, 4,088px of travel and the card holds at top:18px. */
+        .rail { align-self:stretch; }
       }
       .rail { min-width:0; }
       .railinner { position:sticky; top:18px; }
