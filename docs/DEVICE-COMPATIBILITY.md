@@ -47,6 +47,7 @@ answer.
 | **[Lexmark](devices/lexmark-printers-and-mfps.md)** printers and MFPs | Check vendor advisory | — | [advisory](https://support.lexmark.com/content/support/guides/en/kb20211110020010549/setup-installation-and-configuration-issues/how-to-set-up-oauth-2-authentication.html) |
 | **[ManageEngine](devices/manageengine-opmanager.md)** OpManager | Check vendor advisory | — | [advisory](https://www.manageengine.com/network-monitoring/how-to/fix-smtpclientauth-disabled-error.html) |
 | **[Ricoh](devices/ricoh-multifunction-printers.md)** multifunction printers | Check vendor advisory | — | [advisory](https://www.ricoh.com/info/2025/0526_1) |
+| **[Synology](devices/synology-nas-notification-email.md)** NAS notification email | Check vendor advisory | — | [advisory](https://kb.synology.com/en-us/DSM/help/DSM/AdminCenter/system_notification_email?version=7) |
 | **[Microsoft](devices/microsoft-teams-rooms.md)** Teams Rooms | OAuth available | — | [advisory](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) |
 
 ### Notes per entry
@@ -99,10 +100,13 @@ OpManager supports OAuth 2.0 from build 126306, so for anyone on that build or l
 **Ricoh — multifunction printers**  
 Ricoh publishes affected products with per-product firmware status, revised on 2026-01-30 into two tables - products with released OAuth firmware, and products newly added - plus a third group the Ricoh Firmware Update Tool cannot update, where the local representative has to do it. Not reproduced here because the list is long and still moving; check the model against the advisory. Ricoh does not say any product is permanently excluded, but for devices still waiting its own recommendation is to stop relying on email from the device or to use a mail service other than Exchange Online.
 
+**Synology — NAS notification email**  
+Synology DSM 7 supports Outlook as an email notification service with an interactive Sign In flow rather than manual SMTP credentials. Synology documents OAuth-based authentication for this Outlook integration, but availability and behavior depend on the DSM version. Verify the exact DSM version and current Outlook notification configuration before assuming Microsoft 365 SMTP AUTH OAuth compatibility.
+
 **Microsoft — Teams Rooms**  
 Microsoft's own product. Enable modern auth on the resource account - no relay needed.
 
-*17 entries, last reviewed 2026-08-16.*
+*18 entries, last reviewed 2026-08-16.*
 
 <!-- END GENERATED TABLE -->
 
