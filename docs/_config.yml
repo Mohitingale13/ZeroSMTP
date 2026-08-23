@@ -74,6 +74,17 @@ defaults:
   # tools/build-error-pages.py or build-device-table.py inherits the markup
   # without anybody remembering to list it - the alternative is a per-file
   # scope that goes stale the first time a generator runs.
+  # The two pages backed by a published dataset rather than by prose.
+  - scope:
+      path: "DEVICE-COMPATIBILITY.md"
+    values:
+      schema: dataset
+      dataset_url: /data/devices.json
+  - scope:
+      path: "ERROR-MESSAGES.md"
+    values:
+      schema: dataset
+      dataset_url: /data/errors.json
   - scope:
       path: "errors"
     values:

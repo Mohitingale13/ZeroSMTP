@@ -60,8 +60,8 @@ answering somebody's question from this site:
 
 ## Machine-readable data
 
-- [Device OAuth compatibility](https://github.com/msgwing/ZeroSMTP/blob/main/data/devices.json): every vendor's OAuth 2.0 status, each row carrying a link to the vendor's own published statement.
-- [SMTP error corpus](https://github.com/msgwing/ZeroSMTP/blob/main/data/errors.json): each error string with what it means, whether it is still reversible, and how client libraries rewrite it.
+- [Device OAuth compatibility](https://docs.msgwing.com/data/devices.json): every vendor's OAuth 2.0 status, each row carrying a link to the vendor's own published statement. JSON, MIT, stable URL.
+- [SMTP error corpus](https://docs.msgwing.com/data/errors.json): each error string with what it means, whether it is still reversible, and how client libraries rewrite it. JSON, MIT, stable URL.
 
 ## Diagnostic tool
 

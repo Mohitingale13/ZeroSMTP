@@ -80,6 +80,8 @@ jobs:
         run: python tools/build-blast-radius.py --check
       - name: CLI error data matches data/errors.json
         run: python tools/build-cli-errors.py --check
+      - name: Published data matches data/
+        run: python tools/build-data-endpoints.py --check
       - name: llms.txt matches the site
         run: python tools/build-llms-txt.py --check
       - name: README Contents matches its headings
