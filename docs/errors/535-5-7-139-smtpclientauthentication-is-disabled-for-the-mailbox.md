@@ -14,6 +14,16 @@ description: "What 535 5.7.139 SmtpClientAuthentication is disabled for the Mail
 
 The same refusal, reported for this one mailbox. Either an admin disabled it explicitly here, or it inherits a tenant-wide block and Microsoft is naming the mailbox rather than the tenant. Common on personal Outlook.com accounts and on single mailboxes that have been locked down deliberately — worth asking why before undoing it.
 
+## Check it from the machine that is failing
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 SmtpClientAuthentication is disabled for the Mailbox"
+```
+
+No install and nothing sent. It reads the refusal your own client printed - which is rarely what the server said, because libraries and device panels rewrite it - and says which of these cases you are in.
+
+If the send is hanging rather than being refused, the cause is usually the network and not the credentials. `npx zerosmtp-check` with no arguments checks ports 25, 587 and 465 from where you are standing.
+
 **This does not mean your password is wrong.** Nothing about the credentials changed; the method used to present them was switched off.
 
 ## Which of the four causes is yours
@@ -63,6 +73,7 @@ Three options remain, and they differ more than they look:
 | --- | --- |
 | Connection times out; no authentication error ever appears | The network is blocking outbound SMTP. Cloud providers block port 25 and often 587 by default — see [troubleshooting](../TROUBLESHOOTING.md). |
 | `Certificate verify failed` / `unable to get local issuer certificate` | The device's trust store cannot validate the server certificate. Common on firmware predating current root CAs — see [the Canon Maxify MB2755 case](../DEVICE-CASE-STUDIES.md). |
+
 
 ## Related
 

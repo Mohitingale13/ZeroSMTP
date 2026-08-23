@@ -23,6 +23,18 @@ to check. Run the connectivity-only check — no credentials needed, no email
 sent, and the conversation stops after `EHLO`:
 
 ```bash
+npx zerosmtp-check
+```
+
+Nothing to install and nothing to clone. It tests 25, 587 and 465 from the
+machine that is actually failing, which is the only place the answer means
+anything. Port 25 is included because it is the one this table is mostly
+about — it is checked for reachability, not as a route to send by, and the
+output says so.
+
+Already have the repository checked out, or working on a box with no Node?
+
+```bash
 ./check-connection.sh
 ```
 

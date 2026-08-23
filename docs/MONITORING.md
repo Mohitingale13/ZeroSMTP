@@ -107,3 +107,27 @@ dozens of notifications in minutes. The same
 (5/minute, 50/hour, 200/day): configure alert flapping/throttling in your
 monitoring tool so a single incident doesn't burn through the daily limit
 before a human sees it.
+
+## Certificate expiry, from CI
+
+Every check above watches whether the relay is answering. None of them watches
+the thing that takes mail down without any warning at all: the certificate on
+your own mail server expiring.
+
+It is worth a separate line because of how it fails. Nothing degrades, nothing
+retries, no alert threshold is crossed. It works on Saturday and on Sunday it
+does not, and the first report is somebody saying scanning stopped working.
+
+```yaml
+- uses: msgwing/ZeroSMTP@v1.7.0
+  with:
+    host: smtp.office365.com
+    cert-expiry-days: '14'
+```
+
+Put it on a schedule and the build goes red two weeks before the certificate
+does. `fail-on-error: false` reports without failing, which is what you want if
+the host is somebody else's and a red build would page the wrong person.
+
+No credentials are used and no mail is sent - the conversation stops after
+`EHLO`, the same as [`npx zerosmtp-check`](https://www.npmjs.com/package/zerosmtp-check).

@@ -82,6 +82,26 @@ def zbuduj(wpis, aktualizacja):
         "",
         wpis["meaning"],
         "",
+        # The reader arrived here from a search box with the error already in
+        # their clipboard, and the tool that answers it in one line was not
+        # mentioned on any of these pages at all. That is a page telling
+        # somebody about a problem while withholding the thing that solves it.
+        # It goes above every other section for the same reason: they are
+        # mid-incident and reading in order.
+        "## Check it from the machine that is failing",
+        "",
+        "```bash",
+        f'npx zerosmtp-check --explain "{wpis["code"]} {wpis["message"]}"',
+        "```",
+        "",
+        "No install and nothing sent. It reads the refusal your own client "
+        "printed - which is rarely what the server said, because libraries and "
+        "device panels rewrite it - and says which of these cases you are in.",
+        "",
+        "If the send is hanging rather than being refused, the cause is usually "
+        "the network and not the credentials. `npx zerosmtp-check` with no "
+        "arguments checks ports 25, 587 and 465 from where you are standing.",
+        "",
     ]
 
     if wpis["kind"] == "auth-refused":
@@ -210,6 +230,12 @@ def zbuduj(wpis, aktualizacja):
         "certificate` | The device's trust store cannot validate the server "
         "certificate. Common on firmware predating current root CAs — see [the "
         "Canon Maxify MB2755 case](../DEVICE-CASE-STUDIES.md). |",
+        "",
+        *(["", f"**Source:** [Microsoft's own list of Exchange Online error "
+           f"codes]({wpis['source']}). This entry was written from that "
+           "documentation rather than from watching a machine fail, which is "
+           "worth knowing when you compare it against what your hardware "
+           "actually printed."] if wpis.get("source") else []),
         "",
         "## Related",
         "",

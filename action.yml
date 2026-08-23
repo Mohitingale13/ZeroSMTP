@@ -1,0 +1,113 @@
+name: 'ZeroSMTP Check'
+description: 'Check outbound SMTP from a runner: ports, TLS, AUTH, and fail the job when the mail certificate is near expiry.'
+author: 'msgwing'
+
+branding:
+  icon: 'mail'
+  color: 'purple'
+
+inputs:
+  host:
+    description: 'SMTP host to check.'
+    required: false
+    default: 'mx.msgwing.com'
+  ports:
+    description: 'Comma-separated ports. 25 is checked for reachability; whether it can be sent by depends on the server and the output says which.'
+    required: false
+    default: '25,587,465'
+  timeout:
+    description: 'Per-step timeout in milliseconds.'
+    required: false
+    default: '10000'
+  cert-expiry-days:
+    description: 'Fail if any certificate expires within this many days. 0 disables the check. A mail certificate nobody is watching expires on a Sunday.'
+    required: false
+    default: '0'
+  fail-on-error:
+    description: 'Fail the job when a port is unreachable or a certificate does not verify. Set to false to report without failing, which is what you want on a scheduled canary that should not page anybody.'
+    required: false
+    default: 'true'
+
+outputs:
+  ok:
+    description: 'true when every checked port was reachable with a valid certificate.'
+    value: ${{ steps.check.outputs.ok }}
+  result:
+    description: 'The full result as JSON.'
+    value: ${{ steps.check.outputs.result }}
+  soonest-expiry-days:
+    description: 'Days until the earliest certificate expiry across the checked ports, or empty if no certificate was read.'
+    value: ${{ steps.check.outputs.soonest }}
+
+runs:
+  using: 'composite'
+  steps:
+    # No install step and no npm at all. The tool has zero dependencies, so the
+    # file that ships with this action is the whole thing - which also means
+    # this action cannot break because a registry was slow or a version moved.
+    - id: check
+      shell: bash
+      run: |
+        set +e
+        IFS=',' read -ra PORTS <<< "${{ inputs.ports }}"
+        # index.js takes a single --port, so one pass per port and the results
+        # are merged here rather than pretending the CLI does something it does not.
+        merged='{"ports":[]}'
+        for p in "${PORTS[@]}"; do
+          p=$(echo "$p" | tr -d '[:space:]')
+          out=$(node "$GITHUB_ACTION_PATH/packages/zerosmtp-check/index.js" \
+            "${{ inputs.host }}" --port "$p" --timeout "${{ inputs.timeout }}" --json)
+          rc=$?
+          if [ "$rc" = "2" ]; then
+            echo "::error::${{ inputs.host }} does not resolve"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            [ "${{ inputs.fail-on-error }}" = "true" ] && exit 1
+            exit 0
+          fi
+          merged=$(printf '%s\n%s' "$merged" "$out" | jq -s '{host: (.[1].host), addresses: (.[1].addresses), ports: (.[0].ports + .[1].ports)}')
+        done
+        set -e
+
+        echo "$merged" | jq -r '.ports[] | "port \(.port): tcp=\(.tcp) tls=\(.tls) auth=\(.auth|join(" ")|if .=="" then "none" else . end)\(if .error then " error=\(.error)" else "" end)"'
+
+        ok=$(echo "$merged" | jq -r '[.ports[] | (.tcp and .tls and (.cert == null or .cert.authorized) and (.error == null))] | all')
+        echo "ok=$ok" >> "$GITHUB_OUTPUT"
+        {
+          echo "result<<ZEROSMTP_EOF"
+          echo "$merged"
+          echo "ZEROSMTP_EOF"
+        } >> "$GITHUB_OUTPUT"
+
+        # Certificate expiry. The CLI reports validTo per port; the soonest one
+        # is what matters, because that is the day mail stops.
+        soonest=$(echo "$merged" | jq -r '[.ports[].cert.validTo // empty] | .[]' | while read -r d; do
+          date -u -d "$d" +%s 2>/dev/null || true
+        done | sort -n | head -1)
+        days=""
+        if [ -n "$soonest" ]; then
+          days=$(( (soonest - $(date -u +%s)) / 86400 ))
+          echo "soonest=$days" >> "$GITHUB_OUTPUT"
+          echo "earliest certificate expiry: $days days"
+        else
+          echo "soonest=" >> "$GITHUB_OUTPUT"
+        fi
+
+        {
+          echo "### ZeroSMTP check - ${{ inputs.host }}"
+          echo ""
+          echo "| Port | TCP | TLS | AUTH |"
+          echo "|---|---|---|---|"
+          echo "$merged" | jq -r '.ports[] | "| \(.port) | \(if .tcp then "ok" else "FAIL" end) | \(if .tls then "ok" else "FAIL" end) | \(.auth|join(" ")|if .=="" then "none offered" else . end) |"'
+          echo ""
+          [ -n "$days" ] && echo "Earliest certificate expiry: **$days days**."
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        limit="${{ inputs.cert-expiry-days }}"
+        if [ "$limit" != "0" ] && [ -n "$days" ] && [ "$days" -lt "$limit" ]; then
+          echo "::error::certificate expires in $days days, which is under the $limit day limit"
+          exit 1
+        fi
+        if [ "$ok" != "true" ] && [ "${{ inputs.fail-on-error }}" = "true" ]; then
+          echo "::error::at least one port failed - see the rows above"
+          exit 1
+        fi

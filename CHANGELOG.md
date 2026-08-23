@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.7.0] - 2026-08-22
+
+The project's own tool became worth installing, and the one GitHub surface it
+was absent from is ready to list it.
+
+### Added
+- **A GitHub Action.** `action.yml` at the repository root checks outbound SMTP
+  from a runner and **fails the job when the mail server's certificate is
+  inside a window you set**. Nobody watches a mail certificate; it expires on a
+  Sunday and the first report is somebody saying scanning stopped working.
+  `fail-on-error: false` covers the other use, a scheduled canary that should
+  not page anyone. No install and no npm - the tool has no dependencies, so the
+  action runs the file shipped beside it.
+- **`zerosmtp-check --explain`.** Paste the refusal your own client printed - a
+  Postfix SASL line, a Python traceback, `1102` off a Kyocera panel, or the
+  `curl: (67) Login denied` that shows none of the server's answer. Four
+  strings, one cause. It says which case you are in and whether it can still be
+  turned back on before the end of December 2026, and exits 1 rather than
+  guessing when it has no record of the string.
+- **Port 25** is checked by default and goes first, because it is the one a
+  provider is most likely to block.
+- An issue form for error strings, which is what feeds the pages above.
+
+### Fixed
+- AUTH mechanisms are de-duplicated. `poczta.interia.pl` advertises
+  `AUTH PLAIN LOGIN PLAIN LOGIN PLAIN LOGIN`; that is genuinely what it sends,
+  and printing it back verbatim reads like a fault when it is a duplicated SASL
+  config. The repetition now gets its own line.
+- Importing the tool no longer opens sockets as a side effect, which is why its
+  only piece of pure string handling had never been testable offline.
+- The docs claimed port 25 offers no AUTH on "most" servers. Never measured,
+  and two of two hosts tried disproved it. The claim is gone; the report says
+  what the server said.
+- Every error page, the README and the package's own homepage now name the tool
+  that answers the question they are about. None of them did.
+
 ## [Unreleased]
 
 ### Added

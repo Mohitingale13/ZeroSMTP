@@ -51,3 +51,6 @@ free-for-dev/
 # file. The upstream copies it is built from are versioned in the private team
 # repo at .claude/agents/karpathy/.
 /CLAUDE.md
+
+# Coordinator scratch, swept into main by a `git add -A` on 2026-08-22.
+.pr-body.md
