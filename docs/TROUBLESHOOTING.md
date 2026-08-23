@@ -79,6 +79,37 @@ your provider's support to unblock outbound SMTP for your account/instance.
   value or (on Windows) your OS login name — see the note in
   [`.env.example`](https://github.com/msgwing/ZeroSMTP/blob/main/.env.example).
 
+## Authentication failed against Microsoft 365, not against us
+
+Everything above assumes the server refusing you is this relay. If you are
+still pointed at `smtp.office365.com`, `smtp-mail.outlook.com` or Gmail, the
+refusal is theirs and the cause is probably not your password.
+
+Microsoft is switching off Basic authentication - username and password - for
+SMTP AUTH in Exchange Online at the end of December 2026. Devices and scripts
+that have worked for years start being refused on a day nobody touched them,
+with the password still correct.
+
+Find out which it is without guessing:
+
+```bash
+npx zerosmtp-check --explain "535 5.7.139 Authentication unsuccessful"
+```
+
+Paste whatever your own client printed rather than what you think it means. A
+Postfix SASL line, a Python traceback, a code off a printer panel and
+`curl: (67) Login denied` are frequently the same refusal, and `curl` shows
+none of the server's text at all.
+
+- [Every SMTP AUTH error and what it means](ERROR-MESSAGES.md) - seventeen
+  strings, each with whether the cause can still be turned back on
+- [What to do about the shutdown](EXCHANGE-ONLINE-SMTP-AUTH.md) - including the
+  options that are not this project
+- [Which devices have OAuth firmware](DEVICE-COMPATIBILITY.md)
+
+Three of the four causes are still reversible before the deadline, so somebody
+telling you to migrate today may be wrong. Check which case you are in first.
+
 ## Certificate / TLS verification failed
 
 - Do not disable certificate verification to "fix" this (no code example in
