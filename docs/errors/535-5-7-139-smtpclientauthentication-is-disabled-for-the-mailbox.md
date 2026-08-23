@@ -52,6 +52,7 @@ Libraries and device firmware rarely pass the server's message through unchanged
 
 - Python `smtplib` raises `SMTPAuthenticationError: (535, b'5.7.139 ...')`. The numeric code is split off into its own field and the rest arrives as a bytes literal, so searching for the message with `535` still in front of it returns nothing.
 - `curl` prints only `curl: (67) Login denied` and discards the server's text entirely. There is nothing in that line about the tenant, the mailbox or Basic authentication, which is why it is usually mistaken for a wrong password. Add `-v` to see what the server actually said.
+- .NET - `System.Net.Mail.SmtpClient`, and therefore PowerShell's `Send-MailMessage` - throws `SmtpException` with the server's text discarded entirely and the message translated into the operating system's language. Measured on a Polish system it reads "Uwierzytelnianie nie powiodlo sie"; on an English one, "Authentication failed". Either way there is no 535, no 5.7.139 and nothing to search for, which is why this failure is usually reported as a wrong password.
 
 Kyocera MFPs report it as **send error 1102** / `0x1102`, which looks like a hardware fault and is not one.
 
