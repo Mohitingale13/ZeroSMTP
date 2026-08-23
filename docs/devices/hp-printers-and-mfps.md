@@ -36,6 +36,8 @@ ZeroSMTP is the second option. It is free with no paid tier, accepts plain SMTP 
 
 ## Related
 
+- **[HP printer: "SMTP server requires authentication"](../HP-PRINTER-SMTP.md)** — the detailed guide for HP, including what the error on the panel actually means
+
 - [What the error message means](../ERROR-MESSAGES.md) — if the HP device is reporting a code rather than a sentence
 - [The full compatibility list](../DEVICE-COMPATIBILITY.md) — every vendor, in one table
 - [Setup by printer brand](../PRINTERS.md) — where the SMTP fields actually live in each vendor's interface
