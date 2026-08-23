@@ -194,6 +194,35 @@ jobs:
                 continue;
               }
 
+              // Whose ecosystem is it? A mail heading is not enough either:
+              // a list of Swift libraries has one and will never take a Node
+              // CLI, and a list of macOS apps will never take a hosted relay.
+              // The first two runs queued matteocrippa/awesome-swift,
+              // enescingoz/awesome-n8n-templates and a macOS-only app list,
+              // all of which passed every other gate. Eight venues surfaced,
+              // three were usable: 37% precision, and this is the half of it
+              // that is mechanical.
+              //
+              // Only ecosystems we are actually in are allowed through. We
+              // ship a Node CLI and a hosted service, so a list scoped to any
+              // other language or platform is the wrong list no matter how
+              // well the entry is written.
+              const NASZE = ['node', 'nodejs', 'javascript', 'cli', 'npm'];
+              const OBCE = [
+                'swift', 'rust', 'golang', ' go ', 'python', 'php', 'ruby',
+                'kotlin', 'java ', 'flutter', 'dart', 'react', 'vue', 'angular',
+                'n8n', 'wordpress', 'laravel', 'django', 'macos', 'mac os',
+                'ios', 'android', 'unity', 'godot', 'elixir', 'scala',
+              ];
+              const tozsamosc = ((r.name || '') + ' ' + (r.description || '')).toLowerCase();
+              const obcy = OBCE.find(w => tozsamosc.includes(w));
+              if (obcy && !NASZE.some(w => tozsamosc.includes(w))) {
+                core.info(`${r.full_name}: rejected - scoped to ${obcy.trim()}, `
+                  + `which is not an ecosystem this project is in`);
+                rejected++;
+                continue;
+              }
+
               // And it has to have a section this belongs in - a *heading*,
               // not the word somewhere in the prose. A general list with no
               // mail section is not a rejection of the project, it is simply
