@@ -181,7 +181,22 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/apple-touch-icon.png' | relative_url }}">
     <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
 
-    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    {% comment %}
+      No ?v= cache-buster here on purpose, removed 2026-08-23.
+
+      It appended site.github.build_revision, which is the commit SHA, so every
+      commit produced a different stylesheet URL. Thirty commits in two days
+      meant thirty URLs for one unchanged file, and Googlebot re-fetched it each
+      time: Search Console reported 25% of the crawl budget going to CSS while
+      only 10% of requests were discovery. Thirty-six pages sat unindexed while
+      the crawler re-read normalize.css.
+
+      It was buying nothing. Checked against the live response rather than
+      assumed: GitHub Pages already serves this with Cache-Control max-age=600
+      and an ETag, so the worst case without a buster is a ten-minute-old
+      stylesheet, and the ETag usually prevents even that.
+    {% endcomment %}
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
     <style>
       /* ==================================================================
