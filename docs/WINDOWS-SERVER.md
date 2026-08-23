@@ -10,6 +10,15 @@
 > The modern equivalent — connecting directly to `mx.msgwing.com`, no local
 > relay component needed — is the recommended approach below.
 
+> **The username and password come from an account, and the account is free.**
+> Register at [msgwing.com](https://msgwing.com), activate, and copy the
+> generated login and password — they are shown once. Mail leaves from that
+> generated `@msgwing.com` address rather than your own domain, and the cap is
+> 200 messages a day with no paid tier that lifts it. Both limits are stated
+> here rather than discovered later; if either one rules this out for you,
+> [the alternatives page](ALTERNATIVES.md) names the tools that do not have
+> them.
+
 ## Top pick: point your app straight at ZeroSMTP (no local relay needed)
 
 You don't need any Windows feature installed at all — ASP.NET, classic

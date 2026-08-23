@@ -6,6 +6,15 @@ server" to send notifications, password resets, contact-form messages, or
 alerts. It cannot be used as an inbox, so skip any "incoming mail" /
 IMAP / POP3 field these applications might also offer.
 
+> **The username and password come from an account, and the account is free.**
+> Register at [msgwing.com](https://msgwing.com), activate, and copy the
+> generated login and password — they are shown once. Mail leaves from that
+> generated `@msgwing.com` address rather than your own domain, and the cap is
+> 200 messages a day with no paid tier that lifts it. Both limits are stated
+> here rather than discovered later; if either one rules this out for you,
+> [the alternatives page](ALTERNATIVES.md) names the tools that do not have
+> them.
+
 ## Connection values (same for every application)
 
 | Setting | Value |

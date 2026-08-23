@@ -10,6 +10,15 @@ don't have to guess package names per distro.
 > GitHub Codespace via the badge in the [README](https://github.com/msgwing/ZeroSMTP#readme)) — every
 > runtime in the tables below comes preinstalled.
 
+> **The username and password come from an account, and the account is free.**
+> Register at [msgwing.com](https://msgwing.com), activate, and copy the
+> generated login and password — they are shown once. Mail leaves from that
+> generated `@msgwing.com` address rather than your own domain, and the cap is
+> 200 messages a day with no paid tier that lifts it. Both limits are stated
+> here rather than discovered later; if either one rules this out for you,
+> [the alternatives page](ALTERNATIVES.md) names the tools that do not have
+> them.
+
 ## Base tools (curl, openssl)
 
 Needed for [`check-connection.sh`](https://github.com/msgwing/ZeroSMTP/blob/main/check-connection.sh) and
