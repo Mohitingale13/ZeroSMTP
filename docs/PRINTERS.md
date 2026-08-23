@@ -155,6 +155,10 @@ them in the printer's own credential store, not a shared document.
 
 ---
 
+> **Home printer, and not sure what any of this means?** [Scan to email from a home printer](SCAN-TO-EMAIL-HOME.md) explains what an
+> SMTP server is and why Gmail and Hotmail stopped working, without assuming
+> you administer a mail system.
+
 ## Where the settings live, by brand
 
 Menu wording shifts between firmware versions, but locations are stable
