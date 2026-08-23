@@ -166,6 +166,10 @@ current documentation — check there if the wording has moved on your model.
 <div id="zc-brand-picker-mount"></div>
 
 ### HP
+> Its own page: **[HP printer: "SMTP server requires authentication"](HP-PRINTER-SMTP.md)**
+> — the three reasons that message appears, which HP models can do OAuth and
+> which HP has ruled out, and what to do about each.
+
 Embedded Web Server (browser → printer's IP) → `Networking` or `Scan` tab →
 `TCP/IP Settings` → `Outgoing Email` / `Scan to Email` →
 `Outgoing Email Profiles` → add a profile using the values above.
