@@ -8,6 +8,10 @@ who actually hit the problem on real hardware.
 This page collects those reports: one device, one confirmed fix, credited to
 whoever found it.
 
+> **Hitting a certificate error on a printer?** [Printer cannot verify the mail server certificate](PRINTER-CERTIFICATE-ERROR.md)
+> explains why a valid certificate gets rejected by older firmware, and what to
+> do about it.
+
 ## Case studies
 
 ### Canon Maxify MB2755 — certificate verification must stay off, on either port
