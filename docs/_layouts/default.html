@@ -5,13 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% comment %}
-      Yandex Webmaster site-ownership verification. Not doable via DNS TXT
-      here: docs.msgwing.com is a CNAME (required for GitHub Pages), and a
-      name with a CNAME can't carry any other record type (RFC 1034) - the
-      Yandex resolver enforces this and never even looks for the TXT record,
-      unlike Google/Cloudflare's public resolvers which serve it anyway.
+      Search-engine site-ownership verification, driven from _config.yml so a
+      token is pasted in one place rather than edited into this file.
+
+      None of these can use DNS TXT: docs.msgwing.com is a CNAME, required for
+      GitHub Pages, and a name carrying a CNAME can hold no other record type
+      (RFC 1034). Yandex's resolver enforces that and never looks for the TXT
+      at all, unlike Google's and Cloudflare's public resolvers, which serve it
+      anyway. So the HTML tag is the only route for all three.
+
+      Why it matters more than a checkbox: Search Console is the only honest
+      answer to "what are people actually searching for". Search queries are
+      not public and no list of them exists to buy or harvest - the only place
+      the real ones appear is in the console of the site they landed on. It is
+      also the one feedback loop we can have on the December 2026 bet, which is
+      seventeen error pages aimed at queries we currently cannot see.
     {% endcomment %}
-    <meta name="yandex-verification" content="54561a99b7e3ae2b" />
+    {% if site.verification.google %}
+    <meta name="google-site-verification" content="{{ site.verification.google }}" />
+    {% endif %}
+    {% if site.verification.bing %}
+    <meta name="msvalidate.01" content="{{ site.verification.bing }}" />
+    {% endif %}
+    {% if site.verification.yandex %}
+    <meta name="yandex-verification" content="{{ site.verification.yandex }}" />
+    {% endif %}
 
     {% seo %}
 
