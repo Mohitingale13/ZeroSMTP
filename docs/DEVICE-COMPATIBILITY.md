@@ -36,6 +36,7 @@ answer.
 | **[QNAP](devices/qnap-nas-notification-settings.md)** NAS notification settings | No OAuth for this purpose | — | [advisory](https://gist.github.com/msgwing/39958d909e085ae9cc0e6b3584d930bf) |
 | **[HP](devices/hp-printers-and-mfps.md)** printers and MFPs | Some models or versions | — | [advisory](https://support.hp.com/nz-en/document/ish_13623350-13600809-16) |
 | **[Microsoft](devices/microsoft-dynamics-nav-business-central.md)** Dynamics NAV / Business Central | Some models or versions | — | [advisory](https://www.innovia.com/blog/microsoft-to-retire-basic-auth-smtp-for-exchange-online-what-bc-nav-users-need-to-know) |
+| **[Sharp](devices/sharp-printers-and-mfps.md)** printers and MFPs | Some models or versions | — | [advisory](https://global.sharp/restricted/products/copier/downloads/manuals/bp70m65/us/contents_09-07_003.html) |
 | **[Veeam](devices/veeam-backup-for-microsoft-365-and-related-products.md)** Backup for Microsoft 365 and related products | Some models or versions | — | [advisory](https://helpcenter.veeam.com/docs/vbo365/guide/smtp_server.html) |
 | **[Xerox](devices/xerox-connectkey-printers-and-mfps.md)** ConnectKey printers and MFPs | Some models or versions | `VersaLink B415`, `VersaLink C415`, `VersaLink B620`, `VersaLink C620`, `VersaLink B625`, `VersaLink C625`, `AltaLink`, `PrimeLink` | [advisory](https://www.xerox.com/en-us/office/insights/exchange-online-authentication) |
 | **[Brother](devices/brother-printers-mfps-and-document-scanners.md)** printers, MFPs and document scanners | Check vendor advisory | — | [advisory](https://support.brother.com/g/b/oscontents.aspx?c=us&lang=en&ossid=42) |
@@ -66,6 +67,9 @@ HP documents OAuth 2.0 support for Microsoft 365 Scan to Email on HP Enterprise 
 
 **Microsoft — Dynamics NAV / Business Central**  
 Newer Business Central handles modern auth. Older on-prem NAV installs generally need the SMTP account repointed.
+
+**Sharp — printers and MFPs**  
+Sharp documents OAuth 2.0 authentication for Microsoft 365 and Exchange Online SMTP on multiple newer printer and MFP models, including BP-series devices. Sharp does not appear to publish a centralized compatibility list or universal firmware floor for the full printer/MFP range. Verify the exact model's SMTP settings or current manual before assuming OAuth 2.0 support.
 
 **Veeam — Backup for Microsoft 365 and related products**  
 Corrected 2026-08-16 - the previous note claimed newer versions added OAuth for SMTP, which the linked page does not support. The v8 documentation offers "SMTP server (basic authentication)" and does not describe an OAuth option for SMTP notifications; modern app-only authentication appears elsewhere in the product, for Entra applications, not here. So the fix is not "upgrade and SMTP gets OAuth" - check whether your build offers a notification method that is not SMTP at all, and treat the SMTP path as basic-auth only.
@@ -106,7 +110,7 @@ Synology DSM 7 supports Outlook as an email notification service with an interac
 **Microsoft — Teams Rooms**  
 Microsoft's own product. Enable modern auth on the resource account - no relay needed.
 
-*18 entries, last reviewed 2026-08-16.*
+*19 entries, last reviewed 2026-08-16.*
 
 <!-- END GENERATED TABLE -->
 
