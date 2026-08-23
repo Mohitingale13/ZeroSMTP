@@ -38,6 +38,10 @@ inputs:
     description: 'Fail if any certificate expires within this many days. 0 disables the check. A mail certificate nobody is watching expires on a Sunday.'
     required: false
     default: '0'
+  explain:
+    description: 'An SMTP error string to decode instead of connecting. Paste what a log, a mail library or a device panel printed - a Postfix SASL line, a Python traceback, a code off a printer panel. Set this and no connection is made at all.'
+    required: false
+    default: ''
   fail-on-error:
     description: 'Fail the job when a port is unreachable or a certificate does not verify. Set to false to report without failing, which is what you want on a scheduled canary that should not page anybody.'
     required: false
@@ -60,7 +64,35 @@ runs:
     # No install step and no npm at all. The tool has zero dependencies, so the
     # file that ships with this action is the whole thing - which also means
     # this action cannot break because a registry was slow or a version moved.
+    # Decode-only mode. Every other SMTP action in the Marketplace sends mail
+    # or catches it; none of them says what a refusal means. That corpus is
+    # the one thing this project has that nothing else does, and until now it
+    # existed only in the CLI - a workflow that captured an error from a
+    # sending step had nowhere to take it.
+    - id: explain
+      if: inputs.explain != ''
+      shell: bash
+      run: |
+        set +e
+        out=$(node "$GITHUB_ACTION_PATH/packages/zerosmtp-check/index.js"           --explain "${{ inputs.explain }}")
+        rc=$?
+        set -e
+        echo "$out"
+        {
+          echo "### What that SMTP error means"
+          echo ""
+          echo '```'
+          echo "$out"
+          echo '```'
+          echo ""
+          echo "[Every SMTP AUTH error and what it means](https://docs.msgwing.com/ERROR-MESSAGES.html)"
+        } >> "$GITHUB_STEP_SUMMARY"
+        if [ "$rc" != "0" ]; then
+          echo "::warning::no record of that error string - "            "https://github.com/msgwing/ZeroSMTP/issues/new?template=error-string.yml"
+        fi
+
     - id: check
+      if: inputs.explain == ''
       shell: bash
       run: |
         set +e
@@ -74,7 +106,7 @@ runs:
             "${{ inputs.host }}" --port "$p" --timeout "${{ inputs.timeout }}" --json)
           rc=$?
           if [ "$rc" = "2" ]; then
-            echo "::error::${{ inputs.host }} does not resolve"
+            echo "::error::${{ inputs.host }} does not resolve - check the hostname before anything else. https://docs.msgwing.com/TROUBLESHOOTING.html"
             echo "ok=false" >> "$GITHUB_OUTPUT"
             [ "${{ inputs.fail-on-error }}" = "true" ] && exit 1
             exit 0
@@ -119,10 +151,19 @@ runs:
 
         limit="${{ inputs.cert-expiry-days }}"
         if [ "$limit" != "0" ] && [ -n "$days" ] && [ "$days" -lt "$limit" ]; then
-          echo "::error::certificate expires in $days days, which is under the $limit day limit"
+          echo "::error::certificate on ${{ inputs.host }} expires in $days days, under the $limit day limit. Nobody is warned when a mail certificate lapses: https://docs.msgwing.com/MONITORING.html"
           exit 1
         fi
         if [ "$ok" != "true" ] && [ "${{ inputs.fail-on-error }}" = "true" ]; then
-          echo "::error::at least one port failed - see the rows above"
+          # A failing port is one of three different problems and they have
+          # different pages. Saying which is the difference between an error a
+          # person can act on and one they have to go and research.
+          if echo "$merged" | jq -e '[.ports[]|select(.tcp==false)]|length>0' >/dev/null; then
+            echo "::error::a port could not be reached from this runner. Cloud "              "providers block outbound SMTP by default: "              "https://docs.msgwing.com/TROUBLESHOOTING.html"
+          elif echo "$merged" | jq -e '[.ports[]|select(.cert!=null and .cert.authorized==false)]|length>0' >/dev/null; then
+            echo "::error::the certificate did not verify. On a device with old "              "firmware this is usually a frozen root store rather than a real "              "problem: https://docs.msgwing.com/PRINTER-CERTIFICATE-ERROR.html"
+          else
+            echo "::error::at least one port failed - see the rows above. "              "https://docs.msgwing.com/TROUBLESHOOTING.html"
+          fi
           exit 1
         fi

@@ -445,6 +445,11 @@ jobs:
           ports: '25,587'
           cert-expiry-days: '0'
           fail-on-error: 'false'
+      - name: The action decodes an error without connecting
+        id: act_explain
+        uses: ./
+        with:
+          explain: "535 5.7.139 Authentication unsuccessful, SmtpClientAuthentication is disabled for the Tenant"
       - name: The action produced usable outputs
         run: |
           echo "ok=${{ steps.act.outputs.ok }}"
