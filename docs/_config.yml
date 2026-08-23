@@ -241,8 +241,10 @@ exclude:
 # is no list of them anywhere to be found. Without it the seventeen error pages
 # are aimed at a December traffic spike we have no way to watch.
 #
-#   Google: search.google.com/search-console -> add property docs.msgwing.com
-#           -> HTML tag -> copy the content="..." value here
+#   Google: verified 2026-08-23 as a domain property (sc-domain:), so no tag is
+#           needed here and the slot stays empty on purpose. Left in place
+#           because a URL-prefix property would need one and the next person
+#           should not have to re-derive that.
 #   Bing:   bing.com/webmasters -> can import directly from Search Console
 verification:
   google: ""
