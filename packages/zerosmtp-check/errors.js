@@ -127,6 +127,33 @@ export const ERRORS = [
     "scope": "client",
     "meaning": "Authentication is required and was not completed, or the authenticated account is not allowed to send as the address in the From field. The reply code 530 is the useful part and Microsoft does document it for this one: 530 is sent before the message body is accepted, so the refusal happened at the envelope rather than over the content.",
     "slug": "530-5-7-1-delivery-not-authorized"
+  },
+  {
+    "code": "5.7.232",
+    "enhanced": "5.7.232",
+    "message": "Trial tenant has exceeded its daily limit for sending email",
+    "kind": "throttled",
+    "scope": "trial tenant",
+    "meaning": "A trial tenant carries a much lower daily ceiling than a paid one, and hitting it during a migration test is common enough to be worth naming: the setup looks broken when it is merely capped. Nothing about the SMTP configuration is wrong. Confirm which tenant the device authenticates against before changing anything, because trial and production tenants are easy to mix up mid-cutover.",
+    "slug": "5-7-232-trial-tenant-daily-sending-limit"
+  },
+  {
+    "code": "5.7.233",
+    "enhanced": "5.7.233",
+    "message": "Tenant exceeded its daily limit for sending email to external recipients",
+    "kind": "throttled",
+    "scope": "tenant",
+    "meaning": "The ceiling here is on external recipients specifically, so internal mail keeps working while everything leaving the organisation stops. That split is the useful diagnostic: if a scanner can still mail colleagues but not customers, this is the reason, and it is not the device.",
+    "slug": "5-7-233-tenant-daily-limit-external-recipients"
+  },
+  {
+    "code": "5.7.236",
+    "enhanced": "5.7.236",
+    "message": "Tenant has exceeded its daily limit for sending email",
+    "kind": "throttled",
+    "scope": "tenant",
+    "meaning": "The tenant-wide ceiling. Most often reached by something automated rather than by people: a monitoring system alerting on every event, a nightly report fanned out to a large list, or a device retrying a failed send in a tight loop. Find the sender before adjusting limits, because a retry loop will exhaust any ceiling you raise.",
+    "slug": "5-7-236-tenant-daily-limit-per-recipient"
   }
 ];
 
