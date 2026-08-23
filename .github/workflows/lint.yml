@@ -80,6 +80,8 @@ jobs:
         run: python tools/build-blast-radius.py --check
       - name: CLI error data matches data/errors.json
         run: python tools/build-cli-errors.py --check
+      - name: README Contents matches its headings
+        run: python tools/build-readme-toc.py --check
       - name: action.yml is publishable to the Marketplace
         run: python tools/check-action.py
       # A workflow file GitHub cannot parse fails at startup with no job and
