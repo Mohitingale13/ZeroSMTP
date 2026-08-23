@@ -70,6 +70,18 @@ defaults:
     values:
       layout: default
       image: /assets/social-preview.png
+  # The generated reference pages. Scoped by directory so a page added by
+  # tools/build-error-pages.py or build-device-table.py inherits the markup
+  # without anybody remembering to list it - the alternative is a per-file
+  # scope that goes stale the first time a generator runs.
+  - scope:
+      path: "errors"
+    values:
+      schema: reference
+  - scope:
+      path: "devices"
+    values:
+      schema: reference
   - scope:
       path: "index.md"
     values:
