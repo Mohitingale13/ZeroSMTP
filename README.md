@@ -70,8 +70,8 @@ from a shared `@msgwing.com` address rather than your own
 | | |
 | --- | --- |
 | **1. Audit your tenant** | [`Find-SmtpAuthExposure.ps1`](Find-SmtpAuthExposure.ps1) — read-only. Reports every mailbox that can still use SMTP AUTH, counting the ones that *inherit* the tenant setting separately, because the usual `-eq $false` one-liner misses those entirely and can report zero on a fully exposed tenant. |
-| **2. Check your hardware** | [Compatibility list](docs/DEVICE-COMPATIBILITY.md) — machine-readable, backed by [`data/devices.json`](data/devices.json). Which models have OAuth firmware, and [which ones the vendor has ruled out](docs/NO-OAUTH-FIRMWARE.md) with a link to every vendor statement. |
-| **3. Keep it sending** | A free SMTP relay that still accepts a username and password, with [21 code examples across 19 languages](#code-examples), [Ansible and Docker Compose recipes](#deployment-recipes), and [printer setup by brand](docs/PRINTERS.md). |
+| **2. Check your hardware** | [Compatibility list](docs/DEVICE-COMPATIBILITY.md) for printers, MFPs, scanners and NAS units — machine-readable, backed by [`data/devices.json`](data/devices.json) and published as data at [docs.msgwing.com/data/devices.json](https://docs.msgwing.com/data/devices.json). Which models have OAuth firmware, and [which ones the vendor has ruled out](docs/NO-OAUTH-FIRMWARE.md), each row linking the vendor's own statement. |
+| **3. Keep it sending** | A free SMTP relay — an outgoing mail gateway that still accepts a username and password — with [21 code examples across 19 languages](#code-examples), [Ansible and Docker Compose recipes](#deployment-recipes), and [scan to email setup by printer brand](docs/PRINTERS.md) for HP, Canon, Ricoh, Xerox, Kyocera, Sharp, Brother and the rest. |
 
 Plus [what every error message actually means](docs/ERROR-MESSAGES.md), and a
 [migration guide](docs/EXCHANGE-ONLINE-SMTP-AUTH.md) that covers Graph API,
