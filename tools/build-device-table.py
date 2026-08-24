@@ -253,6 +253,17 @@ def zbuduj_strone(wpis, aktualizacja):
         ]
 
     czesci += [
+        # Credit by username, on the page rather than only in the git history.
+        # The one page on this site that ranks first for anything - the Canon
+        # certificate case - is also the only one that named who reported it.
+        # That is not a coincidence worth ignoring: a contributor who is named
+        # has a reason to send the link on, and the next person can see that a
+        # real human stood behind the row.
+        *([f"*{wpis['vendor']} entry contributed by "
+           f"[@{wpis['contributor']}](https://github.com/{wpis['contributor']}) "
+           f"in [#{wpis['contributor_pr']}]"
+           f"(https://github.com/msgwing/ZeroSMTP/pull/{wpis['contributor_pr']}).*",
+           ""] if wpis.get("contributor") else []),
         "## Related",
         "",
         # A vendor with a page of its own gets it first. Only where one exists:
