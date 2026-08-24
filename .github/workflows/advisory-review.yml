@@ -59,6 +59,49 @@ jobs:
 
             const entries = data.entries || [];
 
+            // Whether a vendor page still exists is a fact, not a judgement, so
+            // it gets checked rather than listed for somebody to click. The
+            // judgement - did the advisory change in a way that matters - stays
+            // with a person, which is what the note below is about.
+            //
+            // This matters more than it looks. Every row in devices.json is only
+            // worth citing because a vendor page stands behind it. When one of
+            // those pages moves, the row keeps asserting something with nothing
+            // holding it up, and nobody finds out until a reader clicks.
+            // Three outcomes, not two, and the difference is the whole point.
+            //
+            // 404 and 410 are the vendor saying the page is gone: definite, and
+            // the row behind it has lost its evidence. Anything else - a
+            // timeout, a 403, a connection refused - means we could not reach
+            // the page from a data centre, which is not the same thing at all.
+            // Several of these vendors rate-limit or block non-residential
+            // addresses: support.hp.com answered 200 by hand this morning and
+            // refused a connection an hour later from the same machine.
+            //
+            // Flagging those as broken would fill this checklist with alarms
+            // that are not real, and a checklist that cries wolf stops being
+            // read - which costs more than the check was ever worth.
+            const zywe = new Map();
+            const adresy = [...new Set(entries.map(e => e.evidence).filter(Boolean))];
+            for (const url of adresy) {
+              try {
+                const r = await fetch(url, {
+                  redirect: 'follow',
+                  signal: AbortSignal.timeout(20000),
+                  headers: { 'user-agent': 'Mozilla/5.0 (compatible; zerosmtp-advisory-review)' },
+                });
+                zywe.set(url, r.status === 200 ? 'ok'
+                            : (r.status === 404 || r.status === 410) ? `gone (${r.status})`
+                            : `unverified (${r.status})`);
+              } catch (e) {
+                zywe.set(url, 'unverified (no response)');
+              }
+            }
+            const zgine = adresy.filter(u => String(zywe.get(u)).startsWith('gone'));
+            const niepewne = adresy.filter(u => String(zywe.get(u)).startsWith('unverified'));
+            core.info(`evidence: ${adresy.length} links, ${zgine.length} gone, `
+              + `${niepewne.length} unverified from this runner`);
+
             // Group by vendor so a vendor with several product lines is one
             // checklist line, not four.
             const byVendor = new Map();
@@ -73,7 +116,19 @@ jobs:
                 const links = rows
                   .map(r => r.evidence)
                   .filter((url, i, all) => url && all.indexOf(url) === i)
-                  .map(url => `[advisory](${url})`)
+                  .map(url => {
+                    const st = zywe.get(url);
+                    // A link that does not answer 200 is flagged in the line
+                    // itself. Burying it in a summary somewhere means the
+                    // reviewer ticks the box and the row stays broken.
+                    if (st === 'ok') return `[advisory](${url})`;
+                    if (String(st).startsWith('gone')) {
+                      return `[advisory](${url}) **— ${st}, this row has lost its evidence**`;
+                    }
+                    // Said quietly on purpose: it is a note that the check
+                    // could not be taken, not a claim that anything is wrong.
+                    return `[advisory](${url}) *(${st} from CI — check by hand)*`;
+                  })
                   .join(' · ');
                 const statuses = [...new Set(rows.map(r => r.status))].join(', ');
                 return `- [ ] **${vendor}** — currently \`${statuses}\` — ${links}`;
