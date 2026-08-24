@@ -34,6 +34,8 @@ ZeroSMTP is the second option. It is free with no paid tier, accepts plain SMTP 
 
 [Create a free account](https://msgwing.com) · [what to put in the device's SMTP fields](../PRINTERS.md) · [the code examples](../CODE-EXAMPLES.md)
 
+*Lexmark entry contributed by [@Mohitingale13](https://github.com/Mohitingale13) in [#223](https://github.com/msgwing/ZeroSMTP/pull/223).*
+
 ## Related
 
 - [What the error message means](../ERROR-MESSAGES.md) — if the Lexmark device is reporting a code rather than a sentence

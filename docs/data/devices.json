@@ -179,7 +179,9 @@
       "status": "check-advisory",
       "models": [],
       "evidence": "https://support.lexmark.com/content/support/guides/en/kb20211110020010549/setup-installation-and-configuration-issues/how-to-set-up-oauth-2-authentication.html",
-      "notes": "Lexmark documents OAuth 2.0 authentication for printers starting with the FW24 firmware release, including Outlook Live and Microsoft 365. The Email Server flow is configured through the printer's Embedded Web Server and requires OAuth 2.0 registration. Verify the specific device and firmware before assuming support."
+      "notes": "Lexmark documents OAuth 2.0 authentication for printers starting with the FW24 firmware release, including Outlook Live and Microsoft 365. The Email Server flow is configured through the printer's Embedded Web Server and requires OAuth 2.0 registration. Verify the specific device and firmware before assuming support.",
+      "contributor": "Mohitingale13",
+      "contributor_pr": 223
     },
     {
       "vendor": "HP",
@@ -189,7 +191,9 @@
       "evidence": "https://support.hp.com/nz-en/document/ish_13623350-13600809-16",
       "notes": "HP documents OAuth 2.0 support for Microsoft 365 Scan to Email on HP Enterprise and HP Managed printers running FutureSmart firmware 5.7 and newer. However, HP also states that certain LaserJet Pro models, including the M478-M479 and M428-M429f, do not support OAuth 2.0. Verify the exact product family and firmware before assuming Microsoft 365 SMTP AUTH compatibility.",
       "guide": "HP-PRINTER-SMTP.md",
-      "guide_title": "HP printer: \"SMTP server requires authentication\""
+      "guide_title": "HP printer: \"SMTP server requires authentication\"",
+      "contributor": "Mohitingale13",
+      "contributor_pr": 230
     },
     {
       "vendor": "Sharp",
@@ -197,7 +201,9 @@
       "status": "partial",
       "models": [],
       "evidence": "https://global.sharp/restricted/products/copier/downloads/manuals/bp70m65/us/contents_09-07_003.html",
-      "notes": "Sharp documents OAuth 2.0 authentication for Microsoft 365 and Exchange Online SMTP on multiple newer printer and MFP models, including BP-series devices. Sharp does not appear to publish a centralized compatibility list or universal firmware floor for the full printer/MFP range. Verify the exact model's SMTP settings or current manual before assuming OAuth 2.0 support."
+      "notes": "Sharp documents OAuth 2.0 authentication for Microsoft 365 and Exchange Online SMTP on multiple newer printer and MFP models, including BP-series devices. Sharp does not appear to publish a centralized compatibility list or universal firmware floor for the full printer/MFP range. Verify the exact model's SMTP settings or current manual before assuming OAuth 2.0 support.",
+      "contributor": "Mohitingale13",
+      "contributor_pr": 238
     },
     {
       "vendor": "Toshiba",
@@ -205,7 +211,9 @@
       "status": "check-advisory",
       "models": [],
       "evidence": "https://www.toshibatec.com/information/20260113_01.html",
-      "notes": "Toshiba Tec publishes a model-by-model Exchange Online OAuth 2.0 compatibility table for its MFPs, including firmware release information, compatible models, pending firmware updates, and explicitly incompatible models. Verify the exact model and current firmware status against Toshiba's published advisory before assuming Microsoft 365 SMTP AUTH compatibility."
+      "notes": "Toshiba Tec publishes a model-by-model Exchange Online OAuth 2.0 compatibility table for its MFPs, including firmware release information, compatible models, pending firmware updates, and explicitly incompatible models. Verify the exact model and current firmware status against Toshiba's published advisory before assuming Microsoft 365 SMTP AUTH compatibility.",
+      "contributor": "Mohitingale13",
+      "contributor_pr": 245
     },
     {
       "vendor": "Synology",
@@ -213,7 +221,9 @@
       "status": "check-advisory",
       "models": [],
       "evidence": "https://kb.synology.com/en-us/DSM/help/DSM/AdminCenter/system_notification_email?version=7",
-      "notes": "Synology DSM 7 supports Outlook as an email notification service with an interactive Sign In flow rather than manual SMTP credentials. Synology documents OAuth-based authentication for this Outlook integration, but availability and behavior depend on the DSM version. Verify the exact DSM version and current Outlook notification configuration before assuming Microsoft 365 SMTP AUTH OAuth compatibility."
+      "notes": "Synology DSM 7 supports Outlook as an email notification service with an interactive Sign In flow rather than manual SMTP credentials. Synology documents OAuth-based authentication for this Outlook integration, but availability and behavior depend on the DSM version. Verify the exact DSM version and current Outlook notification configuration before assuming Microsoft 365 SMTP AUTH OAuth compatibility.",
+      "contributor": "Mohitingale13",
+      "contributor_pr": 252
     }
   ]
 }

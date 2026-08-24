@@ -34,6 +34,8 @@ ZeroSMTP is the second option. It is free with no paid tier, accepts plain SMTP 
 
 [Create a free account](https://msgwing.com) · [what to put in the device's SMTP fields](../PRINTERS.md) · [the code examples](../CODE-EXAMPLES.md)
 
+*HP entry contributed by [@Mohitingale13](https://github.com/Mohitingale13) in [#230](https://github.com/msgwing/ZeroSMTP/pull/230).*
+
 ## Related
 
 - **[HP printer: "SMTP server requires authentication"](../HP-PRINTER-SMTP.md)** — the detailed guide for HP, including what the error on the panel actually means

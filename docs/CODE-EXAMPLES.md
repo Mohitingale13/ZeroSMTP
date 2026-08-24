@@ -28,6 +28,17 @@ Ready-to-run, production-ready examples for `mx.msgwing.com:465` (SSL/TLS) or
 | Swift | [swift-zerosmtp.swift](https://github.com/msgwing/ZeroSMTP/blob/main/swift-zerosmtp.swift) |
 | PowerShell | [pwsh-zerosmtp.ps1](https://github.com/msgwing/ZeroSMTP/blob/main/pwsh-zerosmtp.ps1) |
 
+> The **Elixir**, **Lua** and **Dart** examples were contributed by
+> [@slegarraga](https://github.com/slegarraga) in
+> [#83](https://github.com/msgwing/ZeroSMTP/pull/83),
+> [#84](https://github.com/msgwing/ZeroSMTP/pull/84) and
+> [#85](https://github.com/msgwing/ZeroSMTP/pull/85). Every example here is run
+> in CI on each change, so a language nobody on this project writes daily stays
+> correct rather than quietly rotting.
+>
+> Missing a language you use? A working example is a genuinely useful
+> contribution and it gets credited here by name.
+
 ## Deployment recipes
 
 Not every migration is a code change — often the SMTP settings live in a
