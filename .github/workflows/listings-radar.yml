@@ -66,6 +66,16 @@ jobs:
               'free developer resources in:name,description',
               'awesome free in:name,description',
               'free plan in:name,description',
+
+              // Katalogi narzedzi wiersza polecen. Do 2026-08-25 radar szukal
+              // wylacznie katalogow darmowych uslug, bo szkic wpisu byl zakodowany
+              // na usluge hostowana. Odkad bramka ksztaltu listy rozstrzyga, ze
+              // w liscie oprogramowania startuje CLI `zerosmtp-check`, te lokale sa
+              // dla nas osiagalne i nie byly przeszukiwane ani razu.
+              'awesome cli in:name,description',
+              'awesome command line in:name,description',
+              'awesome developer tools in:name,description',
+              'awesome devtools in:name,description',
             ];
 
             // A list has to be alive and read. Both numbers are judgement
@@ -252,7 +262,16 @@ jobs:
               const wiersze = readme.match(/^[ \t]*[-*] \[[^\]]+\]\(https?:\/\/.*$/gm) || [];
               const zPlatforma = wiersze.filter(w => PLAT.some(e => w.includes(e))).length;
               const udzial = wiersze.length ? zPlatforma / wiersze.length : 0;
-              const kandydat = udzial > 0.5 ? 'cli' : 'usluga';
+              // Emoji platformy to sygnal wtorny, nie jedyny. Zmierzone na
+              // agarrharr/awesome-cli-apps: 0% wpisow niesie emoji, a to jest
+              // katalog narzedzi wiersza polecen - czyli dokladnie tam, gdzie
+              // startuje `zerosmtp-check`. Pierwsza wersja tej bramki wskazala
+              // tam usluge i myslila sie; sprawdzenie na dwoch lokalach przeszlo,
+              // bo oba mialy emoji albo nie mialy nic. Tozsamosc lokalu jest
+              // mocniejszym dowodem niz sposob, w jaki formatuje wiersze.
+              const NARZEDZIOWE = /\b(cli|command[- ]?line|terminal|devtools|developer tools|shell)\b/i;
+              const nazwaLokalu = (r.name || '') + ' ' + (r.description || '');
+              const kandydat = (udzial > 0.5 || NARZEDZIOWE.test(nazwaLokalu)) ? 'cli' : 'usluga';
 
               // What kind of list is it? Having a mail section is not enough,
               // and this is where the first run went wrong: it queued
@@ -264,11 +283,16 @@ jobs:
               // would have been spent finding that out by hand.
               const scope = (r.description || '') + ' ' + readme.slice(0, 4000);
               const scopeLower = scope.toLowerCase();
-              const disqualifier = [
-                'self-hosted', 'self hosted', 'selfhosted', 'self-hosting',
-                'open source software', 'open-source software',
-                'foss', 'libre software',
-              ].find(w => scopeLower.includes(w));
+              // Rozdzielone, bo te dwie grupy znacza co innego dla naszych dwoch
+              // produktow. Serwer do samodzielnego postawienia nie jest ani usluga
+              // hostowana, ani sprawdzaczem w wierszu polecen - odrzuca oba. Ale
+              // "otwartozrodlowe" odrzuca tylko usluge: `zerosmtp-check` jest na
+              // licencji MIT z linkiem do repozytorium, czyli dokladnie tym, czego
+              // taka lista wymaga.
+              const SAMOHOSTING = ['self-hosted', 'self hosted', 'selfhosted', 'self-hosting'];
+              const TYLKO_OTWARTE = ['open source software', 'open-source software', 'foss', 'libre software'];
+              const disqualifier = SAMOHOSTING.find(w => scopeLower.includes(w))
+                || (kandydat === 'usluga' ? TYLKO_OTWARTE.find(w => scopeLower.includes(w)) : undefined);
               if (disqualifier) {
                 core.info(`${r.full_name}: scoped to ${disqualifier} software - we are a hosted service.`);
                 rejected++;
