@@ -357,6 +357,8 @@ jobs:
       # check: a diagnostic that compiles and lies is worse than none.
       - name: Help text
         run: node packages/zerosmtp-check/index.js --help
+      - name: Run test suite
+        run: node --test packages/zerosmtp-check/test/zerosmtp-check.test.js
       - name: Unresolvable host exits 2
         run: |
           set +e
