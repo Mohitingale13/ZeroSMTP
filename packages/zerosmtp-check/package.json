@@ -8,7 +8,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/zerosmtp-check.test.js"
   },
   "files": [
     "index.js",
