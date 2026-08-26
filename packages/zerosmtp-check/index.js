@@ -377,7 +377,7 @@ const BLIND = [
   },
 ];
 
-function explain(text) {
+export function explain(text) {
   const lower = text.toLowerCase();
   const out = [];
 
@@ -437,7 +437,7 @@ function explain(text) {
     + '  arguments: npx zerosmtp-check';
 }
 
-function explainJson(text) {
+export function explainJson(text) {
   const code = enhancedCode(text);
   const matches = code
     ? narrowByScope(ERRORS.filter(e => e.enhanced === code), text.toLowerCase())

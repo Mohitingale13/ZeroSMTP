@@ -7,6 +7,9 @@
     "zerosmtp-check": "./index.js"
   },
   "main": "./index.js",
+  "scripts": {
+    "test": "node --test test/"
+  },
   "files": [
     "index.js",
     "errors.js",
