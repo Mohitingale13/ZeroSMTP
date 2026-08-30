@@ -17,7 +17,7 @@ OAuth exists for part of the range. The model or version number decides, which m
 
 TrueNAS SCALE supports OAuth for Outlook and Gmail, but standard SMTP requires basic authentication. Some forum users report issues with Microsoft 365 enforcing OAuth while configuring standard SMTP on CORE.
 
-[Read the vendor's statement in full](https://www.truenas.com/docs/scale/scaletutorials/alerts/alertsettingsscale/)  
+[Read the vendor's statement in full](https://www.truenas.com/docs/scale/systemsettings/general/settingupsystememail/)  
 Everything on this page comes from that document. If it and this page disagree, the vendor is right and this page is out of date — [say so](https://github.com/msgwing/ZeroSMTP/issues/new?template=device_report.yml).
 
 ## What to do instead

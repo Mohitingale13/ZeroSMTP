@@ -243,7 +243,7 @@
       "product": "TrueNAS email alerts",
       "status": "partial",
       "models": [],
-      "evidence": "https://www.truenas.com/docs/scale/scaletutorials/alerts/alertsettingsscale/",
+      "evidence": "https://www.truenas.com/docs/scale/systemsettings/general/settingupsystememail/",
       "notes": "TrueNAS SCALE supports OAuth for Outlook and Gmail, but standard SMTP requires basic authentication. Some forum users report issues with Microsoft 365 enforcing OAuth while configuring standard SMTP on CORE."
     }
   ]
