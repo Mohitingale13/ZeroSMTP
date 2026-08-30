@@ -662,6 +662,7 @@ answer.
 | **[HP](devices/hp-printers-and-mfps.md)** printers and MFPs | Some models or versions | — | [advisory](https://support.hp.com/nz-en/document/ish_13623350-13600809-16) |
 | **[Microsoft](devices/microsoft-dynamics-nav-business-central.md)** Dynamics NAV / Business Central | Some models or versions | — | [advisory](https://www.innovia.com/blog/microsoft-to-retire-basic-auth-smtp-for-exchange-online-what-bc-nav-users-need-to-know) |
 | **[Sharp](devices/sharp-printers-and-mfps.md)** printers and MFPs | Some models or versions | — | [advisory](https://global.sharp/restricted/products/copier/downloads/manuals/bp70m65/us/contents_09-07_003.html) |
+| **[TrueNAS](devices/truenas-truenas-email-alerts.md)** TrueNAS email alerts | Some models or versions | — | [advisory](https://www.truenas.com/docs/scale/systemsettings/general/settingupsystememail/) |
 | **[Veeam](devices/veeam-backup-for-microsoft-365-and-related-products.md)** Backup for Microsoft 365 and related products | Some models or versions | — | [advisory](https://helpcenter.veeam.com/docs/vbo365/guide/smtp_server.html) |
 | **[Xerox](devices/xerox-connectkey-printers-and-mfps.md)** ConnectKey printers and MFPs | Some models or versions | `VersaLink B415`, `VersaLink C415`, `VersaLink B620`, `VersaLink C620`, `VersaLink B625`, `VersaLink C625`, `AltaLink`, `PrimeLink` | [advisory](https://www.xerox.com/en-us/office/insights/exchange-online-authentication) |
 | **[Brother](devices/brother-printers-mfps-and-document-scanners.md)** printers, MFPs and document scanners | Check vendor advisory | — | [advisory](https://support.brother.com/g/b/oscontents.aspx?c=us&lang=en&ossid=42) |
@@ -697,6 +698,9 @@ Newer Business Central handles modern auth. Older on-prem NAV installs generally
 
 **Sharp — printers and MFPs**  
 Sharp documents OAuth 2.0 authentication for Microsoft 365 and Exchange Online SMTP on multiple newer printer and MFP models, including BP-series devices. Sharp does not appear to publish a centralized compatibility list or universal firmware floor for the full printer/MFP range. Verify the exact model's SMTP settings or current manual before assuming OAuth 2.0 support.
+
+**TrueNAS — TrueNAS email alerts**  
+TrueNAS SCALE supports OAuth for Outlook and Gmail, but standard SMTP requires basic authentication. Some forum users report issues with Microsoft 365 enforcing OAuth while configuring standard SMTP on CORE.
 
 **Veeam — Backup for Microsoft 365 and related products**  
 Corrected 2026-08-16 - the previous note claimed newer versions added OAuth for SMTP, which the linked page does not support. The v8 documentation offers "SMTP server (basic authentication)" and does not describe an OAuth option for SMTP notifications; modern app-only authentication appears elsewhere in the product, for Entra applications, not here. So the fix is not "upgrade and SMTP gets OAuth" - check whether your build offers a notification method that is not SMTP at all, and treat the SMTP path as basic-auth only.
@@ -743,7 +747,7 @@ Microsoft's own product. Enable modern auth on the resource account - no relay n
 **Sophos — Sophos Firewall (email alerts and reports)**  
 Sophos publishes an official guide 'Configure OAuth 2.0 on Microsoft 365' for Sophos Firewall 22.0: register the firewall as an app in Microsoft Entra, add delegated SMTP.Send + offline_access permissions, turn on Authenticated SMTP for the sending user, and configure notifications with client ID / secret / refresh token. Confirms Modern (OAuth 2.0) SMTP AUTH support; availability depends on the firewall version.
 
-*21 entries, last reviewed 2026-08-27.*
+*22 entries, last reviewed 2026-08-27.*
 
 ## What this list is not
 
