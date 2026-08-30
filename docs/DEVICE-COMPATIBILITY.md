@@ -40,6 +40,7 @@ answer.
 | **[TrueNAS](devices/truenas-truenas-email-alerts.md)** TrueNAS email alerts | Some models or versions | — | [advisory](https://www.truenas.com/docs/scale/systemsettings/general/settingupsystememail/) |
 | **[Veeam](devices/veeam-backup-for-microsoft-365-and-related-products.md)** Backup for Microsoft 365 and related products | Some models or versions | — | [advisory](https://helpcenter.veeam.com/docs/vbo365/guide/smtp_server.html) |
 | **[Xerox](devices/xerox-connectkey-printers-and-mfps.md)** ConnectKey printers and MFPs | Some models or versions | `VersaLink B415`, `VersaLink C415`, `VersaLink B620`, `VersaLink C620`, `VersaLink B625`, `VersaLink C625`, `AltaLink`, `PrimeLink` | [advisory](https://www.xerox.com/en-us/office/insights/exchange-online-authentication) |
+| **[Zabbix](devices/zabbix-email-notifications.md)** email notifications | Some models or versions | — | [advisory](https://www.zabbix.com/documentation/7.4/en/manual/introduction/whatsnew) |
 | **[Brother](devices/brother-printers-mfps-and-document-scanners.md)** printers, MFPs and document scanners | Check vendor advisory | — | [advisory](https://support.brother.com/g/b/oscontents.aspx?c=us&lang=en&ossid=42) |
 | **[Cerberus](devices/cerberus-ftp-server.md)** FTP Server | Check vendor advisory | — | [advisory](https://support.cerberusftp.com/hc/en-us/articles/24103821642643-Troubleshooting-SMTP-Setup-Error-on-Office365-com-Resolving-EHLO-Message-Failure-535-5-7-139-Authentication-Unsuccessful-Basic-Authentication-Disabled) |
 | **[Cisco](devices/cisco-unity-connection.md)** Unity Connection | Check vendor advisory | — | [advisory](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online) |
@@ -83,6 +84,9 @@ Corrected 2026-08-16 - the previous note claimed newer versions added OAuth for 
 **Xerox — ConnectKey printers and MFPs**  
 Device Code Flow is supported broadly; Client Credentials Flow only on the ConnectKey models listed. Devices not on Xerox's supported-firmware list are the problem cases and are not promised an update. Affects Scan to Email, Internet Fax (Send), Fax Forward to Email and Auto Email Notifications.
 
+**Zabbix — email notifications**  
+Zabbix 7.4 introduced OAuth 2.0 authentication for SMTP, including automated OAuth configuration for Office365 and Gmail. Verify the Zabbix version and Office365 SmtpClientAuthentication configuration before assuming Microsoft 365 SMTP AUTH compatibility.
+
 **Brother — printers, MFPs and document scanners**  
 Brother publishes a per-model Product Support List and states plainly that a machine not on it does not support OAuth 2.0, with no firmware promised - the vendor's own guidance for those owners is to use a different mail service. Listed models split into two tiers: OAuth already present, or present after a firmware update that is already downloadable. Affects Scan to Email Server, Internet Fax, Email Reports and Email Notifications. Check the exact model: support is firmware-dependent as well as model-dependent.
 
@@ -122,7 +126,7 @@ Microsoft's own product. Enable modern auth on the resource account - no relay n
 **Sophos — Sophos Firewall (email alerts and reports)**  
 Sophos publishes an official guide 'Configure OAuth 2.0 on Microsoft 365' for Sophos Firewall 22.0: register the firewall as an app in Microsoft Entra, add delegated SMTP.Send + offline_access permissions, turn on Authenticated SMTP for the sending user, and configure notifications with client ID / secret / refresh token. Confirms Modern (OAuth 2.0) SMTP AUTH support; availability depends on the firewall version.
 
-*22 entries, last reviewed 2026-08-27.*
+*23 entries, last reviewed 2026-08-27.*
 
 <!-- END GENERATED TABLE -->
 
