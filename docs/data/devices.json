@@ -237,6 +237,14 @@
       "notes": "Sophos publishes an official guide 'Configure OAuth 2.0 on Microsoft 365' for Sophos Firewall 22.0: register the firewall as an app in Microsoft Entra, add delegated SMTP.Send + offline_access permissions, turn on Authenticated SMTP for the sending user, and configure notifications with client ID / secret / refresh token. Confirms Modern (OAuth 2.0) SMTP AUTH support; availability depends on the firewall version.",
       "contributor": "TrueFurina",
       "contributor_pr": 310
+    },
+    {
+      "vendor": "TrueNAS",
+      "product": "TrueNAS email alerts",
+      "status": "partial",
+      "models": [],
+      "evidence": "https://www.truenas.com/docs/scale/scaletutorials/alerts/alertsettingsscale/",
+      "notes": "TrueNAS SCALE supports OAuth for Outlook and Gmail, but standard SMTP requires basic authentication. Some forum users report issues with Microsoft 365 enforcing OAuth while configuring standard SMTP on CORE."
     }
   ]
 }
